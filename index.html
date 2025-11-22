@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Image Resizer & Compressor | Free Tool</title>
+
+  <!-- Primary Meta -->
+  <meta name="description" content="Resize, compress, crop, and convert images online — free, fast, and secure. All processing happens in your browser with no uploads." />
+  <meta name="keywords" content="image resizer, compress image, resize image online, crop image online, jpg to webp, online image tools" />
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content="Online Image Resizer & Compressor" />
+  <meta property="og:description" content="Resize, compress, crop, and convert images online. 100% private and browser-based." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/logo.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Image Resizer & Compressor Online">
+  <meta name="twitter:description" content="Resize, compress and convert images instantly — no upload required." />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Image Resizer & Compressor",
+    "description": "Resize, compress, crop, and convert images online with full privacy. Everything runs in your browser.",
+    "url": "https://yourdomain.com",
+    "applicationCategory": "ImageEditing",
+    "operatingSystem": "All",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="head">
+    <img src="assets/logo.png" class="logo" alt="Logo">
+    <h1>Online Image Resizer & Compressor</h1>
+    <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
+  </header>
+
+  <!-- MAIN TOOL WRAPPER -->
+  <div class="tool-container">
+
+    <!-- UPLOAD AREA -->
+    <div id="drop-area" class="drop-area">
+      <h2>Drop Images Here</h2>
+      <p>or click to upload</p>
+      <input type="file" id="fileInput" multiple accept="image/*" hidden />
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div class="settings">
+      <h3>Resize Options</h3>
+
+      <label>Resize Type</label>
+      <select id="resizeType">
+        <option value="px">By Pixels</option>
+        <option value="percent">By Percent</option>
+        <option value="longest">Longest Side</option>
+      </select>
+
+      <label>Width</label>
+      <input type="number" id="widthInput" placeholder="Auto">
+
+      <label>Height</label>
+      <input type="number" id="heightInput" placeholder="Auto">
+
+      <label>Keep Aspect Ratio</label>
+      <input type="checkbox" id="keepRatio" checked />
+
+      <h3>Compression</h3>
+      <label>Quality (<span id="qualityVal">80%</span>)</label>
+      <input type="range" id="qualitySlider" min="10" max="100" value="80" />
+
+      <h3>Format</h3>
+      <select id="formatSelect">
+        <option value="image/jpeg">JPEG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WebP</option>
+      </select>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-section">
+      <h3>Preview</h3>
+      <img id="previewImg" class="preview-img" alt="Preview will appear here" />
+      <p id="previewInfo"></p>
+    </div>
+
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="actions">
+    <button id="processBtn" class="btn">Process Image</button>
+    <button id="downloadBtn" class="btn disabled" disabled>Download</button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© <span id="year"></span> Image Resizer — All Rights Reserved</p>
+  </footer>
+
+  <!-- SCRIPT FILES -->
+  <script src="utils.js"></script>
+  <script src="cropper.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
