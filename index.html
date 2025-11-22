@@ -27,7 +27,7 @@
     "@type": "WebApplication",
     "name": "Image Resizer & Compressor",
     "description": "Resize, compress, crop, and convert images online with full privacy. Everything runs in your browser.",
-    "url": "https://yourdomain.com",
+    "url": "https://your-domain.com",
     "applicationCategory": "ImageEditing",
     "operatingSystem": "All",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -109,10 +109,18 @@
     <p>© <span id="year"></span> Image Resizer — All Rights Reserved</p>
   </footer>
 
-  <!-- SCRIPT FILES -->
-  <script src="utils.js"></script>
-  <script src="cropper.js"></script>
-  <script src="app.js"></script>
+  <!-- SCRIPT FILES - ES MODULES -->
+  <script type="module">
+
+    /* Load ES modules cleanly */
+    import "./utils.js";
+    import "./cropper.js";
+    import "./app.js";
+
+    /* Insert current year */
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+  </script>
 
 </body>
 </html>
