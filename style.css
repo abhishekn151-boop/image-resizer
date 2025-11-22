@@ -1,0 +1,197 @@
+/* -------- GLOBAL RESET -------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  background: #0e1625;
+  font-family: "Inter", system-ui, sans-serif;
+  color: #f2f5fa;
+  min-height: 100%;
+}
+
+/* -------- HEADER -------- */
+.head {
+  text-align: center;
+  padding: 40px 10px 20px;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 10px;
+}
+
+.tagline {
+  color: #b6bdc9;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* -------- TOOL LAYOUT -------- */
+.tool-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 280px 1fr;
+  gap: 25px;
+}
+
+@media (max-width: 900px) {
+  .tool-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------- UPLOAD / DRAG AREA -------- */
+.drop-area {
+  border: 2px dashed #3a4459;
+  background: #111a2e;
+  padding: 40px 15px;
+  text-align: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.drop-area:hover {
+  background: #16223b;
+  border-color: #4ad2ff;
+}
+
+.drop-area h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.drop-area p {
+  color: #a3abba;
+  font-size: 14px;
+}
+
+/* -------- SETTINGS PANEL -------- */
+.settings {
+  background: #131d32;
+  padding: 20px;
+  border-radius: 10px;
+  height: fit-content;
+  border: 1px solid #1d2944;
+}
+
+.settings h3 {
+  margin-bottom: 12px;
+  color: #7fc6ff;
+}
+
+.settings label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #c2c8d6;
+}
+
+.settings input,
+.settings select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #2b3b5a;
+  background: #0f1829;
+  color: #e8ecf4;
+  font-size: 14px;
+}
+
+.settings input:focus,
+.settings select:focus {
+  outline: none;
+  border-color: #4ad2ff;
+}
+
+/* -------- PREVIEW SECTION -------- */
+.preview-section {
+  background: #111a2e;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #1d2944;
+  text-align: center;
+}
+
+.preview-section h3 {
+  margin-bottom: 15px;
+  color: #7fc6ff;
+}
+
+.preview-img {
+  max-width: 100%;
+  max-height: 350px;
+  border-radius: 10px;
+  border: 1px solid #1e2c47;
+  display: block;
+  margin: auto;
+}
+
+#previewInfo {
+  margin-top: 12px;
+  color: #a3abba;
+  font-size: 14px;
+}
+
+/* -------- BUTTONS -------- */
+.actions {
+  text-align: center;
+  margin: 25px 0;
+}
+
+.btn {
+  padding: 12px 25px;
+  margin: 0 10px;
+  background: #1f2a44;
+  color: #d7e3ff;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #324364;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background: #273556;
+}
+
+.btn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* -------- FOOTER -------- */
+footer {
+  text-align: center;
+  padding: 25px 10px;
+  font-size: 13px;
+  color: #8f9ab2;
+}
+
+/* -------- DRAG ACTIVE -------- */
+.drop-area.active {
+  border-color: #00c3ff;
+  background: #102742;
+}
+
+/* -------- SCROLLBAR -------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+::-webkit-scrollbar-thumb {
+  background: #23324d;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2f4368;
+}
