@@ -287,3 +287,46 @@ footer {
   margin-bottom: 6px;
 }
 
+/* -------- TOP NAVIGATION BAR -------- */
+.top-nav {
+  width: 100%;
+  background: #0d1524;
+  border-bottom: 1px solid #1d2944;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.nav-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #dce7f7;
+}
+
+.nav-links a {
+  color: #a9c4e2;
+  margin-left: 18px;
+  text-decoration: none;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.nav-links a:hover {
+  color: #7fc6ff;
+}
