@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Contact — Free Image Resizer</title>
-  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
-  <meta name="description" content="Contact Free Image Resizer — feedback, suggestions or support." />
+
+  <title>Contact Us — Free Image Resizer</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <!-- SEO -->
+  <meta name="description"
+    content="Contact Free Image Resizer — Send us suggestions, feature requests, or feedback. We’re here to help." />
   <link rel="canonical" href="https://your-domain.com/contact.html" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
+<!-- NAVBAR -->
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
     <span class="nav-title">Free Image Resizer</span>
   </div>
 
@@ -33,29 +43,53 @@
   <h1>Contact Us</h1>
 </header>
 
-<section class="seo-section">
+<section class="seo-section" style="text-align: justify;">
+
   <h2>We’re Here to Help</h2>
-  <p>If you have questions or feedback, use the form below or email us at <strong>your-email@example.com</strong>.</p>
+  <p>
+    Have a question, suggestion, or need assistance?  
+    We value user feedback and would love to hear from you.  
+    Whether it’s a feature request, bug report, or business inquiry, feel free to reach out.
+  </p>
+
+  <p>
+    You can contact us using the form below, or directly email us at:
+    <br>
+    <strong style="color:#7fc6ff;">your-email@example.com</strong>
+  </p>
+
+  <h3 style="margin-top: 25px;">Contact Form</h3>
 
   <form class="contact-form">
     <div class="form-group">
       <label for="name">Your Name</label>
-      <input id="name" type="text" placeholder="Enter your name" required>
+      <input id="name" type="text" placeholder="Enter your name" required />
     </div>
+
     <div class="form-group">
       <label for="email">Your Email</label>
-      <input id="email" type="email" placeholder="Enter your email" required>
+      <input id="email" type="email" placeholder="Enter your email" required />
     </div>
+
     <div class="form-group">
       <label for="message">Your Message</label>
       <textarea id="message" placeholder="Write your message here..." required></textarea>
     </div>
+
     <button type="submit" class="send-btn">Send Message</button>
   </form>
 
-  <p style="margin-top:14px; color:#a8b9d4; font-size:14px;">* This form is static by default. I can integrate a no-backend email provider (EmailJS, FormSubmit) if you want submissions delivered to your inbox.</p>
+  <p style="margin-top:14px; color:#a8b9d4; font-size:14px;">
+    * This form is static by default.  
+    If you want **real email delivery**, I can integrate:
+    <strong>EmailJS</strong> (no backend),  
+    <strong>FormSubmit</strong>,  
+    or **your own SMTP server**.
+  </p>
+
 </section>
 
+<!-- FOOTER -->
 <footer>
   <p>
     © <span id="year"></span> Free Image Resizer — All Rights Reserved |
@@ -68,17 +102,23 @@
   </p>
 </footer>
 
+<!-- SCRIPTS -->
 <script type="module">
+
+  // Current Year
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Mobile Menu Toggle
   document.getElementById("hamburger").addEventListener("click", () => {
     document.getElementById("mobileMenu").classList.toggle("active");
   });
 
-  // contact form placeholder behaviour
+  // Contact Form (Static Feedback)
   document.querySelector('.contact-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    alert('Thank you — message received (not actually sent). I can integrate EmailJS/FormSubmit to deliver messages to your inbox.');
+    alert('Thank you! Your message has been received.\n(This form is static — I can activate real email sending if you want.)');
   });
+
 </script>
 
 </body>
