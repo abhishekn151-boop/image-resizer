@@ -319,16 +319,23 @@ footer {
   color: #dce7f7;
 }
 
+/* ----- Vertical Separators Between Links ----- */
 .nav-links a {
   color: #a9c4e2;
-  margin-left: 18px;
+  margin: 0 12px;
   text-decoration: none;
   font-size: 16px;
-  transition: 0.2s;
+  position: relative;
 }
 
 .nav-links a:hover {
   color: #7fc6ff;
+}
+
+.nav-links a:not(:last-child)::after {
+  content: "|";
+  color: #3c4e6e;
+  margin-left: 12px;
 }
 
 /* -------- CONTACT FORM -------- */
