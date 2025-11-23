@@ -429,3 +429,45 @@ footer {
   color: #c9d7ea;
   line-height: 1.6;
 }
+/* -------- MOBILE NAVIGATION -------- */
+.hamburger {
+  display: none;
+  font-size: 26px;
+  color: #dce7f7;
+  cursor: pointer;
+}
+
+@media (max-width: 850px) {
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 58px;
+    right: 0;
+    background: #0d1524;
+    width: 100%;
+    padding: 15px 0;
+    border-top: 1px solid #1d2944;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 12px 0;
+    font-size: 18px;
+  }
+
+  .nav-links a:not(:last-child)::after {
+    display: none; /* remove separators on mobile */
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
+
+/* Show menu when active */
+.nav-links.active {
+  display: flex !important;
+}
