@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Privacy Policy — Free Image Resizer</title>
-  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
-  <meta name="description" content="Privacy Policy — Free Image Resizer. We do not upload or store your images." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <!-- SEO -->
+  <meta name="description"
+    content="Privacy Policy — Free Image Resizer. Your images never leave your device. No uploads, no tracking, no data collection." />
   <link rel="canonical" href="https://your-domain.com/privacy.html" />
-  <meta property="og:image" content="/mnt/data/logo.png" />
+  <meta property="og:image" content="assets/logo.png" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
+<!-- NAVBAR -->
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
     <span class="nav-title">Free Image Resizer</span>
   </div>
 
@@ -30,27 +40,86 @@
   </div>
 </nav>
 
+<!-- HEADER -->
 <header class="head">
   <h1>Privacy Policy</h1>
 </header>
 
-<section class="seo-section">
+<!-- CONTENT -->
+<section class="seo-section" style="text-align: justify;">
+  
   <h2>Privacy Policy</h2>
   <p><strong>Last Updated: January 2025</strong></p>
 
-  <p>Free Image Resizer processes images locally in your browser. We do not upload or store your images on any server.</p>
+  <p>
+    At <strong>Free Image Resizer</strong>, your privacy is our top priority.  
+    This tool is designed to process all images directly within your browser.
+    This means <strong>your images never leave your device</strong>, are not uploaded to any server, and are never stored, logged, or shared.
+  </p>
 
   <h3>Information We Do Not Collect</h3>
+  <p>We firmly believe that privacy is a right. Therefore, we do <strong>not</strong> collect:</p>
+  
   <ul>
-    <li>Uploaded images</li>
-    <li>Personal data</li>
-    <li>Tracking data</li>
+    <li>Your uploaded images or output images</li>
+    <li>Personal information such as your name, email, address, or contact details</li>
+    <li>Tracking information such as browsing history or location</li>
+    <li>Device identifiers, metadata, or analytics tied to your identity</li>
   </ul>
 
+  <h3>How Image Processing Works</h3>
+  <p>
+    All image resizing, compression, conversion, and rendering operations happen locally inside your web browser using modern
+    HTML5 and JavaScript APIs. Your files <strong>never reach any external server</strong> controlled by us or third parties.
+  </p>
+
+  <h3>Cookies and Tracking Technologies</h3>
+  <p>
+    We do not use cookies, trackers, pixels, or behavioural analytics.  
+    Some hosting providers may collect basic anonymized statistics (such as page views),
+    but these are not linked to you or your images.
+  </p>
+
   <h3>Third-Party Services</h3>
-  <p>We may use hosting and analytics providers; these do not access or store images.</p>
+  <p>
+    Although the tool itself does not send data anywhere, our hosting provider may collect general, non-identifiable server logs.
+    These logs never include images or personal user data.
+  </p>
+
+  <h3>Children’s Privacy</h3>
+  <p>
+    Free Image Resizer is safe for users of all ages.  
+    Because we do not collect personal data, the tool is naturally compliant with COPPA and other child-safety regulations.
+  </p>
+
+  <h3>Data Security</h3>
+  <p>
+    Since no images or personal data are uploaded or stored,
+    the risk of data theft or breaches is effectively eliminated.  
+    All processing happens within the secure environment of your own device.
+  </p>
+
+  <h3>Your Rights</h3>
+  <p>
+    Because we do not store any user information, there is no data to view, modify, delete, or export.
+    You remain in full control of your images at all times.
+  </p>
+
+  <h3>Changes to This Policy</h3>
+  <p>
+    We may update this Privacy Policy occasionally if we introduce new features.
+    Any changes will be clearly mentioned with a revised date.
+  </p>
+
+  <h3>Contact Us</h3>
+  <p>
+    If you have any questions about privacy or how your images are processed,
+    feel free to reach out through our <a href="contact.html" style="color:#7fc6ff;">Contact Page</a>.
+  </p>
+
 </section>
 
+<!-- FOOTER -->
 <footer>
   <p>
     © <span id="year"></span> Free Image Resizer — All Rights Reserved |
@@ -63,8 +132,11 @@
   </p>
 </footer>
 
+<!-- SCRIPTS -->
 <script type="module">
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Mobile menu
   document.getElementById("hamburger").addEventListener("click", () => {
     document.getElementById("mobileMenu").classList.toggle("active");
   });
