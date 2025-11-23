@@ -8,7 +8,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <!-- OpenGraph Image -->
+  <!-- OpenGraph -->
   <meta property="og:image" content="assets/logo.png" />
 
   <!-- Primary meta -->
@@ -16,15 +16,7 @@
   <meta name="keywords" content="free image resizer, resize image online, compress image, crop image, convert to webp" />
   <link rel="canonical" href="https://your-domain.com/index.html" />
 
-  <!-- OpenGraph / Twitter -->
-  <meta property="og:title" content="Free Image Resizer" />
-  <meta property="og:description" content="Resize, compress, crop and convert images in your browser. No uploads — everything runs locally." />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Free Image Resizer" />
-  <meta name="twitter:description" content="Resize, compress, crop and convert images in your browser. No uploads — everything runs locally." />
-
-  <!-- Software JSON-LD -->
+  <!-- JSON-LD: Software -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org/",
@@ -38,7 +30,7 @@
   }
   </script>
 
-  <!-- FAQ Schema for main page -->
+  <!-- JSON-LD: FAQ -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -47,12 +39,13 @@
       {"@type":"Question","name":"Is this tool really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. The tool is 100% free with no hidden limits or sign-ups required."}},
       {"@type":"Question","name":"Are my images uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. All image processing happens inside your browser. Files never leave your device."}},
       {"@type":"Question","name":"Will compressing reduce image quality?","acceptedAnswer":{"@type":"Answer","text":"Compression quality can be adjusted. Higher quality means larger size; lower quality reduces size."}},
-      {"@type":"Question","name":"Which image formats does this tool support?","acceptedAnswer":{"@type":"Answer","text":"The tool supports JPG, PNG, BMP, WEBP, and more formats will be added soon."}},
-      {"@type":"Question","name":"Does this tool work on mobile phones?","acceptedAnswer":{"@type":"Answer","text":"Yes. The tool works on all devices including Android, iOS, tablets and desktop."}}
+      {"@type":"Question","name":"Which image formats does this tool support?","acceptedAnswer":{"@type":"Answer","text":"Supports JPG, PNG, BMP, WEBP."}},
+      {"@type":"Question","name":"Does this tool work on mobile phones?","acceptedAnswer":{"@type":"Answer","text":"Yes, the tool works on all devices including Android, iOS, tablets and desktops."}}
     ]
   }
   </script>
 
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -60,7 +53,7 @@
 <!-- NAVBAR -->
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+    <img src="assets/logo.png" class="nav-logo" alt="logo">
     <span class="nav-title">Free Image Resizer</span>
   </div>
 
@@ -83,77 +76,88 @@
   <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
 </header>
 
-<!-- TOOL -->
-<!-- NEW MODERN TOOL LAYOUT -->
-<div class="modern-wrapper">
+<!-- MODERN TOOL LAYOUT -->
+<div class="modern-layout">
 
-  <!-- LEFT TOOL TABS -->
-  <aside class="side-tabs">
-    <button class="tab-btn active" data-panel="resize">Resize</button>
-    <button class="tab-btn" data-panel="compress">Compress</button>
-    <button class="tab-btn" data-panel="crop">Crop</button>
-    <button class="tab-btn" data-panel="rotate">Rotate</button>
-  </aside>
+  <!-- LEFT SIDE TOOLS MENU -->
+  <div class="tool-menu">
+    <button class="tool-tab active" data-tab="resize">Resize</button>
+    <button class="tool-tab" data-tab="compress">Compress</button>
+    <button class="tool-tab" data-tab="crop">Crop</button>
+    <button class="tool-tab" data-tab="rotate">Rotate</button>
+  </div>
 
-  <!-- RIGHT WORK AREA -->
-  <section class="work-area">
+  <!-- RIGHT SIDE WORK AREA -->
+  <div class="work-area">
 
-    <!-- SETTINGS PANELS -->
-    <div class="settings-panel" id="panel-resize">
-      <h3>Resize Options</h3>
-
-      <label>Resize Type</label>
-      <select id="resizeType">
-        <option value="px">By Pixels</option>
-        <option value="percent">By Percent</option>
-        <option value="longest">Longest Side</option>
-      </select>
-
-      <label>Width</label>
-      <input type="number" id="widthInput" placeholder="Auto">
-
-      <label>Height</label>
-      <input type="number" id="heightInput" placeholder="Auto">
-
-      <label class="inline">
-        <input type="checkbox" id="keepRatio" checked />
-        Keep Aspect Ratio
-      </label>
-    </div>
-
-    <div class="settings-panel hidden" id="panel-compress">
-      <h3>Compression</h3>
-      <label>Quality (<span id="qualityVal">80%</span>)</label>
-      <input type="range" id="qualitySlider" min="10" max="100" value="80" />
-    </div>
-
-    <div class="settings-panel hidden" id="panel-crop">
-      <h3>Crop</h3>
-      <p>Crop mode starts automatically when enabled.</p>
-    </div>
-
-    <div class="settings-panel hidden" id="panel-rotate">
-      <h3>Rotate</h3>
-      <button id="rotateLeft" class="mini-btn">⟲ Rotate Left</button>
-      <button id="rotateRight" class="mini-btn">⟳ Rotate Right</button>
-    </div>
-
-    <!-- FILE SECTION + PREVIEW -->
-    <div class="preview-box">
+    <!-- Upload + Preview -->
+    <div class="file-preview-area">
       <div id="drop-area" class="drop-area">
         <h2>Drop Images Here</h2>
         <p>or click to upload</p>
-        <input type="file" id="fileInput" hidden accept="image/*" />
-        <img id="previewImg" class="preview-img" alt="Preview will appear here" />
+        <input type="file" id="fileInput" multiple accept="image/*" hidden />
+      </div>
+
+      <div class="preview-section">
+        <h3>Preview</h3>
+        <img id="previewImg" class="preview-img" alt="Preview will appear here">
         <p id="previewInfo"></p>
       </div>
     </div>
 
-  </section>
+    <!-- TOOL SETTINGS -->
+    <div class="tool-settings">
+
+      <!-- Resize -->
+      <div class="settings-panel active" id="panel-resize">
+        <h3>Resize Options</h3>
+        <label>Resize Type</label>
+        <select id="resizeType">
+          <option value="px">By Pixels</option>
+          <option value="percent">By Percent</option>
+          <option value="longest">Longest Side</option>
+        </select>
+
+        <label>Width</label>
+        <input type="number" id="widthInput" placeholder="Auto">
+
+        <label>Height</label>
+        <input type="number" id="heightInput" placeholder="Auto">
+
+        <label><input type="checkbox" id="keepRatio" checked> Keep Aspect Ratio</label>
+      </div>
+
+      <!-- Compress -->
+      <div class="settings-panel" id="panel-compress">
+        <h3>Compression</h3>
+        <label>Quality (<span id="qualityVal">80%</span>)</label>
+        <input type="range" id="qualitySlider" min="10" max="100" value="80">
+      </div>
+
+      <!-- Crop -->
+      <div class="settings-panel" id="panel-crop">
+        <h3>Crop Tool</h3>
+        <p>Use mouse/gesture crop inside preview (auto-enabled).</p>
+      </div>
+
+      <!-- Rotate -->
+      <div class="settings-panel" id="panel-rotate">
+        <h3>Rotate</h3>
+        <select id="rotateSelect">
+          <option value="0">No Rotation</option>
+          <option value="90">Rotate 90°</option>
+          <option value="180">Rotate 180°</option>
+          <option value="270">Rotate 270°</option>
+        </select>
+      </div>
+
+    </div>
+
+  </div>
 </div>
 
-<!-- BOTTOM BUTTONS -->
-<div class="action-row">
+<!-- ACTION BUTTONS -->
+<div class="actions">
   <button id="processBtn" class="btn">Process</button>
   <button id="downloadBtn" class="btn disabled" disabled>Download</button>
 </div>
@@ -167,42 +171,19 @@
 <!-- SEO CONTENT -->
 <section class="seo-section">
   <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
-  <p>
-    Our online image resizer and compressor allows you to quickly reduce image size,
+  <p>Our online image resizer allows you to quickly reduce image size,
     adjust dimensions, crop photos, and convert formats — all directly in your browser.
-    No uploads, no servers, no data collection. Everything stays on your device.
-  </p>
-
-  <h3>Why Resize Images?</h3>
-  <p>
-    Resizing images helps reduce page load time, improve SEO, save storage,
-    and optimize for social media.
-  </p>
-
-  <h3>Supported Image Formats</h3>
-  <ul>
-    <li>JPEG / JPG</li>
-    <li>PNG</li>
-    <li>WEBP</li>
-    <li>BMP</li>
-  </ul>
+    No uploads, no servers, no data collection. Everything stays on your device.</p>
 
   <h3>Key Features</h3>
   <ul>
-    <li>Resize by pixels, percent, or longest side</li>
+    <li>Resize by pixels, percentage, or longest side</li>
     <li>Compress images with adjustable quality</li>
-    <li>Crop with drag-and-drop precision</li>
+    <li>Crop with draggable precision</li>
+    <li>Rotate images</li>
     <li>Convert between JPG, PNG, and WebP</li>
     <li>100% offline and private</li>
   </ul>
-
-  <h3>How to Use the Image Resizer</h3>
-  <ol>
-    <li>Upload or drag your image.</li>
-    <li>Select resize type.</li>
-    <li>Set format and quality.</li>
-    <li>Process and download.</li>
-  </ol>
 </section>
 
 <!-- FOOTER -->
@@ -218,7 +199,7 @@
   </p>
 </footer>
 
-<!-- MOBILE MENU -->
+<!-- MOBILE MENU TOGGLE -->
 <script>
 document.getElementById("year").textContent = new Date().getFullYear();
 document.getElementById("hamburger").addEventListener("click", () => {
@@ -226,11 +207,23 @@ document.getElementById("hamburger").addEventListener("click", () => {
 });
 </script>
 
-<!-- Load App Scripts -->
+<!-- APP LOGIC -->
 <script type="module">
   import "./utils.js";
   import "./cropper.js";
   import "./app.js";
+
+  // Tab switching
+  document.querySelectorAll(".tool-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tool-tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+
+      const target = btn.dataset.tab;
+      document.querySelectorAll(".settings-panel").forEach(p => p.classList.remove("active"));
+      document.getElementById("panel-" + target).classList.add("active");
+    });
+  });
 </script>
 
 </body>
