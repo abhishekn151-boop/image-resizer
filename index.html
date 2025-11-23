@@ -47,6 +47,57 @@
   }
   </script>
 
+  <!-- FAQ Schema for Main Page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is this tool really free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The tool is 100% free with no hidden limits or sign-ups required."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are my images uploaded to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. All image processing happens inside your browser. Files never leave your device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will compressing reduce image quality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Compression quality can be adjusted. Higher quality means larger size; lower quality reduces size."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which image formats does this tool support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The tool supports JPG, PNG, BMP, WEBP, and more formats will be added soon."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this tool work on mobile phones?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The tool works on all devices including Android, iOS, tablets and desktop."
+      }
+    }
+  ]
+}
+</script>
+
+
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
 
@@ -209,10 +260,18 @@
   <footer>
   <p>
     © <span id="year"></span> Image Resizer — All Rights Reserved |
+    <a href="index.html" style="color:#7fc6ff">Home</a> |
+    <a href="about.html" style="color:#7fc6ff">About Us</a> |
+    <a href="faq.html" style="color:#7fc6ff">FAQ</a> |
     <a href="privacy.html" style="color:#7fc6ff">Privacy Policy</a> |
-    <a href="terms.html" style="color:#7fc6ff">Terms of Service</a>
+    <a href="terms.html" style="color:#7fc6ff">Terms of Service</a> |
+    <a href="contact.html" style="color:#7fc6ff">Contact</a>
   </p>
 </footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 
   <!-- SCRIPT FILES - ES MODULES -->
   <script type="module">
