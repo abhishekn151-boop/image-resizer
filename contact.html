@@ -41,16 +41,23 @@ feel free to contact us using the form below.
 <h3>Contact Form</h3>
 
 <form class="contact-form">
-  <label>Your Name</label>
-  <input type="text" placeholder="Enter your name" required>
 
-  <label>Your Email</label>
-  <input type="email" placeholder="Enter your email" required>
+  <div class="form-group">
+    <label for="name">Your Name</label>
+    <input id="name" type="text" placeholder="Enter your name" required>
+  </div>
 
-  <label>Your Message</label>
-  <textarea rows="5" placeholder="Write your message here..." required></textarea>
+  <div class="form-group">
+    <label for="email">Your Email</label>
+    <input id="email" type="email" placeholder="Enter your email" required>
+  </div>
 
-  <button type="submit" class="btn">Send Message</button>
+  <div class="form-group">
+    <label for="message">Your Message</label>
+    <textarea id="message" placeholder="Write your message here..." required></textarea>
+  </div>
+
+  <button type="submit" class="btn send-btn">Send Message</button>
 </form>
 
 <p style="margin-top: 15px; font-size:14px; color:#aab7d0;">
