@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Terms of Service — Free Image Resizer</title>
-  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
-  <meta name="description" content="Terms of Service — Free Image Resizer" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <!-- SEO -->
+  <meta name="description"
+    content="Terms of Service — Free Image Resizer. Learn the rules and responsibilities for using our tool." />
   <link rel="canonical" href="https://your-domain.com/terms.html" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
+<!-- NAVBAR -->
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
     <span class="nav-title">Free Image Resizer</span>
   </div>
 
@@ -33,19 +43,92 @@
   <h1>Terms of Service</h1>
 </header>
 
-<section class="seo-section">
+<section class="seo-section" style="text-align: justify;">
+
   <h2>Terms of Service</h2>
   <p><strong>Last Updated: January 2025</strong></p>
 
-  <p>By using Free Image Resizer you agree to our Terms. This tool processes images in-browser; we do not upload or store images.</p>
+  <p>
+    By using <strong>Free Image Resizer</strong>, you agree to the following Terms of Service (“Terms”).  
+    These Terms govern your use of our website and tools.  
+    If you do not agree with any part of these Terms, please stop using the service immediately.
+  </p>
 
-  <h3>User Responsibilities</h3>
+  <h3>1. Use of the Service</h3>
+  <p>
+    Free Image Resizer is a browser-based tool for resizing, compressing, and converting images.
+    All processing happens on your device. No images are uploaded to our servers.
+  </p>
+
+  <h3>2. User Responsibilities</h3>
+  <p>By using this tool, you agree to the following:</p>
   <ul>
-    <li>Use the tool legally and responsibly</li>
-    <li>Ensure you have rights to any images processed</li>
+    <li>You will only upload and edit images you own or have legal rights to use.</li>
+    <li>You will not use the tool for illegal, harmful, or abusive purposes.</li>
+    <li>You will not exploit the service or attempt to reverse engineer its functionality.</li>
   </ul>
+
+  <h3>3. No Storage or Backup of Images</h3>
+  <p>
+    Since Free Image Resizer does not upload images to a server,
+    we do not back up, store, or retrieve your images.  
+    You are solely responsible for saving your edited files.
+  </p>
+
+  <h3>4. Disclaimer of Warranty</h3>
+  <p>
+    The service is provided “as is” without warranties of any kind.
+    We do not guarantee:
+  </p>
+  <ul>
+    <li>Uninterrupted availability of the website</li>
+    <li>Compatibility with every browser or device</li>
+    <li>Error-free performance</li>
+  </ul>
+
+  <p>
+    While we strive to maintain high accuracy and performance,
+    we are not liable for any loss, corruption, or misuse of images or data.
+  </p>
+
+  <h3>5. Limitation of Liability</h3>
+  <p>
+    Free Image Resizer is not responsible for any damages arising from:
+  </p>
+  <ul>
+    <li>Use or inability to use the service</li>
+    <li>Loss of data or corrupted files</li>
+    <li>Improper use of the tool</li>
+    <li>Third-party actions or technical issues beyond our control</li>
+  </ul>
+
+  <h3>6. Third-Party Services</h3>
+  <p>
+    Our website may use hosting or analytics providers.  
+    These services <strong>do not</strong> have access to your images since processing is done locally.
+  </p>
+
+  <h3>7. Intellectual Property</h3>
+  <p>
+    The branding, design, code, and content of this website belong to Free Image Resizer.
+    You may not copy, redistribute, or reproduce any part of the website without permission.
+  </p>
+
+  <h3>8. Updates to These Terms</h3>
+  <p>
+    We may update these Terms occasionally to reflect new features or legal requirements.
+    Changes will be posted on this page with an updated date.
+  </p>
+
+  <h3>9. Contact Information</h3>
+  <p>
+    If you have any questions about these Terms, feel free to contact us via our  
+    <a href="contact.html" style="color: #7fc6ff;">Contact Page</a>.
+  </p>
+
 </section>
 
+<!-- FOOTER -->
 <footer>
   <p>
     © <span id="year"></span> Free Image Resizer — All Rights Reserved |
@@ -58,12 +141,10 @@
   </p>
 </footer>
 
+<!-- SCRIPTS -->
 <script type="module">
   document.getElementById("year").textContent = new Date().getFullYear();
-  document.getElementById("hamburger").addEventListener("click", () => {
-    document.getElementById("mobileMenu").classList.toggle("active");
-  });
-</script>
 
-</body>
-</html>
+  // Mobile Menu Toggle
+  document.getElementById("hamburger").addEventListener("click", () => {
+    document.getElementB
