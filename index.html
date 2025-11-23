@@ -5,23 +5,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Favicon (local asset path - replace with your deployed URL) -->
-  <link rel="icon" type="image/png" href="/mnt/data/A_high-resolution_digital_vector_icon_features_a_r.png" />
+  <!-- Favicon & Logo (testing local path; replace with assets/logo.png after uploading to repo) -->
+  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
+  <meta property="og:image" content="/mnt/data/logo.png" />
 
   <!-- Primary meta -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
   <meta name="keywords" content="free image resizer, resize image online, compress image, crop image, convert to webp" />
   <link rel="canonical" href="https://your-domain.com/index.html" />
 
-  <!-- OpenGraph / Twitter (uses local logo path; replace after upload) -->
+  <!-- OpenGraph / Twitter -->
   <meta property="og:title" content="Free Image Resizer" />
   <meta property="og:description" content="Resize, compress, crop and convert images in your browser. No uploads — everything runs locally." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/mnt/data/A_digital_vector_icon_features_a_resize_and_crop_s.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Free Image Resizer" />
   <meta name="twitter:description" content="Resize, compress, crop and convert images in your browser. No uploads — everything runs locally." />
-  <meta name="twitter:image" content="/mnt/data/A_digital_vector_icon_features_a_resize_and_crop_s.png" />
 
   <!-- Software JSON-LD -->
   <script type="application/ld+json">
@@ -58,7 +57,7 @@
 
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="/mnt/data/A_digital_vector_icon_features_a_resize_and_crop_s.png" class="nav-logo" alt="Free Image Resizer logo">
+    <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
     <span class="nav-title">Free Image Resizer</span>
   </div>
 
@@ -75,7 +74,7 @@
 </nav>
 
 <header class="head">
-  <img src="/mnt/data/A_digital_vector_icon_features_a_resize_and_crop_s.png" class="logo" alt="Free Image Resizer logo">
+  <img src="/mnt/data/logo.png" class="logo" alt="Free Image Resizer logo">
   <h1>Free Image Resizer</h1>
   <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
 </header>
@@ -89,6 +88,7 @@
 
   <div class="settings">
     <h3>Resize Options</h3>
+
     <label>Resize Type</label>
     <select id="resizeType">
       <option value="px">By Pixels</option>
@@ -136,15 +136,62 @@
 
 <section class="seo-section">
   <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
-  <p>Our online image resizer and compressor allows you to quickly reduce image size, adjust dimensions, crop photos, and convert formats — all directly in your browser. No uploads, no servers, no data collection. Everything stays on your device.</p>
+  <p>
+    Our online image resizer and compressor allows you to quickly reduce image size,
+    adjust dimensions, crop photos, and convert formats — all directly in your browser.
+    No uploads, no servers, no data collection. Everything stays on your device.
+  </p>
 
   <h3>Why Resize Images?</h3>
-  <p>Resizing images helps reduce page load time, improve SEO, save storage, and optimize for social media.</p>
+  <p>
+    Resizing images helps reduce page load time, improve SEO, save storage, optimize for social media,
+    and meet website upload limits. Large images slow down websites and apps, affecting user experience.
+  </p>
 
-  <!-- short FAQ (visible) -->
+  <h3>Supported Image Formats</h3>
+  <ul>
+    <li>JPEG / JPG</li>
+    <li>PNG</li>
+    <li>WEBP</li>
+    <li>BMP</li>
+  </ul>
+
+  <h3>Key Features</h3>
+  <ul>
+    <li>Resize by pixels, percent, or longest side</li>
+    <li>Compress images with adjustable quality</li>
+    <li>Crop with drag-and-drop precision</li>
+    <li>Convert between JPG, PNG, and WebP</li>
+    <li>High-quality processing using smart algorithms</li>
+    <li>100% browser-based — your images never leave your device</li>
+  </ul>
+
+  <h3>How to Use the Image Resizer</h3>
+  <ol>
+    <li>Click the upload area or drag your image into the tool.</li>
+    <li>Select your resize type: pixels, percent, or longest side.</li>
+    <li>Choose output quality and image format.</li>
+    <li>Click "Process Image" to resize or compress.</li>
+    <li>Preview and download the optimized image.</li>
+  </ol>
+
   <h3>Frequently Asked Questions</h3>
+
   <h4>1. Is this tool really free?</h4>
   <p>Yes, it is 100% free with no hidden limits or registrations.</p>
+
+  <h4>2. Are my images uploaded to a server?</h4>
+  <p>No. All processing happens on your device using secure browser technology.</p>
+
+  <h4>3. Will image quality decrease?</h4>
+  <p>You can adjust compression strength. Higher quality = larger size. Lower quality = smaller size.</p>
+
+  <h4>4. Does this tool work on mobile?</h4>
+  <p>Yes, it works on all devices — phones, tablets, and desktops.</p>
+
+  <h4>5. What is the best format for smallest file size?</h4>
+  <p>WEBP gives the smallest size while maintaining good quality.</p>
+
 </section>
 
 <footer>
@@ -158,6 +205,77 @@
     <a href="contact.html" style="color:#7fc6ff">Contact</a>
   </p>
 </footer>
+
+<!-- Robust UI initializer (ensures upload works even if app.js fails) -->
+<script>
+(function () {
+  const waitForEl = (id, timeout = 3000) => new Promise((res, rej) => {
+    const el = document.getElementById(id);
+    if (el) return res(el);
+    const start = Date.now();
+    const intr = setInterval(() => {
+      const e = document.getElementById(id);
+      if (e) { clearInterval(intr); return res(e); }
+      if (Date.now() - start > timeout) { clearInterval(intr); return rej(new Error('timeout')); }
+    }, 50);
+  });
+
+  Promise.all([waitForEl('fileInput'), waitForEl('drop-area')])
+    .then(([fileInput, dropArea]) => {
+      fileInput.style.display = 'none';
+      if (!dropArea.__uploaderAttached) {
+        dropArea.addEventListener('click', () => {
+          try { fileInput.click(); } catch (e) { console.warn('fileInput.click() failed:', e); }
+        });
+        ['dragenter','dragover'].forEach(ev => {
+          dropArea.addEventListener(ev, (e) => { e.preventDefault(); dropArea.classList.add('active'); });
+        });
+        ['dragleave','drop'].forEach(ev => {
+          dropArea.addEventListener(ev, (e) => { e.preventDefault(); dropArea.classList.remove('active'); });
+        });
+        dropArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const dt = e.dataTransfer;
+          if (!dt) return;
+          const files = dt.files;
+          if (files && files.length) {
+            window.__lastDropFiles = files;
+            if (window.handleFiles) {
+              try { window.handleFiles(files); return; } catch (err) { console.warn('handleFiles failed:', err); }
+            }
+            const ev = new Event('customdrop');
+            fileInput.__droppedFiles = files;
+            fileInput.dispatchEvent(ev);
+          }
+        });
+
+        fileInput.addEventListener('change', () => {
+          if (window.handleFiles) {
+            try { window.handleFiles(fileInput.files); } catch (err) { console.warn('handleFiles error:', err); }
+          } else {
+            // some modules may read fileInput.files directly; keep that available
+            console.log('fileInput change — files available for app.js');
+          }
+        });
+
+        fileInput.addEventListener('customdrop', () => {
+          if (fileInput.__droppedFiles) {
+            if (window.handleFiles) {
+              try { window.handleFiles(fileInput.__droppedFiles); return; } catch (err) { console.warn('handleFiles failure on customdrop:', err); }
+            }
+            window.__lastDropFiles = fileInput.__droppedFiles;
+            console.log('customdrop — stored files at window.__lastDropFiles (for debug)');
+          }
+        });
+
+        dropArea.__uploaderAttached = true;
+      }
+    })
+    .catch(err => {
+      console.warn('Uploader init: DOM elements missing or timed out', err);
+    });
+})();
+</script>
 
 <script type="module">
   import "./utils.js";
