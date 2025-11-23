@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us | Image Resizer</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+
+<body>
+
+<!-- TOP NAVIGATION BAR -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <img src="assets/logo.png" class="nav-logo" alt="Logo">
+    <span class="nav-title">Image Resizer</span>
+  </div>
+
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<header class="head">
+  <h1>Contact Us</h1>
+</header>
+
+<section class="seo-section">
+
+<h2>We’re Here to Help</h2>
+<p>
+If you have any questions, suggestions, or feedback about our Image Resizer & Compressor tool,
+feel free to contact us using the form below.
+</p>
+
+<h3>Contact Form</h3>
+
+<form class="contact-form">
+  <label>Your Name</label>
+  <input type="text" placeholder="Enter your name" required>
+
+  <label>Your Email</label>
+  <input type="email" placeholder="Enter your email" required>
+
+  <label>Your Message</label>
+  <textarea rows="5" placeholder="Write your message here..." required></textarea>
+
+  <button type="submit" class="btn">Send Message</button>
+</form>
+
+<p style="margin-top: 15px; font-size:14px; color:#aab7d0;">
+* Note: This form does not send emails automatically.
+To enable email delivery, you can integrate FormSubmit, Google Forms, or EmailJS.
+</p>
+
+</section>
+
+<footer>
+  <p>© <span id="year"></span> Image Resizer — All Rights Reserved</p>
+</footer>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
