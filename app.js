@@ -38,6 +38,11 @@ function hideLoader() {
   document.getElementById("loadingOverlay").classList.add("hidden");
 }
 
+// -------- MINIMUM LOADER TIME --------
+function wait(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
 // -------- HELPERS --------
 function setStatus(text) {
   if (previewInfo) previewInfo.textContent = text;
@@ -200,6 +205,9 @@ async function processImage() {
   };
 
   enableDownload(true);
+
+  // ---------- MINIMUM LOADER VISIBILITY ----------
+  await wait(400);
 
   // ---------- HIDE LOADER ----------
   hideLoader();
