@@ -1,25 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Terms of Service | Image Resizer</title>
-<link rel="stylesheet" href="style.css">
-<link rel="icon" type="image/png" href="assets/favicon.png" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Terms of Service — Free Image Resizer</title>
+  <link rel="icon" type="image/png" href="/mnt/data/A_high-resolution_digital_vector_icon_features_a_r.png" />
+  <meta name="description" content="Terms of Service — Free Image Resizer" />
+  <link rel="canonical" href="https://your-domain.com/terms.html" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<!-- TOP NAVIGATION BAR -->
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="assets/logo.png" class="nav-logo" alt="Logo">
-    <span class="nav-title">Image Resizer</span>
+    <img src="/mnt/data/A_digital_vector_icon_features_a_resize_and_crop_s.png" class="nav-logo" alt="Free Image Resizer logo">
+    <span class="nav-title">Free Image Resizer</span>
   </div>
 
-  <div class="hamburger" id="hamburger">
-    ☰
-  </div>
+  <div class="hamburger" id="hamburger">☰</div>
 
   <div class="nav-links" id="mobileMenu">
     <a href="index.html">Home</a>
@@ -36,55 +34,21 @@
 </header>
 
 <section class="seo-section">
+  <h2>Terms of Service</h2>
+  <p><strong>Last Updated: January 2025</strong></p>
 
-<h2>Terms of Service</h2>
-<p><strong>Last Updated: January 2025</strong></p>
+  <p>By using Free Image Resizer you agree to our Terms. This tool processes images in-browser; we do not upload or store images.</p>
 
-<p>Welcome to <strong>Online Image Resizer & Compressor</strong> (“the Website”). By accessing or using this Website, you agree to the following Terms of Service. If you do not agree, please stop using the Website immediately.</p>
-
-<h3>1. Use of the Website</h3>
-<p>You may use this Website solely for lawful purposes. You agree not to misuse, disrupt, or harm the Website or its services.</p>
-
-<h3>2. No Image Uploads</h3>
-<p>This tool processes all images directly in your browser. We do <strong>not</strong> upload, store, or transmit your images to any server. You are responsible for ensuring that the images you process do not violate copyrights or laws.</p>
-
-<h3>3. User Responsibilities</h3>
-<p>You agree not to use the Website for:</p>
-<ul>
-  <li>Illegal activity</li>
-  <li>Processing copyrighted images without permission</li>
-  <li>Disrupting or harming the Website or its users</li>
-</ul>
-
-<h3>4. Intellectual Property</h3>
-<p>This Website, including its layout, logo, branding, and tools, is protected by copyright. You may not copy, redistribute, or modify the Website without permission.</p>
-
-<h3>5. No Warranty</h3>
-<p>This Website is provided “as is” without any warranties. We do not guarantee accuracy, performance, or that the Website will always be available.</p>
-
-<h3>6. Limitation of Liability</h3>
-<p>We are not responsible for:</p>
-<ul>
-  <li>Loss of data</li>
-  <li>Device issues</li>
-  <li>Image quality or output issues</li>
-  <li>Any damage resulting from your use of the Website</li>
-</ul>
-
-<h3>7. Third-Party Services</h3>
-<p>We may use third-party hosting or analytics providers. These services do not access your images.</p>
-
-<h3>8. Changes to the Terms</h3>
-<p>We may modify these Terms at any time. Updated Terms will be posted on this page.</p>
-
-<h3>9. Contact Us</h3>
-<p>For any questions, email: <strong>your-email@example.com</strong></p>
-
+  <h3>User Responsibilities</h3>
+  <ul>
+    <li>Use the tool legally and responsibly</li>
+    <li>Ensure you have rights to any images processed</li>
+  </ul>
 </section>
 
 <footer>
   <p>
-    © <span id="year"></span> Image Resizer — All Rights Reserved |
+    © <span id="year"></span> Free Image Resizer — All Rights Reserved |
     <a href="index.html" style="color:#7fc6ff">Home</a> |
     <a href="about.html" style="color:#7fc6ff">About Us</a> |
     <a href="faq.html" style="color:#7fc6ff">FAQ</a> |
@@ -94,12 +58,11 @@
   </p>
 </footer>
 
-<script>
+<script type="module">
   document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-
-<script>
-document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("hamburger").addEventListener("click", () => {
+    document.getElementById("mobileMenu").classList.toggle("active");
+  });
 </script>
 
 </body>
