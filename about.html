@@ -4,17 +4,29 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>About Us — Free Image Resizer</title>
-  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
-  <meta name="description" content="About Free Image Resizer — privacy-first, browser-based image resizing and compression tool." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <!-- SEO Meta -->
+  <meta name="description" content="About Free Image Resizer — a privacy-first, browser-based image resizing and compression tool." />
+  <meta name="keywords" content="about image resizer, who we are, image compression tool, privacy image editor" />
   <link rel="canonical" href="https://your-domain.com/about.html" />
-  <meta property="og:image" content="/mnt/data/logo.png" />
+
+  <!-- Social Preview -->
+  <meta property="og:title" content="About Free Image Resizer" />
+  <meta property="og:description" content="Learn more about Free Image Resizer — fast, free, and privacy-focused image editing." />
+  <meta property="og:image" content="assets/logo.png" />
+  <meta property="og:type" content="website" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+<!-- TOP NAVIGATION BAR -->
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
     <span class="nav-title">Free Image Resizer</span>
   </div>
 
@@ -22,29 +34,113 @@
 
   <div class="nav-links" id="mobileMenu">
     <a href="index.html">Home</a>
+    <span class="sep">|</span>
     <a href="about.html">About Us</a>
+    <span class="sep">|</span>
     <a href="faq.html">FAQ</a>
+    <span class="sep">|</span>
     <a href="privacy.html">Privacy Policy</a>
+    <span class="sep">|</span>
     <a href="terms.html">Terms of Service</a>
+    <span class="sep">|</span>
     <a href="contact.html">Contact</a>
   </div>
 </nav>
 
+<!-- PAGE HEADER -->
 <header class="head">
   <h1>About Us</h1>
 </header>
 
+<!-- CONTENT -->
 <section class="seo-section">
   <h2>Who We Are</h2>
-  <p>Free Image Resizer is a privacy-focused tool that helps you resize, compress and convert images locally in your browser.</p>
+  <p>
+    Free Image Resizer started with a simple idea — image editing should be fast,
+    private, and available to everyone. We noticed that most online tools upload
+    your pictures to unknown servers, add watermarks, force sign-ups, or hide
+    basic features behind subscriptions. We wanted to build something better.
+  </p>
+
+  <p>
+    So we created a lightweight, secure, and 100% browser-based image editor that
+    respects your privacy and doesn’t store a single byte of your data.
+  </p>
 
   <h3>Our Mission</h3>
-  <p>To provide a fast, free and private way to optimize images for web and social platforms.</p>
+  <p>
+    Our mission is to make everyday image editing effortless. Whether you’re a
+    student submitting an assignment, a designer optimizing images for a website,
+    or someone who simply needs to compress a photo before uploading it – we want
+    to give you a tool that works instantly, without complications.
+  </p>
 
   <h3>Why We Built This Tool</h3>
-  <p>We wanted a tool that doesn’t upload your images to unknown servers and keeps things fast and private.</p>
+  <p>
+    We built Free Image Resizer because we believe in:
+  </p>
+
+  <ul>
+    <li><strong>Privacy:</strong> Your images never leave your device.</li>
+    <li><strong>Speed:</strong> Everything runs locally with zero upload time.</li>
+    <li><strong>Simplicity:</strong> No ads, no sign-ups, no confusing menus.</li>
+    <li><strong>Accessibility:</strong> Works on mobile, desktop, and tablets.</li>
+    <li><strong>Quality:</strong> Industry-standard compression and resizing algorithms.</li>
+  </ul>
+
+  <h3>Our Vision</h3>
+  <p>
+    We want to become the most trusted online image optimization platform in the
+    world — the tool people rely on because it's simple, transparent, and built
+    with the user in mind. Technology should make things easier, not more
+    complicated, and we aim to embody that philosophy in everything we build.
+  </p>
+
+  <h3>Our Core Values</h3>
+  <ul>
+    <li><strong>Honesty:</strong> No hidden tracking, no data collection.</li>
+    <li><strong>Efficiency:</strong> Tools that save time and reduce friction.</li>
+    <li><strong>Innovation:</strong> Smart features without unnecessary complexity.</li>
+    <li><strong>Reliability:</strong> The tool should “just work,” every time.</li>
+  </ul>
+
+  <h3>Behind the Tool</h3>
+  <p>
+    Free Image Resizer is developed by a small team of passionate engineers and
+    designers who believe that privacy-friendly tools are the future of the web.
+    We focus heavily on performance, clean UI, and seamless user experience.
+  </p>
+
+  <h3>What Makes Us Different?</h3>
+  <ul>
+    <li>No files are uploaded — processing is 100% local</li>
+    <li>No analytics, no trackers, no hidden scripts</li>
+    <li>No watermark on images</li>
+    <li>No ads interrupting your workflow</li>
+  </ul>
+
+  <h3>Our Commitment to Privacy</h3>
+  <p>
+    Privacy is not a feature for us — it’s a foundation. Your images, your data,
+    your editing history, and your browser activity remain completely yours.
+  </p>
+
+  <h3>Future Plans</h3>
+  <p>
+    As we grow, we plan to introduce smart AI-based enhancements, batch
+    processing, premium filters, and support for more formats — always while
+    keeping everything local inside your browser without storing any user data.
+  </p>
+
+  <h3>Thank You for Being Here</h3>
+  <p>
+    Whether you're a first-time visitor or a regular user, we appreciate you.  
+    Your trust motivates us to keep improving and offering tools that genuinely
+    help people.
+  </p>
 </section>
 
+<!-- FOOTER -->
 <footer>
   <p>
     © <span id="year"></span> Free Image Resizer — All Rights Reserved |
@@ -57,8 +153,12 @@
   </p>
 </footer>
 
-<script type="module">
+<!-- JAVASCRIPT -->
+<script>
+  // Insert year
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Mobile menu toggle
   document.getElementById("hamburger").addEventListener("click", () => {
     document.getElementById("mobileMenu").classList.toggle("active");
   });
