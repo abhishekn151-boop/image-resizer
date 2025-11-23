@@ -392,3 +392,33 @@ footer {
 .send-btn:hover {
   background: #1584e0;
 }
+
+/* -------- FAQ PAGE -------- */
+.faq-container {
+  margin-top: 25px;
+}
+
+.faq-item {
+  margin-bottom: 20px;
+  padding: 18px;
+  background: #0f1829;
+  border-radius: 12px;
+  border: 1px solid #1e2c47;
+  transition: 0.2s ease;
+}
+
+.faq-item:hover {
+  border-color: #4ad2ff;
+}
+
+.faq-question {
+  font-size: 18px;
+  color: #7fc6ff;
+  margin-bottom: 8px;
+}
+
+.faq-answer {
+  font-size: 15px;
+  color: #c9d7ea;
+  line-height: 1.6;
+}
