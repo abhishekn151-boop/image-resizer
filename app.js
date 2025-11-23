@@ -30,22 +30,15 @@ const formatSelect = document.getElementById("formatSelect");
 const processBtn = document.getElementById("processBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 
-let currentFile = null;
-let currentImage = null;
-let currentOrientation = -1;
-let currentCropper = null;
-let cropEnabled = false;
-
-/* ---------------- LOADING ANIMATION ---------------- */
+// -------- LOADING ANIMATION --------
 function showLoader() {
   document.getElementById("loadingOverlay").classList.remove("hidden");
 }
-
 function hideLoader() {
   document.getElementById("loadingOverlay").classList.add("hidden");
 }
 
-/* ---------------- UI HELPERS ---------------- */
+// -------- HELPERS --------
 function setStatus(text) {
   if (previewInfo) previewInfo.textContent = text;
 }
@@ -55,7 +48,7 @@ function enableDownload(enabled = true) {
   downloadBtn.classList.toggle("disabled", !enabled);
 }
 
-/* ---------------- DRAG & DROP ---------------- */
+// -------- DRAG & DROP --------
 function preventDefaults(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -74,16 +67,12 @@ function preventDefaults(e) {
 );
 
 dropArea.addEventListener("click", () => fileInput.click());
-
 dropArea.addEventListener("drop", (e) => {
-  const dt = e.dataTransfer;
-  const files = dt.files;
-  handleFiles(files);
-}, false);
-
+  handleFiles(e.dataTransfer.files);
+});
 fileInput.addEventListener("change", (e) => handleFiles(e.target.files));
 
-/* ---------------- HANDLE FILE ---------------- */
+// -------- HANDLE FILES --------
 async function handleFiles(fileList) {
   if (!fileList || fileList.length === 0) return;
 
@@ -99,6 +88,7 @@ async function handleFiles(fileList) {
 
   try {
     currentOrientation = await getExifOrientation(file);
+
     const img = await loadImage(file);
     currentImage = img;
 
@@ -108,22 +98,24 @@ async function handleFiles(fileList) {
     setStatus(`${formatSize(file.size)} • ${img.naturalWidth} × ${img.naturalHeight}px`);
 
     if (currentCropper) currentCropper = null;
+
   } catch (err) {
-    console.error("Image load error:", err);
+    console.error("Error loading image:", err);
     setStatus("Failed to load image");
   }
 }
 
-/* ---------------- PROCESS IMAGE ---------------- */
+// -------- PROCESS IMAGE --------
 async function processImage() {
   if (!currentImage) {
     alert("Please upload an image first.");
     return;
   }
 
-  showLoader();
-  processBtn.disabled = true;
+  // ---------- SHOW LOADER ----------
   setStatus("Processing...");
+  processBtn.disabled = true;
+  showLoader();
 
   const imgW = currentImage.naturalWidth;
   const imgH = currentImage.naturalHeight;
@@ -146,7 +138,8 @@ async function processImage() {
   if (keepRatioEl.checked) {
     if (widthInput.value && !heightInput.value) {
       targetH = Math.round((targetW / imgW) * imgH);
-    } else if (!widthInput.value && heightInput.value) {
+    } 
+    else if (!widthInput.value && heightInput.value) {
       targetW = Math.round((targetH / imgH) * imgW);
     }
   }
@@ -155,6 +148,7 @@ async function processImage() {
 
   if (cropEnabled && currentCropper) {
     sourceCanvas = currentCropper.export();
+
   } else {
     const source = document.createElement("canvas");
     source.width = imgW;
@@ -178,14 +172,18 @@ async function processImage() {
   outCtx.imageSmoothingEnabled = true;
   outCtx.imageSmoothingQuality = "high";
 
-  outCtx.drawImage(sourceCanvas, 0, 0, sourceCanvas.width, sourceCanvas.height, 0, 0, targetW, targetH);
+  outCtx.drawImage(
+    sourceCanvas,
+    0, 0, sourceCanvas.width, sourceCanvas.height,
+    0, 0, targetW, targetH
+  );
 
   const mime = formatSelect.value || "image/jpeg";
   const q = mime === "image/png" ? 1 : Number(qualitySlider.value) / 100;
 
   const blob = await canvasToBlob(outCanvas, mime, q);
-
   const url = safeURL(blob);
+
   previewImg.src = url;
   setStatus(`${formatSize(blob.size)} • ${formatDim(targetW, targetH)}`);
 
@@ -202,11 +200,13 @@ async function processImage() {
   };
 
   enableDownload(true);
+
+  // ---------- HIDE LOADER ----------
   hideLoader();
   processBtn.disabled = false;
 }
 
-/* ---------------- INITIALIZATION ---------------- */
+// -------- INITIALIZATION --------
 function init() {
   qualitySlider.addEventListener("input", () => {
     qualityVal.textContent = `${qualitySlider.value}%`;
@@ -231,6 +231,7 @@ function init() {
 
       const displayW = previewImg.clientWidth || currentImage.naturalWidth;
       const displayH = Math.round((currentImage.naturalHeight / currentImage.naturalWidth) * displayW);
+
       canvasEl.width = displayW;
       canvasEl.height = displayH;
 
@@ -240,6 +241,7 @@ function init() {
       currentCropper = new Cropper(canvasEl, currentImage);
       cropEnabled = true;
       setStatus("Crop mode enabled — drag and resize.");
+
     } else {
       const croppedCanvas = currentCropper.export();
       const b = await canvasToBlob(croppedCanvas, "image/png", 1);
@@ -247,8 +249,10 @@ function init() {
       previewImg.src = safeURL(b);
       previewImg.style.display = "";
       canvasEl.remove();
+
       currentCropper = null;
       cropEnabled = false;
+
       setStatus("Crop applied.");
       enableDownload(true);
     }
