@@ -330,3 +330,35 @@ footer {
 .nav-links a:hover {
   color: #7fc6ff;
 }
+
+/* -------- CONTACT FORM -------- */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin-top: 15px;
+}
+
+.contact-form label {
+  margin-top: 12px;
+  margin-bottom: 5px;
+  font-size: 16px;
+  color: #c9d7ea;
+}
+
+.contact-form input,
+.contact-form textarea {
+  background: #0f1829;
+  color: #e5eeff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #2b3b5a;
+  font-size: 15px;
+  resize: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: #7fc6ff;
+}
