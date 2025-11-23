@@ -238,3 +238,52 @@ footer {
   font-size: 16px;
   letter-spacing: 0.5px;
 }
+
+/* -------- SEO CONTENT SECTION -------- */
+.seo-section {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 25px;
+  background: #101a2e;
+  border: 1px solid #1c2a44;
+  border-radius: 14px;
+  color: #d6deea;
+  line-height: 1.7;
+}
+
+.seo-section h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #7fc6ff;
+}
+
+.seo-section h3 {
+  font-size: 22px;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  color: #9ac9ff;
+}
+
+.seo-section h4 {
+  font-size: 18px;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  color: #b4d8ff;
+}
+
+.seo-section p,
+.seo-section li {
+  font-size: 16px;
+  color: #cbd6e7;
+}
+
+.seo-section ul,
+.seo-section ol {
+  margin-left: 20px;
+}
+
+.seo-section ul li,
+.seo-section ol li {
+  margin-bottom: 6px;
+}
+
