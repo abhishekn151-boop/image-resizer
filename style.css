@@ -7,213 +7,77 @@ html, body { background: #0e1625; font-family: "Inter", system-ui, sans-serif; c
 .logo { width: 70px; height: 70px; margin-bottom: 10px; }
 .tagline { color: #b6bdc9; font-size: 14px; margin-top: 6px; }
 
-/* -------- TOOL LAYOUT (Design A: 3 columns) -------- */
-.tool-container {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 320px 1fr 360px;
-  gap: 24px;
-}
+/* -------- TOOL LAYOUT -------- */
+.tool-container { max-width: 1200px; margin: auto; padding: 20px; display: grid; grid-template-columns: 1fr 320px 1fr; gap: 25px; }
+@media (max-width: 900px) { .tool-container { grid-template-columns: 1fr; } }
 
-@media (max-width: 1024px) {
-  .tool-container { grid-template-columns: 1fr; padding: 16px; }
-}
-
-/* -------- LEFT: Upload area -------- */
-.drop-area {
-  border: 2px dashed #3a4459;
-  background: #111a2e;
-  padding: 36px 16px;
-  text-align: center;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.18s;
-  min-height: 180px;
-}
-
+/* -------- UPLOAD / DRAG AREA -------- */
+.drop-area { border: 2px dashed #3a4459; background: #111a2e; padding: 40px 15px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.2s; }
 .drop-area:hover { background: #16223b; border-color: #4ad2ff; }
-.drop-area h2 { font-size: 20px; margin-bottom: 8px; color: #e9f3ff; }
-.drop-area p { color: #a3abba; font-size: 13px; }
+.drop-area h2 { font-size: 22px; margin-bottom: 8px; }
+.drop-area p { color: #a3abba; font-size: 14px; }
 
-/* -------- MIDDLE: Settings -------- */
-.settings {
-  background: #131d32;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #1d2944;
-  height: fit-content;
-}
-
+/* -------- SETTINGS PANEL -------- */
+.settings { background: #131d32; padding: 20px; border-radius: 10px; height: fit-content; border: 1px solid #1d2944; }
 .settings h3 { margin-bottom: 12px; color: #7fc6ff; }
-.settings label { display: inline-block; margin-top: 10px; margin-bottom: 6px; font-size: 14px; color: #c2c8d6; }
-.settings select, .settings input[type="number"], .settings input[type="range"] {
-  width: calc(100% - 6px);
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #2b3b5a;
-  background: #0f1829;
-  color: #e8ecf4;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
+.settings label { display: block; margin-top: 14px; margin-bottom: 6px; font-size: 14px; color: #c2c8d6; }
+.settings input, .settings select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2b3b5a; background: #0f1829; color: #e8ecf4; font-size: 14px; }
+.settings input:focus, .settings select:focus { outline: none; border-color: #4ad2ff; }
 
-.settings input[type="checkbox"] { transform: translateY(2px); margin-left: 8px; }
+/* target-size specific input */
+#targetSizeKB { appearance: textfield; -moz-appearance: textfield; }
 
-/* Keep ratio label inline */
-.keep-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
-
-/* -------- RIGHT: Preview -------- */
-.preview-section {
-  background: #111a2e;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #1d2944;
-  text-align: center;
-  min-height: 240px;
-}
-
-.preview-section h3 { margin-bottom: 12px; color: #7fc6ff; }
-.preview-img {
-  max-width: 100%;
-  max-height: 420px;
-  border-radius: 8px;
-  display: block;
-  margin: 8px auto 0;
-  border: 1px solid #1e2c47;
-  background: #0b1220;
-  object-fit: contain;
-}
-
+/* -------- PREVIEW SECTION -------- */
+.preview-section { background: #111a2e; padding: 20px; border-radius: 10px; border: 1px solid #1d2944; text-align: center; }
+.preview-section h3 { margin-bottom: 15px; color: #7fc6ff; }
+.preview-img { max-width: 100%; max-height: 350px; border-radius: 10px; border: 1px solid #1e2c47; display: block; margin: auto; }
 #previewInfo { margin-top: 12px; color: #a3abba; font-size: 14px; }
 
-/* -------- ACTIONS -------- */
-.actions { text-align: center; margin: 20px 0 36px; }
-.btn {
-  padding: 12px 26px;
-  margin: 0 10px;
-  background: #1f2a44;
-  color: #d7e3ff;
-  font-size: 15px;
-  border-radius: 8px;
-  border: 1px solid #324364;
-  cursor: pointer;
-  transition: 0.18s;
-}
+/* -------- BUTTONS -------- */
+.actions { text-align: center; margin: 25px 0; }
+.btn { padding: 12px 25px; margin: 0 10px; background: #1f2a44; color: #d7e3ff; font-size: 15px; border-radius: 8px; border: 1px solid #324364; cursor: pointer; transition: 0.2s; }
 .btn:hover { background: #273556; }
 .btn.disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* -------- NAVBAR -------- */
-.top-nav {
-  width: 100%;
-  background: #0d1524;
-  border-bottom: 1px solid #1d2944;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
+/* -------- FOOTER -------- */
+footer { text-align: center; padding: 25px 10px; font-size: 13px; color: #8f9ab2; }
 
+/* -------- DRAG ACTIVE -------- */
+.drop-area.active { border-color: #00c3ff; background: #102742; }
+
+/* -------- SCROLLBAR -------- */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0b1220; }
+::-webkit-scrollbar-thumb { background: #23324d; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #2f4368; }
+
+/* -------- LOADING OVERLAY -------- */
+.loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 10, 20, 0.8); backdrop-filter: blur(6px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; opacity: 1; transition: opacity 0.3s ease; }
+.loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.spinner { width: 60px; height: 60px; border: 6px solid rgba(255, 255, 255, 0.2); border-top-color: #4acbff; border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 15px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay p { color: #d0e7ff; font-size: 16px; letter-spacing: 0.5px; }
+
+/* -------- SEO CONTENT SECTION -------- */
+.seo-section { max-width: 900px; margin: 50px auto; padding: 25px; background: #101a2e; border: 1px solid #1c2a44; border-radius: 14px; color: #d6deea; line-height: 1.7; }
+.seo-section h2 { font-size: 28px; margin-bottom: 15px; color: #7fc6ff; }
+.seo-section h3 { font-size: 22px; margin-top: 25px; margin-bottom: 10px; color: #9ac9ff; }
+
+/* -------- TOP NAVIGATION BAR -------- */
+.top-nav { width: 100%; background: #0d1524; border-bottom: 1px solid #1d2944; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 999; }
 .nav-left { display: flex; align-items: center; gap: 10px; }
 .nav-logo { width: 32px; height: 32px; border-radius: 8px; }
 .nav-title { font-size: 18px; font-weight: 600; color: #dce7f7; }
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.nav-links a {
-  color: #a9c4e2;
-  margin: 0 10px;
-  text-decoration: none;
-  font-size: 15px;
-  position: relative;
-  padding: 6px 10px;
-}
-
+.nav-links a { color: #a9c4e2; margin: 0 12px; text-decoration: none; font-size: 16px; position: relative; transition: 0.2s; }
 .nav-links a:hover { color: #7fc6ff; }
+.nav-links a:not(:last-child)::after { content: "|"; color: #3c4e6e; margin-left: 12px; font-weight: 300; }
 
-/* Vertical separators between links */
-.nav-links a:not(:last-child)::after {
-  content: "|";
-  color: #3c4e6e;
-  margin-left: 10px;
-  font-weight: 300;
-}
-
-/* Hamburger & mobile menu */
-.hamburger { display: none; font-size: 24px; color: #dce7f7; cursor: pointer; }
+/* MOBILE NAV */
+.hamburger { display: none; font-size: 26px; color: #dce7f7; cursor: pointer; }
 @media (max-width: 850px) {
-  .nav-links { display: none; position: absolute; top: 58px; right: 0; background: #0d1524; width: 100%; padding: 12px 0; text-align: center; flex-direction: column; }
-  .nav-links a { display:block; padding: 12px 0; font-size: 18px; }
+  .nav-links { display: none; position: absolute; top: 58px; right: 0; background: #0d1524; width: 100%; padding: 15px 0; text-align: center; flex-direction: column; }
+  .nav-links a { display: block; padding: 12px 0; font-size: 18px; }
   .nav-links a:not(:last-child)::after { display: none; }
   .hamburger { display: block; }
 }
 .nav-links.active { display: flex !important; }
-
-/* -------- LOADING OVERLAY -------- */
-.loading-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(5, 10, 20, 0.85);
-  backdrop-filter: blur(5px);
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  z-index: 9999; opacity: 1; transition: 0.25s ease;
-}
-.loading-overlay.hidden { opacity: 0; pointer-events: none; }
-
-.spinner {
-  width: 56px; height: 56px;
-  border: 6px solid rgba(255,255,255,0.12);
-  border-top-color: #4acbff;
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-  margin-bottom: 12px;
-}
-@keyframes spin { to { transform: rotate(360deg);} }
-
-.loading-overlay p { color: #d0e7ff; font-size: 15px; }
-
-/* -------- SEO & FOOTER -------- */
-.seo-section {
-  max-width: 980px;
-  margin: 36px auto;
-  padding: 22px;
-  background: #101a2e;
-  border-radius: 12px;
-  border: 1px solid #1c2a44;
-  color: #d6deea;
-  line-height: 1.65;
-}
-
-.seo-section h2 { font-size: 24px; margin-bottom: 12px; color: #7fc6ff; }
-.seo-section h3 { font-size: 18px; margin-top: 18px; color: #9ac9ff; }
-.seo-section p, .seo-section li { font-size: 15px; color: #cbd6e7; }
-
-/* Footer */
-footer { text-align:center; padding: 22px 12px; font-size: 13px; color: #8f9ab2; }
-
-/* -------- FORM / FAQ / CONTACT STYLES -------- */
-.contact-form { display:flex; flex-direction:column; gap:14px; max-width:640px; margin-top:12px; }
-.form-group { display:flex; flex-direction:column; }
-.form-group label { margin-bottom:6px; font-size:15px; font-weight:600; color:#c9d7ea; }
-.contact-form input, .contact-form textarea { background:#0f1829; color:#e5eeff; padding:10px 12px; border-radius:8px; border:1px solid #2b3b5a; font-size:14px; }
-.contact-form textarea { min-height:120px; resize:vertical; }
-.send-btn { width:160px; align-self:flex-start; padding:10px 12px; border-radius:8px; background:#1f9bff; color:#fff; font-weight:600; }
-
-/* FAQ */
-.faq-container { margin-top:18px; }
-.faq-item { margin-bottom:16px; padding:14px; background:#0f1829; border-radius:10px; border:1px solid #1e2c47; }
-.faq-question { font-size:16px; color:#7fc6ff; margin-bottom:6px; }
-.faq-answer { font-size:14px; color:#c9d7ea; line-height:1.55; }
-
-/* small helpers */
-.hidden { display:none!important; }
-.center { text-align:center; }
