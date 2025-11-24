@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Favicon (local path from conversation files) -->
-  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <!-- OpenGraph image (local path from conversation files) -->
-  <meta property="og:image" content="/mnt/data/logo.png" />
+  <!-- OpenGraph -->
+  <meta property="og:image" content="assets/logo.png" />
 
   <!-- Primary meta -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
@@ -38,7 +38,7 @@
     "mainEntity":[
       {"@type":"Question","name":"Is this tool really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. The tool is 100% free with no hidden limits or sign-ups required."}},
       {"@type":"Question","name":"Are my images uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. All image processing happens inside your browser. Files never leave your device."}},
-      {"@type":"Question","name":"Will compressing reduce image quality?","acceptedAnswer":{"@type":"Answer","text":"Compression quality can be adjusted when using quality slider or target size. For target-size compression, choose JPEG or WebP."}},
+      {"@type":"Question","name":"Will compressing reduce image quality?","acceptedAnswer":{"@type":"Answer","text":"Compression quality can be adjusted. Higher quality means larger size; lower quality reduces size."}},
       {"@type":"Question","name":"Which image formats does this tool support?","acceptedAnswer":{"@type":"Answer","text":"Supports JPG, PNG, BMP, WEBP."}},
       {"@type":"Question","name":"Does this tool work on mobile phones?","acceptedAnswer":{"@type":"Answer","text":"Yes, the tool works on all devices including Android, iOS, tablets and desktops."}}
     ]
@@ -49,10 +49,10 @@
 </head>
 <body>
 
-  <!-- TOP NAVIGATION BAR -->
+  <!-- TOP NAV -->
   <nav class="top-nav">
     <div class="nav-left">
-      <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+      <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
       <span class="nav-title">Free Image Resizer</span>
     </div>
 
@@ -70,22 +70,22 @@
 
   <!-- HEADER -->
   <header class="head">
-    <img src="/mnt/data/logo.png" class="logo" alt="Free Image Resizer logo">
+    <img src="assets/logo.png" class="logo" alt="Free Image Resizer logo">
     <h1>Free Image Resizer</h1>
     <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
   </header>
 
-  <!-- MAIN: Classic 3-column layout (Design A) -->
+  <!-- MAIN TOOL WRAPPER (classic 3-column layout) -->
   <div class="tool-container">
 
-    <!-- LEFT: Upload / Drag Area -->
+    <!-- UPLOAD AREA -->
     <div id="drop-area" class="drop-area">
       <h2>Drop Images Here</h2>
       <p>or click to upload</p>
       <input type="file" id="fileInput" multiple accept="image/*" hidden />
     </div>
 
-    <!-- MIDDLE: Settings (Resize / Compress / Format) -->
+    <!-- SETTINGS PANEL -->
     <div class="settings">
       <h3>Resize Options</h3>
 
@@ -102,34 +102,32 @@
       <label>Height</label>
       <input type="number" id="heightInput" placeholder="Auto">
 
-      <!-- NOTE: Keep Aspect Ratio removed as requested -->
+      <!-- NOTE: aspect ratio option removed per request -->
 
       <h3>Compression</h3>
-
-      <label>Target File Size (KB) <small style="color:#9fb8d9">(required for target-size compression)</small></label>
-      <input type="number" id="targetSizeKB" placeholder="e.g., 200" min="1" />
-
-      <p style="font-size:13px; color:#a8b9d4; margin-top:8px;">
-        Target size compression works only for <strong>JPEG</strong> and <strong>WebP</strong>.
-        If you choose PNG, the tool will alert and skip target-size compression.
-      </p>
+      <label>Target File Size</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="targetSize" type="number" placeholder="Enter KB (e.g. 150)" style="width:120px;padding:10px;border-radius:8px;border:1px solid #2b3b5a;background:#0f1829;color:#e8ecf4;">
+        <span style="color:#9fb7d6;font-size:13px">KB</span>
+      </div>
+      <p style="color:#9fb7d6;font-size:13px;margin-top:8px;">Leave empty to use default quality-based export.</p>
 
       <h3>Format</h3>
       <select id="formatSelect">
         <option value="image/jpeg">JPEG</option>
-        <option value="image/png">PNG</option>
         <option value="image/webp">WebP</option>
+        <option value="image/png">PNG</option>
       </select>
     </div>
 
-    <!-- RIGHT: Preview -->
+    <!-- PREVIEW -->
     <div class="preview-section">
       <h3>Preview</h3>
       <img id="previewImg" class="preview-img" alt="Preview will appear here" />
       <p id="previewInfo"></p>
     </div>
 
-  </div> <!-- /.tool-container -->
+  </div>
 
   <!-- ACTION BUTTONS -->
   <div class="actions">
@@ -140,7 +138,7 @@
   <!-- LOADING OVERLAY -->
   <div id="loadingOverlay" class="loading-overlay hidden">
     <div class="spinner"></div>
-    <p>Processing image...</p>
+    <p id="loaderText">Processing image...</p>
   </div>
 
   <!-- SEO CONTENT (preserved) -->
@@ -185,7 +183,7 @@
     </p>
   </footer>
 
-  <!-- Mobile menu toggle + year injection -->
+  <!-- Mobile menu + year script -->
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
     document.getElementById("hamburger").addEventListener("click", () => {
@@ -193,7 +191,7 @@
     });
   </script>
 
-  <!-- App modules (expects utils.js, cropper.js, app.js present) -->
+  <!-- Load scripts (ES modules) -->
   <script type="module">
     import "./utils.js";
     import "./cropper.js";
