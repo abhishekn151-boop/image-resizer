@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <!-- Favicon (local path from conversation files) -->
+  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
 
-  <!-- OpenGraph -->
-  <meta property="og:image" content="assets/logo.png" />
+  <!-- OpenGraph image (local path from conversation files) -->
+  <meta property="og:image" content="/mnt/data/logo.png" />
 
   <!-- Primary meta -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
@@ -50,181 +50,152 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="top-nav">
-  <div class="nav-left">
-    <img src="assets/logo.png" class="nav-logo" alt="logo">
-    <span class="nav-title">Free Image Resizer</span>
-  </div>
-
-  <div class="hamburger" id="hamburger">☰</div>
-
-  <div class="nav-links" id="mobileMenu">
-    <a href="index.html">Home</a>
-    <a href="about.html">About Us</a>
-    <a href="faq.html">FAQ</a>
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="terms.html">Terms of Service</a>
-    <a href="contact.html">Contact</a>
-  </div>
-</nav>
-
-<!-- HEADER -->
-<header class="head">
-  <img src="assets/logo.png" class="logo" alt="Free Image Resizer logo">
-  <h1>Free Image Resizer</h1>
-  <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
-</header>
-
-<!-- MODERN TOOL LAYOUT -->
-<div class="modern-layout">
-
-  <!-- LEFT SIDE TOOLS MENU -->
-  <div class="tool-menu">
-    <button class="tool-tab active" data-tab="resize">Resize</button>
-    <button class="tool-tab" data-tab="compress">Compress</button>
-    <button class="tool-tab" data-tab="crop">Crop</button>
-    <button class="tool-tab" data-tab="rotate">Rotate</button>
-  </div>
-
-  <!-- RIGHT SIDE WORK AREA -->
-  <div class="work-area">
-
-    <!-- Upload + Preview -->
-    <div class="file-preview-area">
-      <div id="drop-area" class="drop-area">
-        <h2>Drop Images Here</h2>
-        <p>or click to upload</p>
-        <input type="file" id="fileInput" multiple accept="image/*" hidden />
-      </div>
-
-      <div class="preview-section">
-        <h3>Preview</h3>
-        <img id="previewImg" class="preview-img" alt="Preview will appear here">
-        <p id="previewInfo"></p>
-      </div>
+  <!-- TOP NAVIGATION BAR (style B: vertical separators) -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <!-- Logo uses local uploaded path (developer instruction) -->
+      <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+      <span class="nav-title">Free Image Resizer</span>
     </div>
 
-    <!-- TOOL SETTINGS -->
-    <div class="tool-settings">
+    <div class="hamburger" id="hamburger">☰</div>
 
-      <!-- Resize -->
-      <div class="settings-panel active" id="panel-resize">
-        <h3>Resize Options</h3>
-        <label>Resize Type</label>
-        <select id="resizeType">
-          <option value="px">By Pixels</option>
-          <option value="percent">By Percent</option>
-          <option value="longest">Longest Side</option>
-        </select>
+    <div class="nav-links" id="mobileMenu">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="faq.html">FAQ</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
 
-        <label>Width</label>
-        <input type="number" id="widthInput" placeholder="Auto">
+  <!-- HEADER -->
+  <header class="head">
+    <img src="/mnt/data/logo.png" class="logo" alt="Free Image Resizer logo">
+    <h1>Free Image Resizer</h1>
+    <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
+  </header>
 
-        <label>Height</label>
-        <input type="number" id="heightInput" placeholder="Auto">
+  <!-- MAIN: Classic 3-column layout (Design A) -->
+  <div class="tool-container">
 
-        <label><input type="checkbox" id="keepRatio" checked> Keep Aspect Ratio</label>
-      </div>
-
-      <!-- Compress -->
-      <div class="settings-panel" id="panel-compress">
-        <h3>Compression</h3>
-        <label>Quality (<span id="qualityVal">80%</span>)</label>
-        <input type="range" id="qualitySlider" min="10" max="100" value="80">
-      </div>
-
-      <!-- Crop -->
-      <div class="settings-panel" id="panel-crop">
-        <h3>Crop Tool</h3>
-        <p>Use mouse/gesture crop inside preview (auto-enabled).</p>
-      </div>
-
-      <!-- Rotate -->
-      <div class="settings-panel" id="panel-rotate">
-        <h3>Rotate</h3>
-        <select id="rotateSelect">
-          <option value="0">No Rotation</option>
-          <option value="90">Rotate 90°</option>
-          <option value="180">Rotate 180°</option>
-          <option value="270">Rotate 270°</option>
-        </select>
-      </div>
-
+    <!-- LEFT: Upload / Drag Area -->
+    <div id="drop-area" class="drop-area">
+      <h2>Drop Images Here</h2>
+      <p>or click to upload</p>
+      <input type="file" id="fileInput" multiple accept="image/*" hidden />
     </div>
 
+    <!-- MIDDLE: Settings (Resize / Compress / Format) -->
+    <div class="settings">
+      <h3>Resize Options</h3>
+
+      <label>Resize Type</label>
+      <select id="resizeType">
+        <option value="px">By Pixels</option>
+        <option value="percent">By Percent</option>
+        <option value="longest">Longest Side</option>
+      </select>
+
+      <label>Width</label>
+      <input type="number" id="widthInput" placeholder="Auto">
+
+      <label>Height</label>
+      <input type="number" id="heightInput" placeholder="Auto">
+
+      <label>Keep Aspect Ratio</label>
+      <input type="checkbox" id="keepRatio" checked />
+
+      <h3>Compression</h3>
+      <label>Quality (<span id="qualityVal">80%</span>)</label>
+      <input type="range" id="qualitySlider" min="10" max="100" value="80" />
+
+      <h3>Format</h3>
+      <select id="formatSelect">
+        <option value="image/jpeg">JPEG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WebP</option>
+      </select>
+    </div>
+
+    <!-- RIGHT: Preview -->
+    <div class="preview-section">
+      <h3>Preview</h3>
+      <img id="previewImg" class="preview-img" alt="Preview will appear here" />
+      <p id="previewInfo"></p>
+    </div>
+
+  </div> <!-- /.tool-container -->
+
+  <!-- ACTION BUTTONS -->
+  <div class="actions">
+    <button id="processBtn" class="btn">Process Image</button>
+    <button id="downloadBtn" class="btn disabled" disabled>Download</button>
   </div>
-</div>
 
-<!-- ACTION BUTTONS -->
-<div class="actions">
-  <button id="processBtn" class="btn">Process</button>
-  <button id="downloadBtn" class="btn disabled" disabled>Download</button>
-</div>
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="spinner"></div>
+    <p>Processing image...</p>
+  </div>
 
-<!-- LOADING OVERLAY -->
-<div id="loadingOverlay" class="loading-overlay hidden">
-  <div class="spinner"></div>
-  <p>Processing image...</p>
-</div>
+  <!-- SEO CONTENT (preserved) -->
+  <section class="seo-section">
+    <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
+    <p>
+      Our online image resizer allows you to quickly reduce image size,
+      adjust dimensions, crop photos, and convert formats — all directly in your browser.
+      No uploads, no servers, no data collection. Everything stays on your device.
+    </p>
 
-<!-- SEO CONTENT -->
-<section class="seo-section">
-  <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
-  <p>Our online image resizer allows you to quickly reduce image size,
-    adjust dimensions, crop photos, and convert formats — all directly in your browser.
-    No uploads, no servers, no data collection. Everything stays on your device.</p>
+    <h3>Key Features</h3>
+    <ul>
+      <li>Resize by pixels, percentage, or longest side</li>
+      <li>Compress images with adjustable quality</li>
+      <li>Crop with draggable precision</li>
+      <li>Rotate images</li>
+      <li>Convert between JPG, PNG, and WebP</li>
+      <li>100% offline and private</li>
+    </ul>
 
-  <h3>Key Features</h3>
-  <ul>
-    <li>Resize by pixels, percentage, or longest side</li>
-    <li>Compress images with adjustable quality</li>
-    <li>Crop with draggable precision</li>
-    <li>Rotate images</li>
-    <li>Convert between JPG, PNG, and WebP</li>
-    <li>100% offline and private</li>
-  </ul>
-</section>
+    <h3>How to Use</h3>
+    <ol>
+      <li>Click the upload area or drag your image into the tool.</li>
+      <li>Select resize type: pixels, percent, or longest side.</li>
+      <li>Choose output quality and image format.</li>
+      <li>Click "Process Image" to resize or compress.</li>
+      <li>Preview and download the optimized image.</li>
+    </ol>
+  </section>
 
-<!-- FOOTER -->
-<footer>
-  <p>
-    © <span id="year"></span> Free Image Resizer — All Rights Reserved |
-    <a href="index.html">Home</a> |
-    <a href="about.html">About</a> |
-    <a href="faq.html">FAQ</a> |
-    <a href="privacy.html">Privacy Policy</a> |
-    <a href="terms.html">Terms</a> |
-    <a href="contact.html">Contact</a>
-  </p>
-</footer>
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      © <span id="year"></span> Free Image Resizer — All Rights Reserved |
+      <a href="index.html" style="color:#7fc6ff">Home</a> |
+      <a href="about.html" style="color:#7fc6ff">About Us</a> |
+      <a href="faq.html" style="color:#7fc6ff">FAQ</a> |
+      <a href="privacy.html" style="color:#7fc6ff">Privacy Policy</a> |
+      <a href="terms.html" style="color:#7fc6ff">Terms of Service</a> |
+      <a href="contact.html" style="color:#7fc6ff">Contact</a>
+    </p>
+  </footer>
 
-<!-- MOBILE MENU TOGGLE -->
-<script>
-document.getElementById("year").textContent = new Date().getFullYear();
-document.getElementById("hamburger").addEventListener("click", () => {
-  document.getElementById("mobileMenu").classList.toggle("active");
-});
-</script>
-
-<!-- APP LOGIC -->
-<script type="module">
-  import "./utils.js";
-  import "./cropper.js";
-  import "./app.js";
-
-  // Tab switching
-  document.querySelectorAll(".tool-tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".tool-tab").forEach(t => t.classList.remove("active"));
-      btn.classList.add("active");
-
-      const target = btn.dataset.tab;
-      document.querySelectorAll(".settings-panel").forEach(p => p.classList.remove("active"));
-      document.getElementById("panel-" + target).classList.add("active");
+  <!-- Mobile menu toggle + year injection -->
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("hamburger").addEventListener("click", () => {
+      document.getElementById("mobileMenu").classList.toggle("active");
     });
-  });
-</script>
+  </script>
+
+  <!-- App modules (expects utils.js, cropper.js, app.js present) -->
+  <script type="module">
+    import "./utils.js";
+    import "./cropper.js";
+    import "./app.js";
+  </script>
 
 </body>
 </html>
