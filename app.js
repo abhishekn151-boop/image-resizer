@@ -1,4 +1,6 @@
 // app.js (ES module)
+// Fully updated: upload fixed, target-size compression, no warnings, no ratio option.
+
 import {
   loadImage,
   getExifOrientation,
@@ -7,10 +9,9 @@ import {
   canvasToBlob,
   formatSize,
   formatDim,
-  safeURL
+  safeURL,
+  compressCanvasToTarget
 } from "./utils.js";
-
-import { Cropper } from "./cropper.js";
 
 /* ---------- DOM Elements ---------- */
 const fileInput = document.getElementById("fileInput");
@@ -38,25 +39,28 @@ let currentOrientation = 1;
 function setStatus(text) {
   if (previewInfo) previewInfo.textContent = text;
 }
+
 function showLoader() {
-  loadingOverlay?.classList.remove("hidden");
-}
-function hideLoader() {
-  loadingOverlay?.classList.add("hidden");
-}
-function enableDownload(flag) {
-  downloadBtn.disabled = !flag;
-  downloadBtn.classList.toggle("disabled", !flag);
+  loadingOverlay.classList.remove("hidden");
 }
 
-/* ---------- FIXED: Upload event ---------- */
+function hideLoader() {
+  loadingOverlay.classList.add("hidden");
+}
+
+function enableDownload(state) {
+  downloadBtn.disabled = !state;
+  downloadBtn.classList.toggle("disabled", !state);
+}
+
+/* ---------- Drag & Drop Handling (FIXED) ---------- */
 function preventDefaults(e) {
   e.preventDefault();
   e.stopPropagation();
 }
 
-["dragenter","dragover","dragleave","drop"].forEach(event => {
-  dropArea.addEventListener(event, preventDefaults);
+["dragenter", "dragover", "dragleave", "drop"].forEach(evt => {
+  dropArea.addEventListener(evt, preventDefaults);
 });
 
 dropArea.addEventListener("dragover", () => dropArea.classList.add("active"));
@@ -64,23 +68,25 @@ dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active")
 
 dropArea.addEventListener("drop", (e) => {
   dropArea.classList.remove("active");
-  handleFiles(e.dataTransfer.files);
+  if (e.dataTransfer.files.length > 0) {
+    handleFiles(e.dataTransfer.files);
+  }
 });
 
-/* --- CLICK TO OPEN FILE PICKER --- */
+/* ---------- Click to open input ---------- */
 dropArea.addEventListener("click", () => fileInput.click());
 
-/* --- INPUT CHANGE --- */
+/* ---------- File input change ---------- */
 fileInput.addEventListener("change", () => {
-  if (fileInput.files.length) handleFiles(fileInput.files);
+  if (fileInput.files.length > 0) {
+    handleFiles(fileInput.files);
+  }
 });
 
-/* ---------- File Handling ---------- */
+/* ---------- Handle File Upload ---------- */
 async function handleFiles(files) {
-  if (!files || !files.length) return;
-
   const file = files[0];
-  if (!file.type.startsWith("image/")) {
+  if (!file || !file.type.startsWith("image/")) {
     alert("Please upload an image file.");
     return;
   }
@@ -91,8 +97,8 @@ async function handleFiles(files) {
   try {
     currentOrientation = await getExifOrientation(file).catch(() => 1);
     const img = await loadImage(file);
-    currentImage = img;
 
+    currentImage = img;
     previewImg.src = safeURL(file);
     previewImg.style.display = "block";
 
@@ -100,78 +106,20 @@ async function handleFiles(files) {
     enableDownload(false);
 
   } catch (err) {
-    console.error(err);
+    console.error("Error loading image:", err);
     alert("Could not load the image.");
-    setStatus("Failed to load image");
+    setStatus("Error loading image");
   }
 }
 
 window.handleFiles = handleFiles;
 
-/* ---------- Smart target-size matching ---------- */
-async function tryMatchTargetSize(sourceCanvas, targetKB, mimePref) {
-  const targetBytes = targetKB * 1024;
-  let canvas = sourceCanvas;
-  let mime = mimePref;
-
-  const minQ = 0.25;
-  const maxQ = 0.98;
-
-  for (let step = 0; step < 8; step++) {
-
-    if (mime === "image/png") {
-      // PNG cannot shrink by quality → scale image
-      const blob = await canvasToBlob(canvas, mime, 1);
-      if (blob.size <= targetBytes) return { blob, width: canvas.width, height: canvas.height, mime };
-
-      // scale down
-      const scaled = document.createElement("canvas");
-      scaled.width = Math.round(canvas.width * 0.85);
-      scaled.height = Math.round(canvas.height * 0.85);
-      scaled.getContext("2d").drawImage(canvas, 0, 0, scaled.width, scaled.height);
-      canvas = scaled;
-      continue;
-    }
-
-    // JPEG / WebP → binary search quality
-    let low = minQ;
-    let high = maxQ;
-    let best = null;
-
-    for (let i = 0; i < 16; i++) {
-      const q = (low + high) / 2;
-
-      const blob = await canvasToBlob(canvas, mime, q);
-      const diff = Math.abs(blob.size - targetBytes);
-
-      if (!best || diff < best.diff) best = { blob, diff };
-
-      if (blob.size > targetBytes) high = q;
-      else low = q;
-
-      if (diff < targetBytes * 0.03) break;
-    }
-
-    if (best) return { blob: best.blob, width: canvas.width, height: canvas.height, mime };
-
-    // else scale image and retry
-    const scaled = document.createElement("canvas");
-    scaled.width = Math.round(canvas.width * 0.85);
-    scaled.height = Math.round(canvas.height * 0.85);
-    scaled.getContext("2d").drawImage(canvas, 0, 0, scaled.width, scaled.height);
-    canvas = scaled;
-  }
-
-  const fallback = await canvasToBlob(canvas, mime, 0.75);
-  return { blob: fallback, width: canvas.width, height: canvas.height, mime };
-}
-
-/* ---------- Processing ---------- */
+/* ---------- PROCESS IMAGE ---------- */
 async function processImage() {
-  if (!currentImage) return alert("Please upload an image.");
+  if (!currentImage) return alert("Please upload an image first.");
 
   const targetKB = Number(targetSizeKBInput.value);
-  if (!targetKB || targetKB <= 0) return alert("Enter target size in KB.");
+  if (!targetKB || targetKB <= 0) return alert("Enter a valid target file size (KB).");
 
   showLoader();
   processBtn.disabled = true;
@@ -181,29 +129,51 @@ async function processImage() {
     const imgW = currentImage.naturalWidth;
     const imgH = currentImage.naturalHeight;
 
-    let wVal = widthInput.value ? Number(widthInput.value) : imgW;
-    let hVal = heightInput.value ? Number(heightInput.value) : imgH;
+    let userW = widthInput.value ? Number(widthInput.value) : imgW;
+    let userH = heightInput.value ? Number(heightInput.value) : imgH;
 
-    const dims = convertResize(wVal, hVal, resizeTypeEl.value, imgW, imgH);
+    const dims = convertResize(userW, userH, resizeTypeEl.value, imgW, imgH);
 
-    // Draw initial scaled canvas
-    const init = document.createElement("canvas");
-    init.width = dims.w;
-    init.height = dims.h;
-    init.getContext("2d").drawImage(currentImage, 0, 0, dims.w, dims.h);
+    /* Draw initial resized canvas */
+    const baseCanvas = document.createElement("canvas");
+    baseCanvas.width = dims.w;
+    baseCanvas.height = dims.h;
 
-    // Final compression
-    const mime = formatSelect.value;
-    const result = await tryMatchTargetSize(init, targetKB, mime);
+    const ctx = baseCanvas.getContext("2d");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    // Apply orientation, then scale image into new canvas
+    const originalCanvas = document.createElement("canvas");
+    originalCanvas.width = imgW;
+    originalCanvas.height = imgH;
+    originalCanvas.getContext("2d").drawImage(currentImage, 0, 0);
+
+    const orientedCanvas =
+      currentOrientation !== 1
+        ? applyOrientation(originalCanvas, currentOrientation)
+        : originalCanvas;
+
+    ctx.drawImage(orientedCanvas, 0, 0, dims.w, dims.h);
+
+    /* Apply target-size compression (Smart System — No slider) */
+    const result = await compressCanvasToTarget(baseCanvas, {
+      mime: formatSelect.value,
+      targetBytes: targetKB * 1024
+    });
 
     const url = safeURL(result.blob);
     previewImg.src = url;
-    setStatus(`${formatSize(result.blob.size)} • ${result.width}×${result.height}`);
 
+    setStatus(`${formatSize(result.achievedBytes)} • ${formatDim(result.width, result.height)}`);
+
+    /* Download */
     downloadBtn.onclick = () => {
       const a = document.createElement("a");
+      const ext = (formatSelect.value.split("/")[1] || "jpg");
+      const baseName = currentFile.name.replace(/\.[^/.]+$/, "");
       a.href = url;
-      a.download = "image_resized." + (result.mime.split("/")[1] || "jpg");
+      a.download = `${baseName}_resized.${ext}`;
       a.click();
     };
 
@@ -211,20 +181,21 @@ async function processImage() {
 
   } catch (err) {
     console.error(err);
-    alert("Processing failed. See console.");
-    setStatus("Error");
+    alert("Processing failed. Check console.");
+    setStatus("Processing failed");
   }
 
   hideLoader();
   processBtn.disabled = false;
 }
 
-/* ---------- Init ---------- */
+/* ---------- INIT ---------- */
 function init() {
   processBtn.addEventListener("click", processImage);
 }
 
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+if (document.readyState === "loading")
+  document.addEventListener("DOMContentLoaded", init);
 else init();
 
 export { processImage, handleFiles };
