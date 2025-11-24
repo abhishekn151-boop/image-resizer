@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <!-- Favicon (local path from conversation files) -->
+  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
 
-  <!-- OpenGraph image -->
-  <meta property="og:image" content="assets/logo.png" />
+  <!-- OpenGraph image (local path from conversation files) -->
+  <meta property="og:image" content="/mnt/data/logo.png" />
 
   <!-- Primary meta -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
@@ -38,14 +38,13 @@
     "mainEntity":[
       {"@type":"Question","name":"Is this tool really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. The tool is 100% free with no hidden limits or sign-ups required."}},
       {"@type":"Question","name":"Are my images uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. All image processing happens inside your browser. Files never leave your device."}},
-      {"@type":"Question","name":"Will compressing reduce image quality?","acceptedAnswer":{"@type":"Answer","text":"Compression quality can be adjusted. Higher quality means larger size; lower quality reduces size."}},
+      {"@type":"Question","name":"Will compressing reduce image quality?","acceptedAnswer":{"@type":"Answer","text":"Compression quality can be adjusted when using quality slider or target size. For target-size compression, choose JPEG or WebP."}},
       {"@type":"Question","name":"Which image formats does this tool support?","acceptedAnswer":{"@type":"Answer","text":"Supports JPG, PNG, BMP, WEBP."}},
       {"@type":"Question","name":"Does this tool work on mobile phones?","acceptedAnswer":{"@type":"Answer","text":"Yes, the tool works on all devices including Android, iOS, tablets and desktops."}}
     ]
   }
   </script>
 
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -53,7 +52,7 @@
   <!-- TOP NAVIGATION BAR -->
   <nav class="top-nav">
     <div class="nav-left">
-      <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+      <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
       <span class="nav-title">Free Image Resizer</span>
     </div>
 
@@ -71,60 +70,66 @@
 
   <!-- HEADER -->
   <header class="head">
-    <img src="assets/logo.png" class="logo" alt="Free Image Resizer logo">
+    <img src="/mnt/data/logo.png" class="logo" alt="Free Image Resizer logo">
     <h1>Free Image Resizer</h1>
     <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
   </header>
 
-  <!-- 3 COLUMN LAYOUT -->
+  <!-- MAIN: Classic 3-column layout (Design A) -->
   <div class="tool-container">
 
-    <!-- LEFT -->
+    <!-- LEFT: Upload / Drag Area -->
     <div id="drop-area" class="drop-area">
       <h2>Drop Images Here</h2>
       <p>or click to upload</p>
       <input type="file" id="fileInput" multiple accept="image/*" hidden />
     </div>
 
-    <!-- MIDDLE: Settings -->
-<div class="settings">
-  <h3>Resize Options</h3>
+    <!-- MIDDLE: Settings (Resize / Compress / Format) -->
+    <div class="settings">
+      <h3>Resize Options</h3>
 
-  <label>Resize Type</label>
-  <select id="resizeType">
-    <option value="px">By Pixels</option>
-    <option value="percent">By Percent</option>
-    <option value="longest">Longest Side</option>
-  </select>
+      <label>Resize Type</label>
+      <select id="resizeType">
+        <option value="px">By Pixels</option>
+        <option value="percent">By Percent</option>
+        <option value="longest">Longest Side</option>
+      </select>
 
-  <label>Width</label>
-  <input type="number" id="widthInput" placeholder="Auto">
+      <label>Width</label>
+      <input type="number" id="widthInput" placeholder="Auto">
 
-  <label>Height</label>
-  <input type="number" id="heightInput" placeholder="Auto">
+      <label>Height</label>
+      <input type="number" id="heightInput" placeholder="Auto">
 
-  <!-- Keep Aspect Ratio removed -->
+      <!-- NOTE: Keep Aspect Ratio removed as requested -->
 
-  <h3>Compression</h3>
-  <label>Quality (<span id="qualityVal">80%</span>)</label>
-  <input type="range" id="qualitySlider" min="10" max="100" value="80" />
+      <h3>Compression</h3>
 
-  <h3>Format</h3>
-  <select id="formatSelect">
-    <option value="image/jpeg">JPEG</option>
-    <option value="image/png">PNG</option>
-    <option value="image/webp">WebP</option>
-  </select>
-</div>
-    
-    <!-- RIGHT -->
+      <label>Target File Size (KB) <small style="color:#9fb8d9">(required for target-size compression)</small></label>
+      <input type="number" id="targetSizeKB" placeholder="e.g., 200" min="1" />
+
+      <p style="font-size:13px; color:#a8b9d4; margin-top:8px;">
+        Target size compression works only for <strong>JPEG</strong> and <strong>WebP</strong>.
+        If you choose PNG, the tool will alert and skip target-size compression.
+      </p>
+
+      <h3>Format</h3>
+      <select id="formatSelect">
+        <option value="image/jpeg">JPEG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WebP</option>
+      </select>
+    </div>
+
+    <!-- RIGHT: Preview -->
     <div class="preview-section">
       <h3>Preview</h3>
       <img id="previewImg" class="preview-img" alt="Preview will appear here" />
       <p id="previewInfo"></p>
     </div>
 
-  </div>
+  </div> <!-- /.tool-container -->
 
   <!-- ACTION BUTTONS -->
   <div class="actions">
@@ -138,17 +143,19 @@
     <p>Processing image...</p>
   </div>
 
-  <!-- SEO CONTENT -->
+  <!-- SEO CONTENT (preserved) -->
   <section class="seo-section">
     <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
-    <p>Our online image resizer allows you to quickly reduce image size,
+    <p>
+      Our online image resizer allows you to quickly reduce image size,
       adjust dimensions, crop photos, and convert formats — all directly in your browser.
-      No uploads, no servers, no data collection. Everything stays on your device.</p>
+      No uploads, no servers, no data collection. Everything stays on your device.
+    </p>
 
     <h3>Key Features</h3>
     <ul>
       <li>Resize by pixels, percentage, or longest side</li>
-      <li>Compress images with adjustable quality</li>
+      <li>Compress images with adjustable quality or target size</li>
       <li>Crop with draggable precision</li>
       <li>Rotate images</li>
       <li>Convert between JPG, PNG, and WebP</li>
@@ -158,10 +165,10 @@
     <h3>How to Use</h3>
     <ol>
       <li>Click the upload area or drag your image into the tool.</li>
-      <li>Select resize type.</li>
-      <li>Set format and quality.</li>
-      <li>Click “Process Image”.</li>
-      <li>Download your optimized image.</li>
+      <li>Select resize type: pixels, percent, or longest side.</li>
+      <li>Enter the <strong>Target File Size (KB)</strong> (required) and choose output format (JPEG/WebP recommended).</li>
+      <li>Click "Process Image" to resize or compress.</li>
+      <li>Preview and download the optimized image.</li>
     </ol>
   </section>
 
@@ -169,24 +176,24 @@
   <footer>
     <p>
       © <span id="year"></span> Free Image Resizer — All Rights Reserved |
-      <a href="index.html">Home</a> |
-      <a href="about.html">About</a> |
-      <a href="faq.html">FAQ</a> |
-      <a href="privacy.html">Privacy Policy</a> |
-      <a href="terms.html">Terms</a> |
-      <a href="contact.html">Contact</a>
+      <a href="index.html" style="color:#7fc6ff">Home</a> |
+      <a href="about.html" style="color:#7fc6ff">About Us</a> |
+      <a href="faq.html" style="color:#7fc6ff">FAQ</a> |
+      <a href="privacy.html" style="color:#7fc6ff">Privacy Policy</a> |
+      <a href="terms.html" style="color:#7fc6ff">Terms of Service</a> |
+      <a href="contact.html" style="color:#7fc6ff">Contact</a>
     </p>
   </footer>
 
-  <!-- Mobile Menu Toggle -->
+  <!-- Mobile menu toggle + year injection -->
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("hamburger").addEventListener("click", () =>
-      document.getElementById("mobileMenu").classList.toggle("active")
-    );
+    document.getElementById("hamburger").addEventListener("click", () => {
+      document.getElementById("mobileMenu").classList.toggle("active");
+    });
   </script>
 
-  <!-- App Logic -->
+  <!-- App modules (expects utils.js, cropper.js, app.js present) -->
   <script type="module">
     import "./utils.js";
     import "./cropper.js";
