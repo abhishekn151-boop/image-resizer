@@ -362,3 +362,62 @@ footer {
 ::-webkit-scrollbar-thumb:hover {
   background: #2f4368;
 }
+/* -------- CONTACT FORM -------- */
+
+.contact-form {
+  margin-top: 20px;
+  background: #0f1829;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #243550;
+}
+
+.contact-form .form-group {
+  margin-bottom: 18px;
+}
+
+.contact-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #c2c8d6;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #2b3b5a;
+  background: #111a2e;
+  color: #e8ecf4;
+  font-size: 15px;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: #4ad2ff;
+}
+
+.contact-form textarea {
+  height: 130px;
+  resize: vertical;
+}
+
+/* Button */
+.send-btn {
+  display: inline-block;
+  padding: 12px 26px;
+  background: #1f2a44;
+  border: 1px solid #324364;
+  border-radius: 8px;
+  color: #d7e3ff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.send-btn:hover {
+  background: #273556;
+}
