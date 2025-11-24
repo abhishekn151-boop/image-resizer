@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Favicon (local path from conversation files) -->
-  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-  <!-- OpenGraph image (local path from conversation files) -->
-  <meta property="og:image" content="/mnt/data/logo.png" />
+  <!-- OpenGraph image -->
+  <meta property="og:image" content="assets/logo.png" />
 
   <!-- Primary meta -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
@@ -50,11 +50,10 @@
 </head>
 <body>
 
-  <!-- TOP NAVIGATION BAR (style B: vertical separators) -->
+  <!-- TOP NAVIGATION BAR -->
   <nav class="top-nav">
     <div class="nav-left">
-      <!-- Logo uses local uploaded path (developer instruction) -->
-      <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+      <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
       <span class="nav-title">Free Image Resizer</span>
     </div>
 
@@ -72,22 +71,22 @@
 
   <!-- HEADER -->
   <header class="head">
-    <img src="/mnt/data/logo.png" class="logo" alt="Free Image Resizer logo">
+    <img src="assets/logo.png" class="logo" alt="Free Image Resizer logo">
     <h1>Free Image Resizer</h1>
     <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
   </header>
 
-  <!-- MAIN: Classic 3-column layout (Design A) -->
+  <!-- 3 COLUMN LAYOUT -->
   <div class="tool-container">
 
-    <!-- LEFT: Upload / Drag Area -->
+    <!-- LEFT -->
     <div id="drop-area" class="drop-area">
       <h2>Drop Images Here</h2>
       <p>or click to upload</p>
       <input type="file" id="fileInput" multiple accept="image/*" hidden />
     </div>
 
-    <!-- MIDDLE: Settings (Resize / Compress / Format) -->
+    <!-- MIDDLE -->
     <div class="settings">
       <h3>Resize Options</h3>
 
@@ -119,14 +118,14 @@
       </select>
     </div>
 
-    <!-- RIGHT: Preview -->
+    <!-- RIGHT -->
     <div class="preview-section">
       <h3>Preview</h3>
       <img id="previewImg" class="preview-img" alt="Preview will appear here" />
       <p id="previewInfo"></p>
     </div>
 
-  </div> <!-- /.tool-container -->
+  </div>
 
   <!-- ACTION BUTTONS -->
   <div class="actions">
@@ -140,14 +139,12 @@
     <p>Processing image...</p>
   </div>
 
-  <!-- SEO CONTENT (preserved) -->
+  <!-- SEO CONTENT -->
   <section class="seo-section">
     <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
-    <p>
-      Our online image resizer allows you to quickly reduce image size,
+    <p>Our online image resizer allows you to quickly reduce image size,
       adjust dimensions, crop photos, and convert formats — all directly in your browser.
-      No uploads, no servers, no data collection. Everything stays on your device.
-    </p>
+      No uploads, no servers, no data collection. Everything stays on your device.</p>
 
     <h3>Key Features</h3>
     <ul>
@@ -162,10 +159,10 @@
     <h3>How to Use</h3>
     <ol>
       <li>Click the upload area or drag your image into the tool.</li>
-      <li>Select resize type: pixels, percent, or longest side.</li>
-      <li>Choose output quality and image format.</li>
-      <li>Click "Process Image" to resize or compress.</li>
-      <li>Preview and download the optimized image.</li>
+      <li>Select resize type.</li>
+      <li>Set format and quality.</li>
+      <li>Click “Process Image”.</li>
+      <li>Download your optimized image.</li>
     </ol>
   </section>
 
@@ -173,24 +170,24 @@
   <footer>
     <p>
       © <span id="year"></span> Free Image Resizer — All Rights Reserved |
-      <a href="index.html" style="color:#7fc6ff">Home</a> |
-      <a href="about.html" style="color:#7fc6ff">About Us</a> |
-      <a href="faq.html" style="color:#7fc6ff">FAQ</a> |
-      <a href="privacy.html" style="color:#7fc6ff">Privacy Policy</a> |
-      <a href="terms.html" style="color:#7fc6ff">Terms of Service</a> |
-      <a href="contact.html" style="color:#7fc6ff">Contact</a>
+      <a href="index.html">Home</a> |
+      <a href="about.html">About</a> |
+      <a href="faq.html">FAQ</a> |
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms</a> |
+      <a href="contact.html">Contact</a>
     </p>
   </footer>
 
-  <!-- Mobile menu toggle + year injection -->
+  <!-- Mobile Menu Toggle -->
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("hamburger").addEventListener("click", () => {
-      document.getElementById("mobileMenu").classList.toggle("active");
-    });
+    document.getElementById("hamburger").addEventListener("click", () =>
+      document.getElementById("mobileMenu").classList.toggle("active")
+    );
   </script>
 
-  <!-- App modules (expects utils.js, cropper.js, app.js present) -->
+  <!-- App Logic -->
   <script type="module">
     import "./utils.js";
     import "./cropper.js";
