@@ -14,9 +14,11 @@
   <!-- SEO -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
   <meta name="keywords" content="free image resizer, resize image online, compress image, crop image, convert to webp" />
+
+  <!-- Canonical -->
   <link rel="canonical" href="https://your-domain.com/index.html" />
 
-  <!-- JSON-LD APP -->
+  <!-- JSON-LD (App) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org/",
@@ -30,51 +32,27 @@
   }
   </script>
 
-  <!-- JSON-LD FAQ -->
+  <!-- JSON-LD (FAQ) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
     "@type":"FAQPage",
     "mainEntity":[
       {"@type":"Question","name":"Is this tool free?","acceptedAnswer":{"@type":"Answer","text":"Yes, fully 100% free."}},
-      {"@type":"Question","name":"Do images get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No, everything is inside your browser."}}
+      {"@type":"Question","name":"Do images get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No, everything happens inside your browser."}}
     ]
   }
   </script>
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Small overrides for target-size input -->
-  <style>
-    .settings input[type="number"],
-    .settings select,
-    .settings input[type="text"],
-    .target-size {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #2b3b5a;
-      background: #0f1829;
-      color: #e8ecf4;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-    .settings label { display:block; margin-top:12px; margin-bottom:6px; color:#c2c8d6; }
-    .target-row { display:flex; gap:10px; align-items:center; }
-    .target-row .target-size { flex:1; }
-    .target-row .target-unit {
-      white-space:nowrap; color:#a3abba; font-size:14px; padding:10px;
-      background:#0f1829; border:1px solid #2b3b5a; border-radius:8px;
-    }
-    .note-small { color:#a8b9d4; font-size:13px; margin-top:8px; }
-  </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- NAV -->
 <nav class="top-nav">
   <div class="nav-left">
-    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo" />
+    <img src="assets/logo.png" class="nav-logo" alt="Logo" />
     <span class="nav-title">Free Image Resizer</span>
   </div>
 
@@ -97,13 +75,15 @@
   <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
 </header>
 
-<!-- MAIN TOOL -->
+<!-- TOOL -->
 <div class="tool-container">
 
   <!-- UPLOAD -->
   <div id="drop-area" class="drop-area" role="button">
     <h2>Drop Images Here</h2>
     <p>or click to upload</p>
+
+    <!-- FIXED: file input must NOT be multiple -->
     <input type="file" id="fileInput" accept="image/*" hidden />
   </div>
 
@@ -125,12 +105,9 @@
     <input type="number" id="heightInput" placeholder="Auto" />
 
     <h3>Target File Size (KB)</h3>
-    <div class="target-row">
-      <input class="target-size" id="targetSizeKB" type="number" min="1" placeholder="e.g. 150" />
-      <div class="target-unit">KB</div>
-    </div>
+    <input id="targetSizeKB" type="number" min="1" placeholder="e.g. 150" />
 
-    <p class="note-small">Tool will adjust quality & size to match this target.</p>
+    <p class="note-small">We match your target using smart compression & scaling.</p>
 
     <h3>Format</h3>
     <select id="formatSelect">
@@ -138,7 +115,6 @@
       <option value="image/webp">WebP</option>
       <option value="image/png">PNG</option>
     </select>
-
   </div>
 
   <!-- PREVIEW -->
@@ -150,40 +126,46 @@
 
 </div>
 
-<!-- ACTION BUTTONS -->
+<!-- ACTIONS -->
 <div class="actions">
   <button id="processBtn" class="btn">Process Image</button>
   <button id="downloadBtn" class="btn disabled" disabled>Download</button>
 </div>
 
-<!-- LOADING OVERLAY -->
+<!-- LOADER -->
 <div id="loadingOverlay" class="loading-overlay hidden">
   <div class="spinner"></div>
   <p>Processing image...</p>
 </div>
 
-<!-- SEO SECTION -->
-<section class="seo-section">
-  <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
-  <p>Resize, compress, crop, rotate and convert images in your browser — totally offline.</p>
+<!-- SEO CONTENT (preserved) -->
+  <section class="seo-section">
+    <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
+    <p>
+      Our online image resizer allows you to quickly reduce image size,
+      adjust dimensions, crop photos, and convert formats — all directly in your browser.
+      No uploads, no servers, no data collection. Everything stays on your device.
+    </p>
 
-  <h3>Key Features</h3>
-  <ul>
-    <li>Resize by pixels, percent, or longest side</li>
-    <li>Set target file size in KB</li>
-    <li>Convert to JPG, PNG, WebP</li>
-    <li>100% offline — no upload</li>
-  </ul>
+    <h3>Key Features</h3>
+    <ul>
+      <li>Resize by pixels, percentage, or longest side</li>
+      <li>Compress images with adjustable quality or target size</li>
+      <li>Crop with draggable precision</li>
+      <li>Rotate images</li>
+      <li>Convert between JPG, PNG, and WebP</li>
+      <li>100% offline and private</li>
+    </ul>
 
-  <h3>How to Use</h3>
-  <ol>
-    <li>Upload or drag the image</li>
-    <li>Enter width/height or leave auto</li>
-    <li>Enter <strong>Target Size (KB)</strong></li>
-    <li>Select format</li>
-    <li>Press Process → Download</li>
-  </ol>
-</section>
+    <h3>How to Use</h3>
+    <ol>
+      <li>Click the upload area or drag your image into the tool.</li>
+      <li>Select resize type: pixels, percent, or longest side.</li>
+      <li>Enter the <strong>Target File Size (KB)</strong> (required) and choose output format (JPEG/WebP recommended).</li>
+      <li>Click "Process Image" to resize or compress.</li>
+      <li>Preview and download the optimized image.</li>
+    </ol>
+  </section>
 
 <!-- FOOTER -->
 <footer>
@@ -200,7 +182,6 @@
     document.getElementById("mobileMenu").classList.toggle("active");
 </script>
 
-<!-- MAIN APP -->
 <script type="module" src="app.js"></script>
 
 </body>
