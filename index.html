@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <!-- Favicon (local uploaded path) -->
+  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
 
   <!-- OpenGraph -->
-  <meta property="og:image" content="assets/logo.png" />
+  <meta property="og:image" content="/mnt/data/logo.png" />
 
   <!-- Primary meta -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
   <meta name="keywords" content="free image resizer, resize image online, compress image, crop image, convert to webp" />
   <link rel="canonical" href="https://your-domain.com/index.html" />
 
-  <!-- JSON-LD: Software -->
+  <!-- JSON-LD: Software & FAQ (keeps SEO rich snippets) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org/",
@@ -30,29 +30,47 @@
   }
   </script>
 
-  <!-- JSON-LD: FAQ -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
     "@type":"FAQPage",
     "mainEntity":[
-      {"@type":"Question","name":"Is this tool really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. The tool is 100% free with no hidden limits or sign-ups required."}},
-      {"@type":"Question","name":"Are my images uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. All image processing happens inside your browser. Files never leave your device."}},
-      {"@type":"Question","name":"Will compressing reduce image quality?","acceptedAnswer":{"@type":"Answer","text":"Compression quality can be adjusted. Higher quality means larger size; lower quality reduces size."}},
-      {"@type":"Question","name":"Which image formats does this tool support?","acceptedAnswer":{"@type":"Answer","text":"Supports JPG, PNG, BMP, WEBP."}},
-      {"@type":"Question","name":"Does this tool work on mobile phones?","acceptedAnswer":{"@type":"Answer","text":"Yes, the tool works on all devices including Android, iOS, tablets and desktops."}}
+      {"@type":"Question","name":"Is this tool really free?","acceptedAnswer":{"@type":"Answer","text":"Yes, it is free with no sign-ups."}},
+      {"@type":"Question","name":"Do images get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No — all processing happens in your browser."}}
     ]
   }
   </script>
 
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* minor page-level adjustments so the new input size matches others */
+    .settings input[type="number"],
+    .settings select,
+    .settings input[type="text"],
+    .settings .target-size {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #2b3b5a;
+      background: #0f1829;
+      color: #e8ecf4;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .settings label { display:block; margin-top:12px; margin-bottom:6px; color:#c2c8d6; }
+    .target-row { display:flex; gap:10px; align-items:center; }
+    .target-row .target-size { flex:1; }
+    .target-row .target-unit { white-space:nowrap; color:#a3abba; font-size:14px; padding:10px; background:#0f1829; border:1px solid #2b3b5a; border-radius:8px; }
+    .note-small { color:#a8b9d4; font-size:13px; margin-top:8px; }
+  </style>
 </head>
 <body>
 
   <!-- TOP NAV -->
   <nav class="top-nav">
     <div class="nav-left">
-      <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+      <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo" />
       <span class="nav-title">Free Image Resizer</span>
     </div>
 
@@ -70,24 +88,24 @@
 
   <!-- HEADER -->
   <header class="head">
-    <img src="assets/logo.png" class="logo" alt="Free Image Resizer logo">
+    <img src="/mnt/data/logo.png" class="logo" alt="Free Image Resizer logo" />
     <h1>Free Image Resizer</h1>
     <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
   </header>
 
-  <!-- MAIN TOOL WRAPPER (classic 3-column layout) -->
+  <!-- TOOL (classic 3-column layout) -->
   <div class="tool-container">
 
-    <!-- UPLOAD AREA -->
-    <div id="drop-area" class="drop-area">
+    <!-- UPLOAD -->
+    <div id="drop-area" class="drop-area" role="button" aria-label="Drop images here or click to upload">
       <h2>Drop Images Here</h2>
       <p>or click to upload</p>
       <input type="file" id="fileInput" multiple accept="image/*" hidden />
     </div>
 
-    <!-- SETTINGS PANEL -->
+    <!-- SETTINGS -->
     <div class="settings">
-      <h3>Resize Options</h3>
+      <h3>Resize & Compression</h3>
 
       <label>Resize Type</label>
       <select id="resizeType">
@@ -97,20 +115,17 @@
       </select>
 
       <label>Width</label>
-      <input type="number" id="widthInput" placeholder="Auto">
+      <input type="number" id="widthInput" placeholder="Auto" />
 
       <label>Height</label>
-      <input type="number" id="heightInput" placeholder="Auto">
+      <input type="number" id="heightInput" placeholder="Auto" />
 
-      <!-- NOTE: aspect ratio option removed per request -->
-
-      <h3>Compression</h3>
-      <label>Target File Size</label>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="targetSize" type="number" placeholder="Enter KB (e.g. 150)" style="width:120px;padding:10px;border-radius:8px;border:1px solid #2b3b5a;background:#0f1829;color:#e8ecf4;">
-        <span style="color:#9fb7d6;font-size:13px">KB</span>
+      <h3>Target File Size (KB)</h3>
+      <div class="target-row">
+        <input class="target-size" id="targetSizeKB" type="number" min="1" placeholder="Enter desired filesize in KB (e.g. 150)" />
+        <div class="target-unit">KB</div>
       </div>
-      <p style="color:#9fb7d6;font-size:13px;margin-top:8px;">Leave empty to use default quality-based export.</p>
+      <div class="note-small">Enter the approximate file size you want. The tool attempts to match the size using quality & subtle rescaling.</div>
 
       <h3>Format</h3>
       <select id="formatSelect">
@@ -118,6 +133,8 @@
         <option value="image/webp">WebP</option>
         <option value="image/png">PNG</option>
       </select>
+
+      <p class="note-small">Tip: WebP usually gives the best size-to-quality ratio. PNG is lossless and may not reach lower sizes.</p>
     </div>
 
     <!-- PREVIEW -->
@@ -129,16 +146,16 @@
 
   </div>
 
-  <!-- ACTION BUTTONS -->
+  <!-- ACTIONS -->
   <div class="actions">
     <button id="processBtn" class="btn">Process Image</button>
     <button id="downloadBtn" class="btn disabled" disabled>Download</button>
   </div>
 
-  <!-- LOADING OVERLAY -->
+  <!-- LOADER -->
   <div id="loadingOverlay" class="loading-overlay hidden">
     <div class="spinner"></div>
-    <p id="loaderText">Processing image...</p>
+    <p>Processing image...</p>
   </div>
 
   <!-- SEO CONTENT (preserved) -->
@@ -172,18 +189,14 @@
 
   <!-- FOOTER -->
   <footer>
-    <p>
-      © <span id="year"></span> Free Image Resizer — All Rights Reserved |
+    <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved |
       <a href="index.html" style="color:#7fc6ff">Home</a> |
       <a href="about.html" style="color:#7fc6ff">About Us</a> |
-      <a href="faq.html" style="color:#7fc6ff">FAQ</a> |
-      <a href="privacy.html" style="color:#7fc6ff">Privacy Policy</a> |
-      <a href="terms.html" style="color:#7fc6ff">Terms of Service</a> |
-      <a href="contact.html" style="color:#7fc6ff">Contact</a>
+      <a href="faq.html" style="color:#7fc6ff">FAQ</a>
     </p>
   </footer>
 
-  <!-- Mobile menu + year script -->
+  <!-- Small inline script for mobile menu & year -->
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
     document.getElementById("hamburger").addEventListener("click", () => {
@@ -191,12 +204,7 @@
     });
   </script>
 
-  <!-- Load scripts (ES modules) -->
-  <script type="module">
-    import "./utils.js";
-    import "./cropper.js";
-    import "./app.js";
-  </script>
-
+  <!-- App JS -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
