@@ -86,38 +86,37 @@
       <input type="file" id="fileInput" multiple accept="image/*" hidden />
     </div>
 
-    <!-- MIDDLE -->
-    <div class="settings">
-      <h3>Resize Options</h3>
+    <!-- MIDDLE: Settings -->
+<div class="settings">
+  <h3>Resize Options</h3>
 
-      <label>Resize Type</label>
-      <select id="resizeType">
-        <option value="px">By Pixels</option>
-        <option value="percent">By Percent</option>
-        <option value="longest">Longest Side</option>
-      </select>
+  <label>Resize Type</label>
+  <select id="resizeType">
+    <option value="px">By Pixels</option>
+    <option value="percent">By Percent</option>
+    <option value="longest">Longest Side</option>
+  </select>
 
-      <label>Width</label>
-      <input type="number" id="widthInput" placeholder="Auto">
+  <label>Width</label>
+  <input type="number" id="widthInput" placeholder="Auto">
 
-      <label>Height</label>
-      <input type="number" id="heightInput" placeholder="Auto">
+  <label>Height</label>
+  <input type="number" id="heightInput" placeholder="Auto">
 
-      <label>Keep Aspect Ratio</label>
-      <input type="checkbox" id="keepRatio" checked />
+  <!-- Keep Aspect Ratio removed -->
 
-      <h3>Compression</h3>
-      <label>Quality (<span id="qualityVal">80%</span>)</label>
-      <input type="range" id="qualitySlider" min="10" max="100" value="80" />
+  <h3>Compression</h3>
+  <label>Quality (<span id="qualityVal">80%</span>)</label>
+  <input type="range" id="qualitySlider" min="10" max="100" value="80" />
 
-      <h3>Format</h3>
-      <select id="formatSelect">
-        <option value="image/jpeg">JPEG</option>
-        <option value="image/png">PNG</option>
-        <option value="image/webp">WebP</option>
-      </select>
-    </div>
-
+  <h3>Format</h3>
+  <select id="formatSelect">
+    <option value="image/jpeg">JPEG</option>
+    <option value="image/png">PNG</option>
+    <option value="image/webp">WebP</option>
+  </select>
+</div>
+    
     <!-- RIGHT -->
     <div class="preview-section">
       <h3>Preview</h3>
