@@ -7,7 +7,8 @@ import {
   canvasToBlob,
   formatSize,
   formatDim,
-  safeURL
+  safeURL,
+  compressCanvasToTarget
 } from "./utils.js";
 
 import { Cropper } from "./cropper.js";
@@ -22,60 +23,47 @@ const resizeTypeEl = document.getElementById("resizeType");
 const widthInput = document.getElementById("widthInput");
 const heightInput = document.getElementById("heightInput");
 
-const targetSizeInput = document.getElementById("targetSizeKB");
+const targetSizeInput = document.getElementById("targetSize"); // NEW (KB)
 const formatSelect = document.getElementById("formatSelect");
 
 const processBtn = document.getElementById("processBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const loadingOverlay = document.getElementById("loadingOverlay");
+const loaderText = document.getElementById("loaderText");
 
-/* ---------- State ---------- */
 let currentFile = null;
 let currentImage = null;
-let currentOrientation = 1; // EXIF orientation
+let currentOrientation = 1;
+let currentCropper = null;
+let cropEnabled = false;
 
-/* Developer sample (optional) */
-const SAMPLE_LOCAL_PATH = "/mnt/data/Home Design.png";
-
-/* ---------- UI Helpers ---------- */
+/* ---------- UI helpers ---------- */
 function setStatus(text) {
   if (previewInfo) previewInfo.textContent = text;
 }
-function showLoader() {
-  if (loadingOverlay) loadingOverlay.classList.remove("hidden");
+function showLoader(text = "Processing image...") {
+  if (loaderText) loaderText.textContent = text;
+  loadingOverlay && loadingOverlay.classList.remove("hidden");
 }
 function hideLoader() {
-  if (loadingOverlay) loadingOverlay.classList.add("hidden");
+  loadingOverlay && loadingOverlay.classList.add("hidden");
 }
 function enableDownload(enabled = true) {
-  if (!downloadBtn) return;
   downloadBtn.disabled = !enabled;
   downloadBtn.classList.toggle("disabled", !enabled);
 }
 
-/* ---------- Drag & Drop + File Input ---------- */
+/* ---------- Drag & Drop handling ---------- */
 function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-
-["dragenter","dragover","dragleave","drop"].forEach(evt => {
-  dropArea && dropArea.addEventListener(evt, preventDefaults, false);
-});
-["dragenter","dragover"].forEach(() => {
-  dropArea && dropArea.addEventListener("dragenter", () => dropArea.classList.add("active"), false);
-});
-["dragleave","drop"].forEach(() => {
-  dropArea && dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active"), false);
-});
-
+["dragenter","dragover","dragleave","drop"].forEach(evt => dropArea && dropArea.addEventListener(evt, preventDefaults, false));
+["dragenter","dragover"].forEach(() => dropArea && dropArea.addEventListener("dragenter", () => dropArea.classList.add("active"), false));
+["dragleave","drop"].forEach(() => dropArea && dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active"), false));
 dropArea && dropArea.addEventListener("drop", (e) => {
   const dt = e.dataTransfer;
   if (!dt) return;
   handleFiles(dt.files);
 }, false);
-
-dropArea && dropArea.addEventListener("click", () => {
-  if (fileInput) fileInput.click();
-});
-
+dropArea && dropArea.addEventListener("click", () => fileInput && fileInput.click());
 fileInput && fileInput.addEventListener("change", (e) => {
   if (fileInput.__droppedFiles && fileInput.__droppedFiles.length) {
     handleFiles(fileInput.__droppedFiles);
@@ -85,8 +73,8 @@ fileInput && fileInput.addEventListener("change", (e) => {
   }
 });
 
-/* ---------- Handle Incoming Files ---------- */
-async function handleFiles(fileList) {
+/* ---------- Handle incoming FileList ---------- */
+export async function handleFiles(fileList) {
   if (!fileList || fileList.length === 0) return;
   const file = fileList[0];
   if (!file.type || !file.type.startsWith("image/")) {
@@ -97,14 +85,19 @@ async function handleFiles(fileList) {
   currentFile = file;
   setStatus("Loading image...");
   try {
+    // EXIF
     currentOrientation = await getExifOrientation(file).catch(() => 1);
     const img = await loadImage(file);
     currentImage = img;
-
-    // Use object URL for preview
     previewImg.src = safeURL(file);
     previewImg.style.display = "";
     setStatus(`${formatSize(file.size)} • ${img.naturalWidth} × ${img.naturalHeight}px`);
+
+    // reset crop/rotation
+    if (currentCropper) {
+      currentCropper = null;
+      cropEnabled = false;
+    }
   } catch (err) {
     console.error("Error loading image:", err);
     alert("Could not load the image. See console for details.");
@@ -113,161 +106,98 @@ async function handleFiles(fileList) {
   enableDownload(false);
 }
 
-/* expose globally for initializer */
-window.handleFiles = handleFiles;
-
-/* ---------- Utility: Convert KB to bytes ---------- */
-function kbToBytes(kb) {
-  return Math.max(0, Math.round(Number(kb) * 1024));
-}
-
-/* ---------- Binary-search compressor for lossy formats (JPEG/WebP) ---------- */
-/**
- * compressToTargetSize(canvas, mime, targetKB)
- * - canvas: HTMLCanvasElement containing full-resolution image to compress
- * - mime: desired mimetype (image/jpeg or image/webp)
- * - targetKB: integer (KB)
- *
- * Returns a Blob close to requested size (attempts binary search on quality).
- */
-async function compressToTargetSize(canvas, mime, targetKB) {
-  const targetBytes = kbToBytes(targetKB);
-  // quality bounds
-  let low = 0.05;
-  let high = 0.98;
-  let bestBlob = null;
-  let bestDiff = Infinity;
-
-  // if target is larger than uncompressed PNG/JPEG baseline, return high quality quickly
-  // run up to 12 iterations
-  for (let i = 0; i < 12; i++) {
-    const q = (low + high) / 2;
-    // canvasToBlob from utils.js should accept (canvas, mime, quality)
-    const blob = await canvasToBlob(canvas, mime, q).catch(() => null);
-    if (!blob) break;
-    const size = blob.size;
-    const diff = Math.abs(size - targetBytes);
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      bestBlob = blob;
-    }
-
-    // stop early if within +/- 3KB
-    if (Math.abs(size - targetBytes) <= 3 * 1024) {
-      return blob;
-    }
-
-    // adjust binary search
-    if (size > targetBytes) {
-      // file too large -> reduce quality
-      high = q;
-    } else {
-      // file too small -> increase quality
-      low = q;
-    }
-  }
-
-  // if bestBlob found return it, otherwise fallback to default quality
-  if (bestBlob) return bestBlob;
-  return await canvasToBlob(canvas, mime, 0.8);
-}
-
-/* ---------- Process Image (Resize/Compress) ---------- */
+/* ---------- Process Image with Option C algorithm ---------- */
 async function processImage() {
   if (!currentImage) { alert("Please upload an image first."); return; }
 
-  // target-size is mandatory (option A)
-  if (!targetSizeInput || !targetSizeInput.value) {
-    alert("Please enter the Target File Size (KB) before processing.");
-    return;
-  }
-  const targetKB = Number(targetSizeInput.value);
-  if (!Number.isFinite(targetKB) || targetKB <= 0) {
-    alert("Please enter a valid positive number for Target File Size (KB).");
-    return;
-  }
-
-  setStatus("Processing...");
   processBtn.disabled = true;
-  showLoader();
+  showLoader("Preparing image...");
 
   try {
     const imgW = currentImage.naturalWidth;
     const imgH = currentImage.naturalHeight;
-
     const type = resizeTypeEl ? resizeTypeEl.value : "px";
     let wVal = widthInput && widthInput.value ? Number(widthInput.value) : null;
     let hVal = heightInput && heightInput.value ? Number(heightInput.value) : null;
 
     const dims = convertResize(wVal, hVal, type === "px" ? "px" : (type === "percent" ? "percent" : "longest"), imgW, imgH);
-    const targetW = Math.max(1, Math.round(dims.w));
-    const targetH = Math.max(1, Math.round(dims.h));
+    let targetW = Math.max(1, Math.round(dims.w));
+    let targetH = Math.max(1, Math.round(dims.h));
 
-    // prepare source canvas (apply EXIF orientation)
-    const s = document.createElement("canvas");
-    s.width = imgW;
-    s.height = imgH;
-    const sctx = s.getContext("2d");
-    sctx.imageSmoothingEnabled = true;
-    sctx.imageSmoothingQuality = "high";
-    sctx.drawImage(currentImage, 0, 0, imgW, imgH);
-    const sourceCanvas = currentOrientation > 1 ? applyOrientation(s, currentOrientation) : s;
+    // build source canvas (crop or full)
+    let sourceCanvas;
+    if (cropEnabled && currentCropper && currentCropper.export) {
+      sourceCanvas = currentCropper.export();
+    } else {
+      const s = document.createElement("canvas");
+      s.width = imgW;
+      s.height = imgH;
+      const sctx = s.getContext("2d");
+      sctx.imageSmoothingEnabled = true;
+      sctx.imageSmoothingQuality = "high";
+      sctx.drawImage(currentImage, 0, 0, imgW, imgH);
+      sourceCanvas = currentOrientation > 1 ? applyOrientation(s, currentOrientation) : s;
+    }
 
-    // draw scaled output canvas (target dims)
-    const outCanvas = document.createElement("canvas");
-    outCanvas.width = targetW;
-    outCanvas.height = targetH;
-    const outCtx = outCanvas.getContext("2d");
-    outCtx.imageSmoothingEnabled = true;
-    outCtx.imageSmoothingQuality = "high";
-    outCtx.drawImage(sourceCanvas, 0, 0, sourceCanvas.width, sourceCanvas.height, 0, 0, targetW, targetH);
+    // scale to target dims onto a working canvas
+    const work = document.createElement("canvas");
+    work.width = targetW;
+    work.height = targetH;
+    const wctx = work.getContext("2d");
+    wctx.imageSmoothingEnabled = true;
+    wctx.imageSmoothingQuality = "high";
+    wctx.drawImage(sourceCanvas, 0, 0, sourceCanvas.width, sourceCanvas.height, 0, 0, targetW, targetH);
 
-    const selectedMime = (formatSelect && formatSelect.value) ? formatSelect.value : "image/jpeg";
+    // target size input (KB -> bytes)
+    const targetKB = targetSizeInput && targetSizeInput.value ? Number(targetSizeInput.value) : null;
+    const targetBytes = targetKB ? Math.max(1, Math.round(targetKB * 1024)) : null;
 
-    // If PNG selected -> inform user that target-size compression won't work
-    if (selectedMime === "image/png") {
-      alert("Target file size compression only works with JPEG or WebP. PNG is lossless; target-size compression cannot be guaranteed. The result will be exported as PNG.");
-      // export PNG at full quality
-      const pngBlob = await canvasToBlob(outCanvas, "image/png", 1);
-      const url = safeURL(pngBlob);
+    const mime = formatSelect && formatSelect.value ? formatSelect.value : "image/jpeg";
+
+    if (targetBytes) {
+      showLoader("Searching for best compression (this may take a few seconds)...");
+      // run the Option C compressor
+      const result = await compressCanvasToTarget(work, { mime, targetBytes, maxIterations: 14, tolerance: 0.025 });
+      const blob = result.blob;
+      const url = safeURL(blob);
       previewImg.src = url;
-      setStatus(`${formatSize(pngBlob.size)} • ${formatDim(targetW, targetH)}`);
+      setStatus(`${formatSize(blob.size)} • ${formatDim(targetW, targetH)}`);
       downloadBtn.onclick = () => {
         const a = document.createElement("a");
         const base = (currentFile && currentFile.name) ? currentFile.name.replace(/\.[^/.]+$/, "") : "image";
+        const ext = mime.split("/")[1] || "jpg";
         a.href = url;
-        a.download = `${base}_resized.png`;
+        a.download = `${base}_resized.${ext}`;
         document.body.appendChild(a);
         a.click();
         a.remove();
       };
       enableDownload(true);
-      return;
+    } else {
+      // simple direct export (no target)
+      showLoader("Exporting image...");
+      const blob = await canvasToBlob(work, mime, 0.92);
+      const url = safeURL(blob);
+      previewImg.src = url;
+      setStatus(`${formatSize(blob.size)} • ${formatDim(targetW, targetH)}`);
+      downloadBtn.onclick = () => {
+        const a = document.createElement("a");
+        const base = (currentFile && currentFile.name) ? currentFile.name.replace(/\.[^/.]+$/, "") : "image";
+        const ext = mime.split("/")[1] || "jpg";
+        a.href = url;
+        a.download = `${base}_resized.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      };
+      enableDownload(true);
     }
 
-    // For JPEG / WebP -> run binary search compression to match targetKB
-    const mime = selectedMime === "image/webp" ? "image/webp" : "image/jpeg";
-    const compressedBlob = await compressToTargetSize(outCanvas, mime, targetKB);
-
-    const url = safeURL(compressedBlob);
-    previewImg.src = url;
-    setStatus(`${formatSize(compressedBlob.size)} • ${formatDim(targetW, targetH)}`);
-
-    downloadBtn.onclick = () => {
-      const a = document.createElement("a");
-      const base = (currentFile && currentFile.name) ? currentFile.name.replace(/\.[^/.]+$/, "") : "image";
-      const ext = mime.split("/")[1] || "jpg";
-      a.href = url;
-      a.download = `${base}_resized.${ext}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    };
-    enableDownload(true);
   } catch (err) {
-    console.error("Processing error:", err);
-    alert("Processing failed. See console for details.");
+    console.error("Processing failed:", err);
+    alert("Processing failed — see console.");
     setStatus("Processing failed");
+    enableDownload(false);
   } finally {
     processBtn.disabled = false;
     hideLoader();
@@ -276,9 +206,11 @@ async function processImage() {
 
 /* ---------- Init ---------- */
 function init() {
+  // quick UI wiring
   processBtn && processBtn.addEventListener("click", processImage);
+  downloadBtn && downloadBtn.addEventListener("click", () => { if (downloadBtn.disabled) return; });
 
-  // Enter key handling (not on inputs)
+  // keyboard: Enter triggers process when not in input
   document.addEventListener("keydown", (e) => {
     const active = document.activeElement;
     if (e.key === "Enter" && active && (active.tagName !== "INPUT" && active.tagName !== "TEXTAREA" && active.tagName !== "SELECT")) {
@@ -286,16 +218,56 @@ function init() {
     }
   });
 
-  // ensure file input click bindings exist (initializer script may attach dropped file data)
-  // no dev sample loaded by default
-}
+  // double-click preview toggles simple crop (if Cropper available)
+  previewImg && previewImg.addEventListener("dblclick", async () => {
+    if (!currentImage) return;
+    const parent = previewImg.parentElement;
+    let canvasEl = parent.querySelector("canvas.crop-canvas");
+    if (!canvasEl) {
+      canvasEl = document.createElement("canvas");
+      canvasEl.className = "crop-canvas";
+      canvasEl.style.maxWidth = "100%";
+      canvasEl.style.display = "block";
+      parent.insertBefore(canvasEl, previewImg);
+      previewImg.style.display = "none";
 
-/* Run init */
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
+      const displayW = previewImg.clientWidth || currentImage.naturalWidth;
+      const displayH = Math.round((currentImage.naturalHeight / currentImage.naturalWidth) * displayW);
+      canvasEl.width = displayW;
+      canvasEl.height = displayH;
+      const cctx = canvasEl.getContext("2d");
+      cctx.drawImage(currentImage, 0, 0, canvasEl.width, canvasEl.height);
 
-/* Exports for debugging/testing */
-export { processImage, handleFiles };
+      try {
+        currentCropper = new Cropper(canvasEl, currentImage, { simpleMode: true });
+        cropEnabled = true;
+        setStatus("Crop mode enabled — drag to adjust. Double-click again to apply.");
+      } catch (err) {
+        console.warn("Simple cropper init failed:", err);
+        canvasEl.remove();
+        previewImg.style.display = "";
+        currentCropper = null;
+        cropEnabled = false;
+        setStatus("Crop unavailable.");
+      }
+    } else {
+      try {
+        const croppedCanvas = currentCropper.export();
+        const b = await canvasToBlob(croppedCanvas, "image/png", 1);
+        previewImg.src = safeURL(b);
+        previewImg.style.display = "";
+        canvasEl.remove();
+        currentCropper = null;
+        cropEnabled = false;
+        setStatus("Crop applied.");
+        enableDownload(true);
+      } catch (err) {
+        console.error("Applying crop failed:", err);
+        setStatus("Crop failed.");
+      }
+    }
+  });
+
+  // ready
+}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
