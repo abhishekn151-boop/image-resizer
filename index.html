@@ -5,24 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Favicon (local uploaded path) -->
-  <link rel="icon" type="image/png" href="/mnt/data/favicon.png" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
 
   <!-- OpenGraph -->
-  <meta property="og:image" content="/mnt/data/logo.png" />
+  <meta property="og:image" content="assets/logo.png" />
 
-  <!-- Primary meta -->
+  <!-- SEO -->
   <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
   <meta name="keywords" content="free image resizer, resize image online, compress image, crop image, convert to webp" />
   <link rel="canonical" href="https://your-domain.com/index.html" />
 
-  <!-- JSON-LD: Software & FAQ (keeps SEO rich snippets) -->
+  <!-- JSON-LD APP -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org/",
     "@type":"SoftwareApplication",
     "name":"Free Image Resizer",
-    "description":"Free Image Resizer — resize, compress, crop and convert images locally in your browser.",
+    "description":"Resize, compress, crop and convert images offline in your browser.",
     "applicationCategory":"ImageEditing",
     "operatingSystem":"All",
     "url":"https://your-domain.com",
@@ -30,24 +30,26 @@
   }
   </script>
 
+  <!-- JSON-LD FAQ -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
     "@type":"FAQPage",
     "mainEntity":[
-      {"@type":"Question","name":"Is this tool really free?","acceptedAnswer":{"@type":"Answer","text":"Yes, it is free with no sign-ups."}},
-      {"@type":"Question","name":"Do images get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No — all processing happens in your browser."}}
+      {"@type":"Question","name":"Is this tool free?","acceptedAnswer":{"@type":"Answer","text":"Yes, fully 100% free."}},
+      {"@type":"Question","name":"Do images get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No, everything is inside your browser."}}
     ]
   }
   </script>
 
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Small overrides for target-size input -->
   <style>
-    /* minor page-level adjustments so the new input size matches others */
     .settings input[type="number"],
     .settings select,
     .settings input[type="text"],
-    .settings .target-size {
+    .target-size {
       width: 100%;
       padding: 10px;
       border-radius: 8px;
@@ -57,154 +59,149 @@
       font-size: 14px;
       box-sizing: border-box;
     }
-
     .settings label { display:block; margin-top:12px; margin-bottom:6px; color:#c2c8d6; }
     .target-row { display:flex; gap:10px; align-items:center; }
     .target-row .target-size { flex:1; }
-    .target-row .target-unit { white-space:nowrap; color:#a3abba; font-size:14px; padding:10px; background:#0f1829; border:1px solid #2b3b5a; border-radius:8px; }
+    .target-row .target-unit {
+      white-space:nowrap; color:#a3abba; font-size:14px; padding:10px;
+      background:#0f1829; border:1px solid #2b3b5a; border-radius:8px;
+    }
     .note-small { color:#a8b9d4; font-size:13px; margin-top:8px; }
   </style>
 </head>
 <body>
 
-  <!-- TOP NAV -->
-  <nav class="top-nav">
-    <div class="nav-left">
-      <img src="/mnt/data/logo.png" class="nav-logo" alt="Free Image Resizer logo" />
-      <span class="nav-title">Free Image Resizer</span>
+<!-- NAVBAR -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo" />
+    <span class="nav-title">Free Image Resizer</span>
+  </div>
+
+  <div class="hamburger" id="hamburger">☰</div>
+
+  <div class="nav-links" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About Us</a>
+    <a href="faq.html">FAQ</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="head">
+  <img src="assets/logo.png" class="logo" alt="Free Image Resizer logo" />
+  <h1>Free Image Resizer</h1>
+  <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
+</header>
+
+<!-- MAIN TOOL -->
+<div class="tool-container">
+
+  <!-- UPLOAD -->
+  <div id="drop-area" class="drop-area" role="button">
+    <h2>Drop Images Here</h2>
+    <p>or click to upload</p>
+    <input type="file" id="fileInput" accept="image/*" hidden />
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="settings">
+    <h3>Resize & Compression</h3>
+
+    <label>Resize Type</label>
+    <select id="resizeType">
+      <option value="px">By Pixels</option>
+      <option value="percent">By Percent</option>
+      <option value="longest">Longest Side</option>
+    </select>
+
+    <label>Width</label>
+    <input type="number" id="widthInput" placeholder="Auto" />
+
+    <label>Height</label>
+    <input type="number" id="heightInput" placeholder="Auto" />
+
+    <h3>Target File Size (KB)</h3>
+    <div class="target-row">
+      <input class="target-size" id="targetSizeKB" type="number" min="1" placeholder="e.g. 150" />
+      <div class="target-unit">KB</div>
     </div>
 
-    <div class="hamburger" id="hamburger">☰</div>
+    <p class="note-small">Tool will adjust quality & size to match this target.</p>
 
-    <div class="nav-links" id="mobileMenu">
-      <a href="index.html">Home</a>
-      <a href="about.html">About Us</a>
-      <a href="faq.html">FAQ</a>
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms of Service</a>
-      <a href="contact.html">Contact</a>
-    </div>
-  </nav>
-
-  <!-- HEADER -->
-  <header class="head">
-    <img src="/mnt/data/logo.png" class="logo" alt="Free Image Resizer logo" />
-    <h1>Free Image Resizer</h1>
-    <p class="tagline">Fast. Private. Browser-based. No upload required.</p>
-  </header>
-
-  <!-- TOOL (classic 3-column layout) -->
-  <div class="tool-container">
-
-    <!-- UPLOAD -->
-    <div id="drop-area" class="drop-area" role="button" aria-label="Drop images here or click to upload">
-      <h2>Drop Images Here</h2>
-      <p>or click to upload</p>
-      <input type="file" id="fileInput" multiple accept="image/*" hidden />
-    </div>
-
-    <!-- SETTINGS -->
-    <div class="settings">
-      <h3>Resize & Compression</h3>
-
-      <label>Resize Type</label>
-      <select id="resizeType">
-        <option value="px">By Pixels</option>
-        <option value="percent">By Percent</option>
-        <option value="longest">Longest Side</option>
-      </select>
-
-      <label>Width</label>
-      <input type="number" id="widthInput" placeholder="Auto" />
-
-      <label>Height</label>
-      <input type="number" id="heightInput" placeholder="Auto" />
-
-      <h3>Target File Size (KB)</h3>
-      <div class="target-row">
-        <input class="target-size" id="targetSizeKB" type="number" min="1" placeholder="Enter desired filesize in KB (e.g. 150)" />
-        <div class="target-unit">KB</div>
-      </div>
-      <div class="note-small">Enter the approximate file size you want. The tool attempts to match the size using quality & subtle rescaling.</div>
-
-      <h3>Format</h3>
-      <select id="formatSelect">
-        <option value="image/jpeg">JPEG</option>
-        <option value="image/webp">WebP</option>
-        <option value="image/png">PNG</option>
-      </select>
-
-      <p class="note-small">Tip: WebP usually gives the best size-to-quality ratio. PNG is lossless and may not reach lower sizes.</p>
-    </div>
-
-    <!-- PREVIEW -->
-    <div class="preview-section">
-      <h3>Preview</h3>
-      <img id="previewImg" class="preview-img" alt="Preview will appear here" />
-      <p id="previewInfo"></p>
-    </div>
+    <h3>Format</h3>
+    <select id="formatSelect">
+      <option value="image/jpeg">JPEG</option>
+      <option value="image/webp">WebP</option>
+      <option value="image/png">PNG</option>
+    </select>
 
   </div>
 
-  <!-- ACTIONS -->
-  <div class="actions">
-    <button id="processBtn" class="btn">Process Image</button>
-    <button id="downloadBtn" class="btn disabled" disabled>Download</button>
+  <!-- PREVIEW -->
+  <div class="preview-section">
+    <h3>Preview</h3>
+    <img id="previewImg" class="preview-img" alt="Preview will appear here" />
+    <p id="previewInfo"></p>
   </div>
 
-  <!-- LOADER -->
-  <div id="loadingOverlay" class="loading-overlay hidden">
-    <div class="spinner"></div>
-    <p>Processing image...</p>
-  </div>
+</div>
 
-  <!-- SEO CONTENT (preserved) -->
-  <section class="seo-section">
-    <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
-    <p>
-      Our online image resizer allows you to quickly reduce image size,
-      adjust dimensions, crop photos, and convert formats — all directly in your browser.
-      No uploads, no servers, no data collection. Everything stays on your device.
-    </p>
+<!-- ACTION BUTTONS -->
+<div class="actions">
+  <button id="processBtn" class="btn">Process Image</button>
+  <button id="downloadBtn" class="btn disabled" disabled>Download</button>
+</div>
 
-    <h3>Key Features</h3>
-    <ul>
-      <li>Resize by pixels, percentage, or longest side</li>
-      <li>Compress images with adjustable quality or target size</li>
-      <li>Crop with draggable precision</li>
-      <li>Rotate images</li>
-      <li>Convert between JPG, PNG, and WebP</li>
-      <li>100% offline and private</li>
-    </ul>
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="spinner"></div>
+  <p>Processing image...</p>
+</div>
 
-    <h3>How to Use</h3>
-    <ol>
-      <li>Click the upload area or drag your image into the tool.</li>
-      <li>Select resize type: pixels, percent, or longest side.</li>
-      <li>Enter the <strong>Target File Size (KB)</strong> (required) and choose output format (JPEG/WebP recommended).</li>
-      <li>Click "Process Image" to resize or compress.</li>
-      <li>Preview and download the optimized image.</li>
-    </ol>
-  </section>
+<!-- SEO SECTION -->
+<section class="seo-section">
+  <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
+  <p>Resize, compress, crop, rotate and convert images in your browser — totally offline.</p>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved |
-      <a href="index.html" style="color:#7fc6ff">Home</a> |
-      <a href="about.html" style="color:#7fc6ff">About Us</a> |
-      <a href="faq.html" style="color:#7fc6ff">FAQ</a>
-    </p>
-  </footer>
+  <h3>Key Features</h3>
+  <ul>
+    <li>Resize by pixels, percent, or longest side</li>
+    <li>Set target file size in KB</li>
+    <li>Convert to JPG, PNG, WebP</li>
+    <li>100% offline — no upload</li>
+  </ul>
 
-  <!-- Small inline script for mobile menu & year -->
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("hamburger").addEventListener("click", () => {
-      document.getElementById("mobileMenu").classList.toggle("active");
-    });
-  </script>
+  <h3>How to Use</h3>
+  <ol>
+    <li>Upload or drag the image</li>
+    <li>Enter width/height or leave auto</li>
+    <li>Enter <strong>Target Size (KB)</strong></li>
+    <li>Select format</li>
+    <li>Press Process → Download</li>
+  </ol>
+</section>
 
-  <!-- App JS -->
-  <script type="module" src="app.js"></script>
+<!-- FOOTER -->
+<footer>
+  <p>
+    © <span id="year"></span> Free Image Resizer |
+    <a href="about.html">About</a> |
+    <a href="faq.html">FAQ</a>
+  </p>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("hamburger").onclick = () =>
+    document.getElementById("mobileMenu").classList.toggle("active");
+</script>
+
+<!-- MAIN APP -->
+<script type="module" src="app.js"></script>
+
 </body>
 </html>
