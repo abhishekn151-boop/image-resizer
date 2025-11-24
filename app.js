@@ -459,4 +459,4 @@ if (document.readyState === "loading") {
 }
 
 /* Exports for debugging/testing */
-export { processImage, handleFiles, tryLoadLocalSample }; update it
+export { processImage, handleFiles, tryLoadLocalSample };
