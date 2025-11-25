@@ -10,7 +10,8 @@ import {
   formatSize,
   formatDim,
   safeURL,
-  compressCanvasToTarget
+  compressCanvasToTarget,
+  getImageDPI
 } from "./utils.js";
 
 /* ---------- DOM Elements ---------- */
@@ -97,8 +98,10 @@ async function handleFiles(files) {
   try {
     currentOrientation = await getExifOrientation(file).catch(() => 1);
     const img = await loadImage(file);
+currentImage = img;
 
-    currentImage = img;
+// Read true DPI and store it
+currentImage.__dpi = await getImageDPI(file);
     previewImg.src = safeURL(file);
     previewImg.style.display = "block";
 
@@ -132,7 +135,8 @@ async function processImage() {
     let userW = widthInput.value ? Number(widthInput.value) : imgW;
     let userH = heightInput.value ? Number(heightInput.value) : imgH;
 
-    const dims = convertResize(userW, userH, resizeTypeEl.value, imgW, imgH);
+    const dpiValue = currentImage.__dpi || 96;
+    const dims = convertResize(userW, userH, resizeTypeEl.value, imgW, imgH, dpiValue);
 
     /* Draw initial resized canvas */
     const baseCanvas = document.createElement("canvas");
