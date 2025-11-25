@@ -152,7 +152,7 @@ export async function getImageDPI(file) {
 }
 
 /* ---------- Resize / Dimension Helper ---------- */
-export function convertResize(wVal, hVal, type, imgW, imgH) {
+export function convertResize(wVal, hVal, type, imgW, imgH, dpi = 96) {
 
   // Resize by pixels
   if (type === "px") {
@@ -169,10 +169,9 @@ export function convertResize(wVal, hVal, type, imgW, imgH) {
     return { w: pctW, h: pctH };
   }
 
-  // Resize by centimeters (using true DPI)
+  // Resize by centimeters (true DPI)
 if (type === "cm") {
-  const dpi = imgW.__dpi || 96; // DPI injected by app.js
-  const PX_PER_CM = dpi / 2.54;
+  const PX_PER_CM = dpi / 2.54; // dpi comes from app.js
 
   const newW = wVal ? Math.round(wVal * PX_PER_CM) : imgW;
   const newH = hVal ? Math.round(hVal * PX_PER_CM) : imgH;
