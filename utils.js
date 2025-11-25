@@ -110,6 +110,47 @@ export function safeURL(obj) {
   return URL.createObjectURL(obj);
 }
 
+/* ---------- Extract DPI from JPEG (fallback 96 DPI) ---------- */
+export async function getImageDPI(file) {
+  try {
+    if (!file || !file.type) return 96;
+    const type = file.type.toLowerCase();
+    if (!type.includes("jpeg") && !type.includes("jpg")) return 96;
+
+    const buffer = await file.arrayBuffer();
+    const view = new DataView(buffer);
+
+    // Check SOI
+    if (view.getUint16(0, false) !== 0xFFD8) return 96;
+
+    let offset = 2;
+    const length = view.byteLength;
+
+    while (offset < length) {
+      const marker = view.getUint16(offset, false);
+      offset += 2;
+
+      const size = view.getUint16(offset, false);
+
+      // APP0 JFIF marker
+      if (marker === 0xFFE0) {
+        // Check "JFIF"
+        if (view.getUint32(offset + 2, false) === 0x4A464946) {
+          const units = view.getUint8(offset + 7); // 1 = DPI, 2 = Dots/cm
+          const xDensity = view.getUint16(offset + 8, false);
+
+          if (units === 1 && xDensity > 0) return xDensity;        // DPI
+          if (units === 2 && xDensity > 0) return Math.round(xDensity * 2.54); // Convert dp/cm → DPI
+        }
+      }
+
+      offset += size;
+    }
+  } catch (e) {}
+
+  return 96; // fallback
+}
+
 /* ---------- Resize / Dimension Helper ---------- */
 export function convertResize(wVal, hVal, type, imgW, imgH) {
 
@@ -128,18 +169,17 @@ export function convertResize(wVal, hVal, type, imgW, imgH) {
     return { w: pctW, h: pctH };
   }
 
-  // Resize by centimeters
-  if (type === "cm") {
-    // Browser assumption: 96 DPI
-    const DPI = 96;
-    const PX_PER_CM = DPI / 2.54;
+  // Resize by centimeters (using true DPI)
+if (type === "cm") {
+  const dpi = imgW.__dpi || 96; // DPI injected by app.js
+  const PX_PER_CM = dpi / 2.54;
 
-    const newW = wVal ? Math.round(wVal * PX_PER_CM) : imgW;
-    const newH = hVal ? Math.round(hVal * PX_PER_CM) : imgH;
+  const newW = wVal ? Math.round(wVal * PX_PER_CM) : imgW;
+  const newH = hVal ? Math.round(hVal * PX_PER_CM) : imgH;
 
-    return { w: newW, h: newH };
-  }
-
+  return { w: newW, h: newH };
+}
+  
   // Fallback
   return { w: imgW, h: imgH };
 }
