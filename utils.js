@@ -112,6 +112,8 @@ export function safeURL(obj) {
 
 /* ---------- Resize / Dimension Helper ---------- */
 export function convertResize(wVal, hVal, type, imgW, imgH) {
+
+  // Resize by pixels
   if (type === "px") {
     return {
       w: wVal || imgW,
@@ -119,20 +121,26 @@ export function convertResize(wVal, hVal, type, imgW, imgH) {
     };
   }
 
+  // Resize by percent
   if (type === "percent") {
     const pctW = wVal ? imgW * (wVal / 100) : imgW;
     const pctH = hVal ? imgH * (hVal / 100) : imgH;
     return { w: pctW, h: pctH };
   }
 
-  if (type === "longest") {
-    const long = Math.max(imgW, imgH);
-    if (!wVal) return { w: imgW, h: imgH };
+  // Resize by centimeters
+  if (type === "cm") {
+    // Browser assumption: 96 DPI
+    const DPI = 96;
+    const PX_PER_CM = DPI / 2.54;
 
-    const scale = wVal / long;
-    return { w: imgW * scale, h: imgH * scale };
+    const newW = wVal ? Math.round(wVal * PX_PER_CM) : imgW;
+    const newH = hVal ? Math.round(hVal * PX_PER_CM) : imgH;
+
+    return { w: newW, h: newH };
   }
 
+  // Fallback
   return { w: imgW, h: imgH };
 }
 
