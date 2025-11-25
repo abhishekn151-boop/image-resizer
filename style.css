@@ -421,3 +421,38 @@ footer {
 .send-btn:hover {
   background: #273556;
 }
+.vertical-footer {
+  padding: 30px 0;
+  text-align: center;
+  background: #0d1524;
+  border-top: 1px solid #1d2944;
+  margin-top: 40px;
+}
+
+.vertical-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vertical-footer ul li {
+  margin: 8px 0;
+}
+
+.vertical-footer ul li a {
+  color: #a9c4e2;
+  text-decoration: none;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.vertical-footer ul li a:hover {
+  color: #7fc6ff;
+}
+
+.vertical-footer p {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #8f9ab2;
+}
+
