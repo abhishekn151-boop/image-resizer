@@ -21,32 +21,13 @@
 
 <body>
 
-<nav class="top-nav">
-  <div class="nav-left">
-    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
-    <span class="nav-title">Free Image Resizer</span>
-  </div>
-
-  <div class="hamburger" id="hamburger">☰</div>
-
-  <div class="nav-links" id="mobileMenu">
-
-    <!-- TOOLS DROPDOWN MENU -->
-    <div class="dropdown">
-      <button class="dropbtn">Tools ▼</button>
-      <div class="dropdown-content">
-        <a href="index.html">Image Resizer</a>
-        <a href="compress.html">Image Compressor</a>
-      </div>
-    </div>
-
-    <a href="about.html">About Us</a>
-    <a href="faq.html">FAQ</a>
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="terms.html">Terms of Service</a>
-    <a href="contact.html">Contact</a>
-  </div>
-</nav>
+<!-- TOP NAVIGATION BAR -->
+  <div id="navbar"></div>
+<script>
+  fetch("components/navbar.html")
+    .then(r => r.text())
+    .then(html => document.getElementById("navbar").innerHTML = html);
+</script>
   
 <!-- HEADER -->
 <header class="head">
