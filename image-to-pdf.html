@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image to PDF Converter — Free Image Tools</title>
+
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .pdf-wrapper {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #101a2e;
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid #1c2a44;
+    }
+
+    .drop-area {
+      border: 2px dashed #3a4459;
+      background: #111a2e;
+      padding: 40px 15px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-bottom: 25px;
+    }
+
+    .drop-area:hover {
+      background: #16223b;
+      border-color: #4ad2ff;
+    }
+
+    .preview-list img {
+      width: 120px;
+      height: auto;
+      border-radius: 8px;
+      margin: 8px;
+      border: 1px solid #2a3a58;
+    }
+
+    .select-row {
+      margin-bottom: 18px;
+    }
+
+    .select-row label {
+      display: block;
+      margin-bottom: 6px;
+      color: #c8d4e8;
+    }
+
+    .small-input,
+    .size-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #2b3b5a;
+      background: #0f1829;
+      color: #e8ecf4;
+      font-size: 14px;
+    }
+
+    .size-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      margin-top: 15px;
+      background: #1f2a44;
+      color: #d7e3ff;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid #324364;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      background: #273556;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+    <span class="nav-title">Free Image Resizer</span>
+  </div>
+
+  <div class="hamburger" id="hamburger">☰</div>
+
+  <div class="nav-links" id="mobileMenu">
+
+    <!-- TOOLS DROPDOWN MENU -->
+    <div class="dropdown">
+      <button class="dropbtn">Tools ▼</button>
+      <div class="dropdown-content">
+        <a href="index.html">Image Resizer</a>
+        <a href="compress.html">Image Compressor</a>
+        <a href="image-to-pdf.html">Image to PDF</a>
+      </div>
+    </div>
+
+    <a href="about.html">About Us</a>
+    <a href="faq.html">FAQ</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="pdf-wrapper">
+
+  <h2 style="color:#7fc6ff; margin-bottom:20px;">Image to PDF Converter</h2>
+
+  <!-- UPLOAD AREA -->
+  <div id="drop-area" class="drop-area">
+    <h3>Upload Images</h3>
+    <p>Drag & drop or click to select images</p>
+    <input type="file" id="fileInput" accept="image/*" multiple hidden />
+  </div>
+
+  <!-- PREVIEW IMAGES -->
+  <div id="previewList" class="preview-list"></div>
+
+  <!-- PAGE SIZE -->
+  <div class="select-row">
+    <label>Page Size</label>
+    <select id="pageSize" class="small-input">
+      <option value="original">Original Size</option>
+      <option value="a4">A4</option>
+      <option value="letter">Letter</option>
+      <option value="legal">Legal</option>
+      <option value="custom">Custom Size</option>
+    </select>
+  </div>
+
+  <!-- CUSTOM SIZE INPUTS -->
+  <div id="customSizeSection" style="display:none;">
+    <div class="select-row">
+      <label>Unit</label>
+      <select id="customUnit" class="small-input">
+        <option value="px">Pixels</option>
+        <option value="cm">Centimeters</option>
+        <option value="mm">Millimeters</option>
+      </select>
+    </div>
+
+    <div class="size-row">
+      <div style="flex:1;">
+        <label>Width</label>
+        <input id="customWidth" type="number" class="size-input" placeholder="Width" />
+      </div>
+      <div style="flex:1;">
+        <label>Height</label>
+        <input id="customHeight" type="number" class="size-input" placeholder="Height" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ORIENTATION -->
+  <div class="select-row">
+    <label>Orientation</label>
+    <select id="orientation" class="small-input">
+      <option value="portrait">Portrait</option>
+      <option value="landscape">Landscape</option>
+    </select>
+  </div>
+
+  <button id="generatePDF" class="btn">Convert to PDF</button>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    © <span id="year"></span> Free Image Resizer |
+    <a href="about.html">About</a> |
+    <a href="faq.html">FAQ</a>
+  </p>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  document.getElementById("hamburger").onclick = () =>
+    document.getElementById("mobileMenu").classList.toggle("active");
+</script>
+
+<script src="pdf-lib.min.js"></script>
+
+<!-- MAIN LOGIC -->
+<script>
+  const dropArea = document.getElementById("drop-area");
+  const fileInput = document.getElementById("fileInput");
+  const previewList = document.getElementById("previewList");
+
+  let images = [];
+
+  // ---------- Upload Events ----------
+  dropArea.addEventListener("click", () => fileInput.click());
+
+  dropArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropArea.classList.add("active");
+  });
+
+  dropArea.addEventListener("dragleave", () => {
+    dropArea.classList.remove("active");
+  });
+
+  dropArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropArea.classList.remove("active");
+    loadFiles(e.dataTransfer.files);
+  });
+
+  fileInput.addEventListener("change", () => {
+    loadFiles(fileInput.files);
+  });
+
+  function loadFiles(fileList) {
+    images = [...fileList];
+    previewList.innerHTML = "";
+    images.forEach(file => {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      previewList.appendChild(img);
+    });
+  }
+
+  // Show custom size input only if selected
+  document.getElementById("pageSize").addEventListener("change", function () {
+    document.getElementById("customSizeSection").style.display =
+      this.value === "custom" ? "block" : "none";
+  });
+
+  // ---------- PDF GENERATION ----------
+  document.getElementById("generatePDF").addEventListener("click", async () => {
+    if (images.length === 0) return alert("Please upload at least 1 image.");
+
+    const pdfDoc = await PDFLib.PDFDocument.create();
+
+    for (let file of images) {
+      const imgBytes = await file.arrayBuffer();
+
+      const extension = file.type.includes("png") ? "png" : "jpg";
+
+      const pdfImage =
+        extension === "png"
+          ? await pdfDoc.embedPng(imgBytes)
+          : await pdfDoc.embedJpg(imgBytes);
+
+      let { width, height } = pdfImage;
+
+      // --- PAGE SIZE HANDLING ---
+      const sizeOption = document.getElementById("pageSize").value;
+      const orient = document.getElementById("orientation").value;
+
+      if (sizeOption === "a4") {
+        width = orient === "portrait" ? 595 : 842;
+        height = orient === "portrait" ? 842 : 595;
+      } else if (sizeOption === "letter") {
+        width = orient === "portrait" ? 612 : 792;
+        height = orient === "portrait" ? 792 : 612;
+      } else if (sizeOption === "legal") {
+        width = orient === "portrait" ? 612 : 1008;
+        height = orient === "portrait" ? 1008 : 612;
+      } else if (sizeOption === "custom") {
+        let unit = document.getElementById("customUnit").value;
+        let cw = Number(document.getElementById("customWidth").value);
+        let ch = Number(document.getElementById("customHeight").value);
+
+        if (unit === "cm") {
+          cw = cw * 28.346;
+          ch = ch * 28.346;
+        } else if (unit === "mm") {
+          cw = cw * 2.8346;
+          ch = ch * 2.8346;
+        }
+        width = cw;
+        height = ch;
+      }
+
+      const page = pdfDoc.addPage([width, height]);
+
+      // Fit image inside the page
+      const scale = Math.min(width / pdfImage.width, height / pdfImage.height);
+      const scaledW = pdfImage.width * scale;
+      const scaledH = pdfImage.height * scale;
+
+      page.drawImage(pdfImage, {
+        x: (width - scaledW) / 2,
+        y: (height - scaledH) / 2,
+        width: scaledW,
+        height: scaledH
+      });
+    }
+
+    const pdfBytes = await pdfDoc.save();
+
+    // Download
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "images_to_pdf.pdf";
+    a.click();
+  });
+</script>
+
+</body>
+</html>
