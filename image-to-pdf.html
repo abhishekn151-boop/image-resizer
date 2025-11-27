@@ -170,7 +170,9 @@
       <option value="landscape">Landscape</option>
     </select>
 
-    <button id="generateBtn" class="generate-btn">Generate PDF</button>
+<button id="deleteSelectedBtn" class="generate-btn" style="background:#ff4f4f;">Delete Selected</button>
+<button id="deleteAllBtn" class="generate-btn" style="background:#d93636;">Delete All</button>
+<button id="generateBtn" class="generate-btn">Generate PDF</button>
 
   </div>
 
@@ -259,19 +261,46 @@ function updateCount() {
 /* ----------------------------
    RENDER THUMBNAILS
 ----------------------------- */
-function createThumb(item) {
+function createThumb(item, index) {
   const div = document.createElement("div");
   div.className = "thumb";
   div.draggable = true;
   div.dataset.id = item.id;
 
+  /* --- Number + Checkbox Row --- */
+  const topRow = document.createElement("div");
+  topRow.style.display = "flex";
+  topRow.style.justifyContent = "space-between";
+  topRow.style.alignItems = "center";
+  topRow.style.marginBottom = "6px";
+
+  const numberBox = document.createElement("span");
+  numberBox.textContent = index + 1;
+  numberBox.style.background = "#273556";
+  numberBox.style.color = "#dbefff";
+  numberBox.style.fontSize = "12px";
+  numberBox.style.padding = "2px 6px";
+  numberBox.style.borderRadius = "6px";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "select-checkbox";
+  checkbox.dataset.id = item.id;
+
+  topRow.appendChild(numberBox);
+  topRow.appendChild(checkbox);
+
+  /* --- Image Thumbnail --- */
   const img = document.createElement("img");
   img.src = item.url;
 
+  /* --- Filename --- */
   const name = document.createElement("div");
   name.style.fontSize = "12px";
+  name.style.wordBreak = "break-word";
   name.textContent = item.file.name;
 
+  /* --- Remove Button --- */
   const removeBtn = document.createElement("button");
   removeBtn.textContent = "Remove";
   removeBtn.style.marginTop = "6px";
@@ -288,11 +317,13 @@ function createThumb(item) {
     renderThumbs();
   };
 
+  /* Add all parts */
+  div.appendChild(topRow);
   div.appendChild(img);
   div.appendChild(name);
   div.appendChild(removeBtn);
 
-  // drag events
+  /* Drag behavior */
   div.addEventListener("dragstart", () => div.classList.add("dragging"));
   div.addEventListener("dragend", () => div.classList.remove("dragging"));
 
@@ -301,7 +332,9 @@ function createThumb(item) {
 
 function renderThumbs() {
   thumbList.innerHTML = "";
-  files.forEach((item) => thumbList.appendChild(createThumb(item)));
+  files.forEach((item, i) => {
+    thumbList.appendChild(createThumb(item, i));
+  });
   updateCount();
 }
 
@@ -310,40 +343,61 @@ function renderThumbs() {
 ----------------------------- */
 thumbList.addEventListener("dragover", (e) => {
   e.preventDefault();
-  
+
   const dragging = document.querySelector(".thumb.dragging");
   if (!dragging) return;
 
-  const children = [...thumbList.querySelectorAll(".thumb:not(.dragging)")];
+  const elements = [...thumbList.querySelectorAll(".thumb:not(.dragging)")];
 
   let closest = null;
-  let closestDist = Infinity;
+  let minDist = Infinity;
 
-  children.forEach(child => {
-    const box = child.getBoundingClientRect();
-    const cx = box.left + box.width / 2;
-    const cy = box.top + box.height / 2;
+  elements.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
 
     const dx = e.clientX - cx;
     const dy = e.clientY - cy;
-    const dist = Math.sqrt(dx*dx + dy*dy);
 
-    if (dist < closestDist) {
-      closestDist = dist;
-      closest = child;
+    const dist = dx * dx + dy * dy; // faster than sqrt
+
+    if (dist < minDist) {
+      minDist = dist;
+      closest = el;
     }
   });
 
-  if (closest) {
+  if (closest)
     thumbList.insertBefore(dragging, closest);
-  } else {
-    thumbList.appendChild(dragging);
-  }
 
-  // Update logical array order
+  // sync order
   files = [...thumbList.children].map(el =>
     files.find(f => f.id === el.dataset.id)
   );
+});
+
+  /* ----------------------------
+   DELETE SELECTED
+----------------------------- */
+document.getElementById("deleteSelectedBtn").addEventListener("click", () => {
+  const selected = [...document.querySelectorAll(".select-checkbox:checked")]
+    .map(cb => cb.dataset.id);
+
+  if (!selected.length) return alert("No images selected.");
+
+  files = files.filter(f => !selected.includes(f.id));
+  renderThumbs();
+});
+
+/* ----------------------------
+   DELETE ALL
+----------------------------- */
+document.getElementById("deleteAllBtn").addEventListener("click", () => {
+  if (!files.length) return;
+  if (!confirm("Delete ALL images?")) return;
+  files = [];
+  renderThumbs();
 });
 
 /* ----------------------------
