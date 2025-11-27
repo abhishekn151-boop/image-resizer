@@ -229,14 +229,17 @@ const dropArea = document.getElementById("drop-area");
 const thumbList = document.getElementById("thumbList");
 const countEl = document.getElementById("count");
 
-let files = [];  // { file, url, img, id }
+let files = [];  // { file, url, id, img }
 
+/* ---------------- UPDATE COUNT ---------------- */
 function updateCount() {
-  countEl.textContent = files.length + " files";
+  countEl.textContent = files.length + " file" + (files.length === 1 ? "" : "s");
 }
 
+/* ---------------- RENDER THUMBNAILS ---------------- */
 function renderThumbs() {
   thumbList.innerHTML = "";
+
   files.forEach(item => {
     const div = document.createElement("div");
     div.className = "thumb";
@@ -249,10 +252,39 @@ function renderThumbs() {
       <button>Remove</button>
     `;
 
+    /* Remove button */
     div.querySelector("button").onclick = () => {
       files = files.filter(f => f.id !== item.id);
       renderThumbs();
     };
+
+    /* Drag start */
+    div.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("id", item.id);
+      div.classList.add("dragging");
+    });
+
+    /* Drag end */
+    div.addEventListener("dragend", () => {
+      div.classList.remove("dragging");
+    });
+
+    /* Drag over (drop reorder) */
+    div.addEventListener("dragover", e => {
+      e.preventDefault();
+      const draggingId = e.dataTransfer.getData("id");
+      const overId = div.dataset.id;
+
+      if (draggingId === overId) return;
+
+      const fromIndex = files.findIndex(x => x.id === draggingId);
+      const toIndex = files.findIndex(x => x.id === overId);
+
+      const moved = files.splice(fromIndex, 1)[0];
+      files.splice(toIndex, 0, moved);
+
+      renderThumbs();
+    });
 
     thumbList.appendChild(div);
   });
@@ -260,68 +292,119 @@ function renderThumbs() {
   updateCount();
 }
 
-function handleSelectedFiles(selected) {
-  for (const file of selected) {
-    if (!file.type.startsWith("image/")) continue;
+/* ---------------- HANDLE FILES ---------------- */
+function handleSelectedFiles(list) {
+  [...list].forEach(file => {
+    if (!file.type.startsWith("image/")) return;
 
     const id = Math.random().toString(36).slice(2, 9);
     const url = URL.createObjectURL(file);
-    files.push({ file, url, id });
-  }
+
+    const img = new Image();
+    img.src = url;
+
+    files.push({ file, url, id, img });
+  });
+
   renderThumbs();
 }
 
-dropArea.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", () => {
+/* Upload listeners */
+dropArea.onclick = () => fileInput.click();
+fileInput.onchange = () => {
   handleSelectedFiles(fileInput.files);
   fileInput.value = "";
-});
-
-dropArea.addEventListener("dragover", e => { e.preventDefault(); });
-dropArea.addEventListener("drop", e => {
+};
+dropArea.ondragover = e => e.preventDefault();
+dropArea.ondrop = e => {
   e.preventDefault();
   handleSelectedFiles(e.dataTransfer.files);
-});
+};
 
+/* ---------------- CUSTOM SIZE UI ---------------- */
 document.getElementById("pageSize").addEventListener("change", () => {
   const show = document.getElementById("pageSize").value === "custom";
   document.getElementById("customSizeRow").style.display = show ? "block" : "none";
 });
 
-
-// PDF GENERATION
+/* ---------------- PDF GENERATION (CROP FIX APPLIED) ---------------- */
 document.getElementById("generateBtn").onclick = async () => {
-  if (!files.length) {
-    alert("Add at least one image.");
-    return;
-  }
+  if (!files.length) return alert("Add at least one image first.");
 
-  const doc = new jsPDF({ unit: "px", format: "a4" });
+  const pageSize = document.getElementById("pageSize").value;
+  const orientation = document.getElementById("orientation").value;
+
+  let pdf;
 
   for (let i = 0; i < files.length; i++) {
-    const img = new Image();
-    await new Promise(res => {
-      img.onload = res;
-      img.src = files[i].url;
-    });
+    const item = files[i];
+    const img = item.img;
 
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
+    await imgDecode(img);
 
-    if (i > 0) doc.addPage([w, h]);
+    let pageW, pageH;
 
-    doc.setPage(i + 1);
-    doc.addImage(img, "JPEG", 0, 0, w, h);
+    if (pageSize === "original") {
+      pageW = img.naturalWidth;
+      pageH = img.naturalHeight;
+    } else {
+      ({ pageW, pageH } = getStandardPageSize(pageSize, orientation));
+    }
+
+    /* First page */
+    if (i === 0) {
+      pdf = new jsPDF({
+        unit: "px",
+        format: [pageW, pageH],
+        orientation: orientation,
+        compress: false
+      });
+    } else {
+      pdf.addPage([pageW, pageH], orientation);
+    }
+
+    /* AUTO-FIT to avoid cropping */
+    const ratio = Math.min(pageW / img.naturalWidth, pageH / img.naturalHeight, 1);
+    const drawW = img.naturalWidth * ratio;
+    const drawH = img.naturalHeight * ratio;
+
+    const x = (pageW - drawW) / 2;
+    const y = (pageH - drawH) / 2;
+
+    pdf.addImage(img, "JPEG", x, y, drawW, drawH);
   }
 
-  doc.save("images.pdf");
+  pdf.save("images.pdf");
 };
 
+/* Helper: accurate image load */
+function imgDecode(img) {
+  return new Promise(res => {
+    if (img.complete) return res();
+    img.onload = () => res();
+  });
+}
 
-// year
+/* Standard page sizes in px (converted from mm @ 96 DPI) */
+function getStandardPageSize(type, orientation) {
+  const DPI = 96;
+  const mmToPx = mm => mm * DPI / 25.4;
+
+  let wMM = 210, hMM = 297; // default A4
+
+  if (type === "letter") { wMM = 216; hMM = 279; }
+  if (type === "legal") { wMM = 216; hMM = 356; }
+
+  let pageW = mmToPx(wMM);
+  let pageH = mmToPx(hMM);
+
+  if (orientation === "landscape") [pageW, pageH] = [pageH, pageW];
+
+  return { pageW, pageH };
+}
+
+/* Year + mobile menu */
 document.getElementById("year").textContent = new Date().getFullYear();
-
-// mobile menu toggle
 document.getElementById("hamburger").onclick = () =>
   document.getElementById("mobileMenu").classList.toggle("active");
 
