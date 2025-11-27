@@ -6,335 +6,326 @@
   <title>Image → PDF — Free Image Resizer</title>
 
   <link rel="icon" type="image/png" href="assets/favicon.png" />
-  <meta name="description" content="Convert one or multiple images into a single high-quality PDF." />
+  <meta property="og:image" content="assets/logo.png" />
+  <meta name="description" content="Convert one or many images to a single PDF (original quality)." />
 
-  <!-- GLOBAL CSS -->
+  <!-- Global CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- jsPDF (NO INTEGRITY, 100% WORKING) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+  <!-- jsPDF WITHOUT INTEGRITY (works correctly) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    /* Page-specific minimal CSS */
-    .pdf-tool { max-width: 1100px; margin: 30px auto; padding: 18px; }
-    .uploader { display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
-    .drop-area.small { flex:1 1 420px; min-height:190px; display:flex; align-items:center; justify-content:center; flex-direction:column; }
-    .thumbs { flex:1 1 420px; background:#0f1829; border:1px solid #1d2944; border-radius:10px; padding:12px; }
-    .thumbs .list { display:flex; flex-wrap:wrap; gap:10px; }
-    .thumb { width:110px; text-align:center; background:#111a2e; padding:8px; border-radius:8px; border:1px solid #1e2c47; cursor:grab; }
-    .thumb img { width:100%; height:70px; object-fit:cover; border-radius:6px; margin-bottom:6px; }
-    .generate-btn { padding:10px 16px; background:#1f9bff; color:white; border:none; border-radius:8px; cursor:pointer; }
-    .small-input { width:130px; padding:8px; border-radius:8px; background:#0f1829; border:1px solid #2b3b5a; color:#e8ecf4; }
-    .muted { color:#a3abba; font-size:13px; }
+    /* ---------- PAGE-SPECIFIC TWEAKS ---------- */
+    .pdf-container {
+      max-width: 1200px;
+      margin: 30px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 280px;
+      gap: 20px;
+      padding: 10px;
+    }
+
+    @media(max-width: 900px) {
+      .pdf-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Upload area */
+    .drop-area.small {
+      min-height: 200px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+    }
+
+    /* Thumbnails panel */
+    .thumb-box {
+      background:#111a2e;
+      border:1px solid #1d2944;
+      border-radius:10px;
+      padding:14px;
+    }
+    .thumb-header {
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .thumb-list {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .thumb {
+      width:110px;
+      padding:8px;
+      background:#0f1829;
+      border-radius:8px;
+      border:1px solid #2b3b5a;
+      text-align:center;
+      cursor:grab;
+    }
+    .thumb img {
+      width:100%;
+      height:70px;
+      object-fit:cover;
+      border-radius:6px;
+      margin-bottom:6px;
+    }
+    .thumb button {
+      padding:5px 8px;
+      font-size:12px;
+      background:#273556;
+      color:#dbefff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+    .thumb.dragging { opacity:0.5; }
+
+    /* Settings Panel */
+    .settings-panel {
+      background:#131d32;
+      border:1px solid #1d2944;
+      padding:20px;
+      border-radius:10px;
+      height:fit-content;
+    }
+    .settings-panel h3 {
+      color:#7fc6ff;
+      margin-bottom:10px;
+    }
+    .small-input {
+      width:100%;
+      padding:10px;
+      border-radius:8px;
+      background:#0f1829;
+      color:#e8ecf4;
+      border:1px solid #2b3b5a;
+      font-size:14px;
+      margin-bottom:10px;
+    }
+    .generate-btn {
+      width:100%;
+      padding:12px;
+      background:#1f9bff;
+      color:white;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      margin-top:10px;
+      font-size:16px;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="top-nav">
-    <div class="nav-left">
-      <img src="assets/logo.png" class="nav-logo" alt="logo">
-      <span class="nav-title">Free Image Resizer</span>
-    </div>
+<!-- NAVBAR -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <img src="assets/logo.png" class="nav-logo" alt="logo">
+    <span class="nav-title">Free Image Resizer</span>
+  </div>
 
-    <div class="hamburger" id="hamburger">☰</div>
+  <div class="hamburger" id="hamburger">☰</div>
 
-    <div class="nav-links" id="mobileMenu">
-      <div class="dropdown">
-        <button class="dropbtn">Tools ▼</button>
-        <div class="dropdown-content">
-          <a href="index.html">Image Resizer</a>
-          <a href="compress.html">Image Compressor</a>
-          <a href="image-to-pdf.html">Image → PDF</a>
-        </div>
-      </div>
-      <a href="about.html">About Us</a>
-      <a href="faq.html">FAQ</a>
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms of Service</a>
-      <a href="contact.html">Contact</a>
-    </div>
-  </nav>
+  <div class="nav-links" id="mobileMenu">
 
-  <header class="head">
-    <img src="assets/logo.png" class="logo" alt="logo">
-    <h1>Image → PDF Converter</h1>
-    <p class="tagline">Upload multiple images and convert them into a single PDF without quality loss.</p>
-  </header>
-
-  <main class="pdf-tool">
-
-    <!-- Uploader -->
-    <div class="uploader">
-
-      <div id="drop-area" class="drop-area small">
-        <h3>Drop images here</h3>
-        <p class="muted">or click to pick files (PNG, JPG, WEBP)</p>
-        <input id="fileInput" type="file" accept="image/*" multiple hidden />
-      </div>
-
-      <!-- Thumbnails -->
-      <div class="thumbs">
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <strong>Selected Images</strong>
-          <span class="muted" id="count">0 files</span>
-        </div>
-
-        <div class="list" id="thumbList"></div>
-
-        <!-- Controls -->
-        <div class="controls">
-
-          <!-- Page size + orientation -->
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <select id="pageSize" class="small-input">
-              <option value="original">Original Size</option>
-              <option value="a4">A4</option>
-              <option value="letter">Letter</option>
-              <option value="legal">Legal</option>
-              <option value="custom">Custom</option>
-            </select>
-
-            <select id="orientation" class="small-input">
-              <option value="portrait">Portrait</option>
-              <option value="landscape">Landscape</option>
-            </select>
-          </div>
-
-          <!-- Custom size -->
-          <div id="customSizeRow" style="display:none; margin-top:10px;">
-            <input id="customWidth" class="small-input" type="number" placeholder="Width" />
-            <input id="customHeight" class="small-input" type="number" placeholder="Height" />
-            <select id="customUnit" class="small-input">
-              <option value="mm">mm</option>
-              <option value="cm">cm</option>
-              <option value="px">px</option>
-            </select>
-          </div>
-
-          <button id="generateBtn" class="generate-btn">Generate PDF</button>
-
-        </div>
+    <!-- Tools Menu -->
+    <div class="dropdown">
+      <button class="dropbtn">Tools ▼</button>
+      <div class="dropdown-content">
+        <a href="index.html">Image Resizer</a>
+        <a href="compress.html">Image Compressor</a>
+        <a href="image-to-pdf.html">Image → PDF</a>
       </div>
     </div>
 
-    <p class="note-small" style="margin-top:14px; text-align:justify;">
-      Tip: Drag thumbnails to reorder pages. Using <b>Original Size</b> keeps image pixels untouched (no quality loss).
-    </p>
+    <a href="about.html">About Us</a>
+    <a href="faq.html">FAQ</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
 
-  </main>
+<header class="head">
+  <img src="assets/logo.png" class="logo" alt="logo">
+  <h1>Image → PDF Converter</h1>
+  <p class="tagline">Convert multiple images into a single high-quality PDF.</p>
+</header>
 
-  <footer>
-    <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved</p>
-  </footer>
 
-  <!-- JS -->
-  <script>
-    const { jsPDF } = window.jspdf;
+<!-- MAIN 3-COLUMN LAYOUT -->
+<div class="pdf-container">
 
-    const fileInput = document.getElementById('fileInput');
-    const dropArea = document.getElementById('drop-area');
-    const thumbList = document.getElementById('thumbList');
-    const countEl = document.getElementById('count');
+  <!-- LEFT: UPLOADER -->
+  <div id="drop-area" class="drop-area small">
+    <h3>Drop images</h3>
+    <p class="muted">or click to upload</p>
+    <input id="fileInput" type="file" multiple accept="image/*" hidden />
+  </div>
 
-    const pageSizeEl = document.getElementById('pageSize');
-    const orientationEl = document.getElementById('orientation');
-    const customSizeRow = document.getElementById('customSizeRow');
-    const customWidth = document.getElementById('customWidth');
-    const customHeight = document.getElementById('customHeight');
-    const customUnit = document.getElementById('customUnit');
-    const generateBtn = document.getElementById('generateBtn');
+  <!-- MIDDLE: THUMBNAILS -->
+  <div class="thumb-box">
+    <div class="thumb-header">
+      <strong>Images</strong>
+      <span class="muted" id="count">0 files</span>
+    </div>
+    <div id="thumbList" class="thumb-list"></div>
+  </div>
 
-    let files = [];
+  <!-- RIGHT: SETTINGS PANEL -->
+  <div class="settings-panel">
+    <h3>PDF Settings</h3>
 
-    /** ------------------------
-     *  UTILS
-     ------------------------ */
-    function updateCount() {
-      countEl.textContent = files.length + " file" + (files.length === 1 ? "" : "s");
-    }
+    <label class="muted">Page Size</label>
+    <select id="pageSize" class="small-input">
+      <option value="original">Original (no loss)</option>
+      <option value="a4">A4</option>
+      <option value="letter">Letter</option>
+      <option value="legal">Legal</option>
+      <option value="custom">Custom</option>
+    </select>
 
-    function renderThumbs() {
-      thumbList.innerHTML = "";
-      files.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "thumb";
+    <div id="customSizeRow" style="display:none;">
+      <input id="customWidth" class="small-input" type="number" placeholder="Width" />
+      <input id="customHeight" class="small-input" type="number" placeholder="Height" />
+      <select id="customUnit" class="small-input">
+        <option value="mm">mm</option>
+        <option value="cm">cm</option>
+        <option value="px">px</option>
+      </select>
+    </div>
 
-        const img = document.createElement("img");
-        img.src = item.url;
+    <label class="muted">Orientation</label>
+    <select id="orientation" class="small-input">
+      <option value="portrait">Portrait</option>
+      <option value="landscape">Landscape</option>
+    </select>
 
-        const name = document.createElement("div");
-        name.style.fontSize = "12px";
-        name.textContent = item.file.name;
+    <button id="generateBtn" class="generate-btn">Generate PDF</button>
+  </div>
 
-        const remove = document.createElement("button");
-        remove.textContent = "Remove";
-        remove.style.marginTop = "6px";
-        remove.className = "btn-small";
+</div>
 
-        remove.onclick = () => {
-          files = files.filter(f => f.id !== item.id);
-          renderThumbs();
-        };
 
-        div.append(img, name, remove);
-        thumbList.appendChild(div);
-      });
-      updateCount();
-    }
+<footer>
+  <p>© <span id="year"></span> Free Image Resizer — All rights reserved</p>
+</footer>
 
-    /** ------------------------
-     *  FILE HANDLING
-     ------------------------ */
-    dropArea.onclick = () => fileInput.click();
 
-    dropArea.ondragover = e => { e.preventDefault(); dropArea.classList.add("active"); };
-    dropArea.ondragleave = () => dropArea.classList.remove("active");
+<!-- =========================== -->
+<!--        MAIN SCRIPT          -->
+<!-- =========================== -->
+<script>
+const { jsPDF } = window.jspdf;
 
-    dropArea.ondrop = e => {
-      e.preventDefault();
-      dropArea.classList.remove("active");
-      handleFiles(e.dataTransfer.files);
-    };
+const fileInput = document.getElementById("fileInput");
+const dropArea = document.getElementById("drop-area");
+const thumbList = document.getElementById("thumbList");
+const countEl = document.getElementById("count");
 
-    fileInput.onchange = () => {
-      handleFiles(fileInput.files);
-      fileInput.value = "";
-    };
+let files = [];  // { file, url, img, id }
 
-    function handleFiles(list) {
-      Array.from(list).forEach(file => {
-        if (!file.type.startsWith("image/")) return;
-        const id = Math.random().toString(36).slice(2, 10);
-        const url = URL.createObjectURL(file);
-        const item = { id, file, url };
+function updateCount() {
+  countEl.textContent = files.length + " files";
+}
 
-        // Preload natural size
-        const img = new Image();
-        img.onload = () => { item.img = img; };
-        img.src = url;
+function renderThumbs() {
+  thumbList.innerHTML = "";
+  files.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "thumb";
+    div.draggable = true;
+    div.dataset.id = item.id;
 
-        files.push(item);
-      });
+    div.innerHTML = `
+      <img src="${item.url}">
+      <div style="font-size:12px">${item.file.name}</div>
+      <button>Remove</button>
+    `;
+
+    div.querySelector("button").onclick = () => {
+      files = files.filter(f => f.id !== item.id);
       renderThumbs();
-    }
-
-    /** ------------------------
-     *  PAGE SIZE UI
-     ------------------------ */
-    pageSizeEl.onchange = () => {
-      customSizeRow.style.display = pageSizeEl.value === "custom" ? "flex" : "none";
     };
 
-    /** ------------------------
-     *  GENERATE PDF
-     ------------------------ */
-    generateBtn.onclick = async () => {
-      if (!files.length) return alert("Please add at least one image.");
+    thumbList.appendChild(div);
+  });
 
-      generateBtn.disabled = true;
-      generateBtn.textContent = "Generating…";
+  updateCount();
+}
 
-      try {
-        // Ensure all images are loaded
-        await Promise.all(
-          files.map(f => new Promise(res => {
-            if (f.img) return res();
-            const i = new Image();
-            i.onload = () => { f.img = i; res(); };
-            i.src = f.url;
-          }))
-        );
+function handleSelectedFiles(selected) {
+  for (const file of selected) {
+    if (!file.type.startsWith("image/")) continue;
 
-        const pages = [];
-        const orientation = orientationEl.value;
+    const id = Math.random().toString(36).slice(2, 9);
+    const url = URL.createObjectURL(file);
+    files.push({ file, url, id });
+  }
+  renderThumbs();
+}
 
-        // Convert sizes
-        function convertToPx(val, unit) {
-          if (unit === "px") return val;
-          if (unit === "cm") return Math.round(val * 96 / 2.54);
-          if (unit === "mm") return Math.round(val * 96 / 25.4);
-          return val;
-        }
+dropArea.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", () => {
+  handleSelectedFiles(fileInput.files);
+  fileInput.value = "";
+});
 
-        // Build page list
-        for (const f of files) {
-          const img = f.img;
+dropArea.addEventListener("dragover", e => { e.preventDefault(); });
+dropArea.addEventListener("drop", e => {
+  e.preventDefault();
+  handleSelectedFiles(e.dataTransfer.files);
+});
 
-          if (pageSizeEl.value === "original") {
-            pages.push({ w: img.naturalWidth, h: img.naturalHeight, img });
-          } else {
-            let w, h;
+document.getElementById("pageSize").addEventListener("change", () => {
+  const show = document.getElementById("pageSize").value === "custom";
+  document.getElementById("customSizeRow").style.display = show ? "block" : "none";
+});
 
-            if (pageSizeEl.value === "a4") { w = 210; h = 297; }
-            else if (pageSizeEl.value === "letter") { w = 216; h = 279; }
-            else if (pageSizeEl.value === "legal") { w = 216; h = 356; }
-            else {
-              w = convertToPx(customWidth.value, customUnit.value);
-              h = convertToPx(customHeight.value, customUnit.value);
-            }
 
-            // convert mm → px at 96 DPI
-            const pageW = convertToPx(w, "mm");
-            const pageH = convertToPx(h, "mm");
+// PDF GENERATION
+document.getElementById("generateBtn").onclick = async () => {
+  if (!files.length) {
+    alert("Add at least one image.");
+    return;
+  }
 
-            const ratio = Math.min(pageW / img.naturalWidth, pageH / img.naturalHeight);
-            const drawW = Math.round(img.naturalWidth * ratio);
-            const drawH = Math.round(img.naturalHeight * ratio);
+  const doc = new jsPDF({ unit: "px", format: "a4" });
 
-            pages.push({ w: pageW, h: pageH, img, drawW, drawH });
-          }
-        }
+  for (let i = 0; i < files.length; i++) {
+    const img = new Image();
+    await new Promise(res => {
+      img.onload = res;
+      img.src = files[i].url;
+    });
 
-        // Create PDF
-        const first = pages[0];
-        const pdf = new jsPDF({
-          unit: "px",
-          format: [first.w, first.h],
-          orientation,
-        });
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
 
-        pages.forEach((p, i) => {
-          if (i > 0) pdf.addPage([p.w, p.h], orientation);
+    if (i > 0) doc.addPage([w, h]);
 
-          const canvas = document.createElement("canvas");
-          canvas.width = p.img.naturalWidth;
-          canvas.height = p.img.naturalHeight;
+    doc.setPage(i + 1);
+    doc.addImage(img, "JPEG", 0, 0, w, h);
+  }
 
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(p.img, 0, 0);
+  doc.save("images.pdf");
+};
 
-          const mime = p.img.src.includes("png") ? "image/png" : "image/jpeg";
-          const dataURL = canvas.toDataURL(mime, 1.0);
 
-          const w = p.drawW || p.w;
-          const h = p.drawH || p.h;
-          const x = (p.w - w) / 2;
-          const y = (p.h - h) / 2;
+// year
+document.getElementById("year").textContent = new Date().getFullYear();
 
-          pdf.addImage(dataURL, mime.includes("png") ? "PNG" : "JPEG", x, y, w, h);
-        });
+// mobile menu toggle
+document.getElementById("hamburger").onclick = () =>
+  document.getElementById("mobileMenu").classList.toggle("active");
 
-        pdf.save("images.pdf");
-      }
-
-      catch (err) {
-        console.error(err);
-        alert("Failed to generate PDF. Check console.");
-      }
-
-      finally {
-        generateBtn.disabled = false;
-        generateBtn.textContent = "Generate PDF";
-      }
-    };
-
-    /** Footer year + mobile menu */
-    document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("hamburger").onclick = () =>
-      document.getElementById("mobileMenu").classList.toggle("active");
-  </script>
+</script>
 
 </body>
 </html>
