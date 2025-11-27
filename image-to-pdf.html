@@ -339,45 +339,53 @@ function renderThumbs() {
 }
 
 /* ----------------------------
-   SMOOTH DRAG-TO-REORDER
+   SMOOTH DRAG-TO-REORDER (FINAL FIXED)
 ----------------------------- */
+
 thumbList.addEventListener("dragover", (e) => {
   e.preventDefault();
 
   const dragging = document.querySelector(".thumb.dragging");
   if (!dragging) return;
 
-  const elements = [...thumbList.querySelectorAll(".thumb:not(.dragging)")];
+  const afterElement = getDragAfterElement(thumbList, e.clientX, e.clientY);
 
-  let closest = null;
-  let minDist = Infinity;
+  if (afterElement == null) {
+    thumbList.appendChild(dragging);
+  } else {
+    thumbList.insertBefore(dragging, afterElement);
+  }
 
-  elements.forEach(el => {
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-
-    const dx = e.clientX - cx;
-    const dy = e.clientY - cy;
-
-    const dist = dx * dx + dy * dy; // faster than sqrt
-
-    if (dist < minDist) {
-      minDist = dist;
-      closest = el;
-    }
-  });
-
-  if (closest)
-    thumbList.insertBefore(dragging, closest);
-
-  // sync order
-  files = [...thumbList.children].map(el =>
-    files.find(f => f.id === el.dataset.id)
+  // Sync file order
+  files = [...thumbList.querySelectorAll(".thumb")].map(div =>
+    files.find(f => f.id === div.dataset.id)
   );
+
+  // Refresh numbers
+  renderThumbs();
 });
 
-  /* ----------------------------
+function getDragAfterElement(container, mouseX, mouseY) {
+  const elements = [...container.querySelectorAll(".thumb:not(.dragging)")];
+
+  return elements.reduce(
+    (closest, child) => {
+      const rect = child.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      const distance = Math.hypot(mouseX - cx, mouseY - cy);
+
+      if (distance < closest.distance) {
+        return { distance, element: child };
+      }
+      return closest;
+    },
+    { distance: Infinity, element: null }
+  ).element;
+}
+
+/* ----------------------------
    DELETE SELECTED
 ----------------------------- */
 document.getElementById("deleteSelectedBtn").addEventListener("click", () => {
@@ -446,9 +454,17 @@ generateBtn.addEventListener("click", async () => {
           let H = Number(customHeight.value);
           const unit = customUnit.value;
 
-          if (unit === "cm") W *= 10, H *= 10;
-          if (unit === "px") {} 
-          if (unit === "mm") {} 
+          if (unit === "cm") {
+  W = W * 10;   // cm → mm
+  H = H * 10;
+}
+if (unit === "px") {
+  // px → mm  (using 96 dpi)
+  const DPI = 96;
+  W = (W / DPI) * 25.4;
+  H = (H / DPI) * 25.4;
+}
+// if mm — already mm 
 
           pageW = W;
           pageH = H;
