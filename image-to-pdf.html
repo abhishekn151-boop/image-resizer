@@ -189,9 +189,25 @@
 
 </div>
 
-<footer>
-  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved</p>
+<!-- FOOTER -->
+  <footer class="vertical-footer">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="privacy.html">Privacy Policy</a></li>
+    <li><a href="terms.html">Terms of Service</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
 </footer>
+  
+<script>
+  // mobile menu toggle
+  document.getElementById("hamburger").onclick = () =>
+    document.getElementById("mobileMenu").classList.toggle("active");
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 
 <script>
 /* ----------------------------
