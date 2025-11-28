@@ -213,10 +213,19 @@
 </footer>
   
 <script>
-  // mobile menu toggle
-  document.getElementById("hamburger").onclick = () =>
-    document.getElementById("mobileMenu").classList.toggle("active");
   document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const ham = document.getElementById("hamburger");
+  const menu = document.getElementById("mobileMenu");
+
+  if (ham && menu) {
+    ham.addEventListener("click", () => {
+      menu.classList.toggle("active");
+    });
+  }
+});
 </script>
 
 <script>
@@ -575,8 +584,6 @@ if (unit === "px") {
    FOOTER + NAV
 ----------------------------- */
 document.getElementById("year").textContent = new Date().getFullYear();
-document.getElementById("hamburger").addEventListener("click", () =>
-  document.getElementById("mobileMenu").classList.toggle("active")
 );
 
 </script>
