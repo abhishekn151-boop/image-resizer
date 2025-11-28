@@ -90,8 +90,30 @@ export function applyOrientation(canvas, orientation) {
 /* ---------- canvas <-> blob helpers ---------- */
 export function canvasToBlob(canvas, mime = "image/jpeg", quality = 0.92) {
   return new Promise((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), mime, quality);
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        // Safari fallback
+        const dataURL = canvas.toDataURL(mime, quality);
+        resolve(dataURLToBlob(dataURL));
+      }
+    }, mime, quality);
   });
+}
+
+// helper
+function dataURLToBlob(dataURL) {
+  const parts = dataURL.split(",");
+  const byteString = atob(parts[1]);
+  const mime = parts[0].split(":")[1].split(";")[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mime });
 }
 
 export function formatSize(bytes) {
@@ -162,12 +184,33 @@ export function convertResize(wVal, hVal, type, imgW, imgH, dpi = 96) {
     };
   }
 
-  // Resize by percent
-  if (type === "percent") {
-    const pctW = wVal ? imgW * (wVal / 100) : imgW;
-    const pctH = hVal ? imgH * (hVal / 100) : imgH;
-    return { w: pctW, h: pctH };
+  // Resize by percent ( with aspect-ratio preservation )
+if (type === "percent") {
+
+  // If only width% is given → scale everything equally
+  if (wVal && !hVal) {
+    const scale = wVal / 100;
+    return {
+      w: imgW * scale,
+      h: imgH * scale,
+    };
   }
+
+  // If only height% is given → scale everything equally
+  if (hVal && !wVal) {
+    const scale = hVal / 100;
+    return {
+      w: imgW * scale,
+      h: imgH * scale,
+    };
+  }
+
+  // If both provided → apply separately
+  return {
+    w: imgW * (wVal / 100),
+    h: imgH * (hVal / 100),
+  };
+}
 
   // Resize by centimeters (true DPI)
 if (type === "cm") {
