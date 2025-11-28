@@ -133,7 +133,9 @@
   
     <!-- JAVASCRIPT -->
 <script>
-  // Insert year
+  // mobile menu toggle
+  document.getElementById("hamburger").onclick = () =>
+    document.getElementById("mobileMenu").classList.toggle("active");
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
