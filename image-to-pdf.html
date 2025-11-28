@@ -99,32 +99,25 @@
 
 <body>
 
-<!-- TOP NAV -->
-<nav class="top-nav">
-  <div class="nav-left">
-    <img src="assets/logo.png" class="nav-logo" alt="logo">
-    <span class="nav-title">Free Image Resizer</span>
-  </div>
+<!-- TOP NAVIGATION BAR -->
+  <div id="navbar"></div>
+<script>
+  fetch("components/navbar.html")
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("navbar").innerHTML = html;
 
-  <div class="hamburger" id="hamburger">☰</div>
+      // Attach hamburger listener AFTER navbar loads
+      const ham = document.getElementById("hamburger");
+      const menu = document.getElementById("mobileMenu");
 
-  <div class="nav-links" id="mobileMenu">
-    <div class="dropdown">
-      <button class="dropbtn">Tools ▼</button>
-      <div class="dropdown-content">
-        <a href="index.html">Image Resizer</a>
-        <a href="compress.html">Image Compressor</a>
-        <a href="image-to-pdf.html">Image → PDF</a>
-      </div>
-    </div>
-
-    <a href="about.html">About Us</a>
-    <a href="faq.html">FAQ</a>
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="terms.html">Terms of Service</a>
-    <a href="contact.html">Contact</a>
-  </div>
-</nav>
+      if (ham && menu) {
+        ham.onclick = () => {
+          menu.classList.toggle("active");
+        };
+      }
+    });
+</script>
 
 <header class="head">
   <img src="assets/logo.png" class="logo" />
@@ -203,9 +196,6 @@
 </footer>
   
 <script>
-  // mobile menu toggle
-  document.getElementById("hamburger").onclick = () =>
-    document.getElementById("mobileMenu").classList.toggle("active");
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
@@ -542,14 +532,6 @@ if (unit === "px") {
   generateBtn.disabled = false;
   generateBtn.textContent = "Generate PDF";
 });
-
-/* ----------------------------
-   FOOTER + NAV
------------------------------ */
-document.getElementById("year").textContent = new Date().getFullYear();
-document.getElementById("hamburger").addEventListener("click", () =>
-  document.getElementById("mobileMenu").classList.toggle("active")
-);
 
 </script>
 
