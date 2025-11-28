@@ -139,11 +139,16 @@
   <div class="pdf-settings">
 
     <h3 style="color:#7fc6ff;">Upload Images</h3>
-    <div id="drop-area" class="drop-area" style="padding:20px; text-align:center;">
-      <h3>Drop images here</h3>
-      <p class="note-small">or click to browse</p>
-      <input id="fileInput" type="file" accept="image/*" multiple hidden>
-    </div>
+
+<button id="cameraBtn" class="generate-btn" style="background:#28a745; margin-top:15px;">
+  📷 Capture from Camera
+</button>
+
+<div id="drop-area" class="drop-area" style="padding:20px; text-align:center;">
+  <h3>Drop images here</h3>
+  <p class="note-small">or click to browse</p>
+  <input id="fileInput" type="file" accept="image/*" multiple hidden>
+</div>
 
     <h3 style="margin-top:25px; color:#7fc6ff;">Page Size</h3>
     <select class="small-input" id="pageSize">
@@ -227,6 +232,24 @@ const customUnit = document.getElementById("customUnit");
 const generateBtn = document.getElementById("generateBtn");
 
 let files = []; // { file, url, id, img }
+
+/* ----------------------------
+   CAMERA CAPTURE
+----------------------------- */
+document.getElementById("cameraBtn").addEventListener("click", () => {
+  const camInput = document.createElement("input");
+  camInput.type = "file";
+  camInput.accept = "image/*";
+  camInput.capture = "environment"; // rear camera on mobile
+
+  camInput.onchange = () => {
+    if (camInput.files.length > 0) {
+      handleFilesList(camInput.files);
+    }
+  };
+
+  camInput.click();
+});
 
 /* ----------------------------
    FILE HANDLING
