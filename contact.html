@@ -94,6 +94,10 @@
 <!-- SCRIPTS -->
 <script type="module">
 
+  // mobile menu toggle
+  document.getElementById("hamburger").onclick = () =>
+    document.getElementById("mobileMenu").classList.toggle("active");
+
   // Current Year
   document.getElementById("year").textContent = new Date().getFullYear();
 
