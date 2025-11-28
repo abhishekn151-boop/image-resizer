@@ -95,7 +95,19 @@
 <script>
   fetch("components/navbar.html")
     .then(r => r.text())
-    .then(html => document.getElementById("navbar").innerHTML = html);
+    .then(html => {
+      document.getElementById("navbar").innerHTML = html;
+
+      // Attach hamburger click AFTER navbar is inserted
+      const ham = document.getElementById("hamburger");
+      const menu = document.getElementById("mobileMenu");
+
+      if (ham && menu) {
+        ham.addEventListener("click", () => {
+          menu.classList.toggle("active");
+        });
+      }
+    });
 </script>
 
 <!-- HEADER -->
@@ -184,18 +196,5 @@
 <script type="module">
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
-  <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const ham = document.getElementById("hamburger");
-  const menu = document.getElementById("mobileMenu");
-
-  if (ham && menu) {
-    ham.addEventListener("click", () => {
-      menu.classList.toggle("active");
-    });
-  }
-});
-</script>
-
 </body>
 </html>
