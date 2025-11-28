@@ -23,11 +23,23 @@
 <!-- TOP NAVIGATION BAR -->
   <div id="navbar"></div>
 <script>
-  fetch("components/navbar.html")
-    .then(r => r.text())
-    .then(html => document.getElementById("navbar").innerHTML = html);
-</script>
+fetch("components/navbar.html")
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById("navbar").innerHTML = html;
 
+    // Attach hamburger click AFTER navbar loads
+    const ham = document.getElementById("hamburger");
+    const menu = document.getElementById("mobileMenu");
+
+    if (ham && menu) {
+      ham.addEventListener("click", () => {
+        menu.classList.toggle("active");
+      });
+    }
+  });
+</script>
+  
 <header class="head">
   <h1>Contact Us</h1>
 </header>
@@ -104,18 +116,5 @@
   });
 
 </script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const ham = document.getElementById("hamburger");
-  const menu = document.getElementById("mobileMenu");
-
-  if (ham && menu) {
-    ham.addEventListener("click", () => {
-      menu.classList.toggle("active");
-    });
-  }
-});
-</script>  
-
 </body>
 </html>
