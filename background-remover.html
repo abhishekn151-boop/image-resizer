@@ -5,488 +5,494 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Background Remover — Free Image Resizer</title>
 
-  <!-- TensorFlow.js + BodyPix -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.7.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0.5/dist/body-pix.min.js"></script>
+  <!-- Theme CSS (your global stylesheet) -->
+  <link rel="stylesheet" href="../style.css" />
 
-  <meta name="description" content="Remove background from images instantly using AI — fast, free, and browser-based. Privacy-first.">
-
+  <!-- Page-local styles -->
   <style>
-  /* ------------------------------
-     GLOBAL (navbar + site-like theme)
-     (condensed to include only what's needed)
-     ------------------------------ */
-  :root{
-    --bg:#0d1524;
-    --panel:#131d32;
-    --muted:#a9b4c9;
-    --accent:#4ad2ff;
-    --text:#dce7f7;
-    --card:#0f1829;
-    --border:#1d2944;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
-  a{color:inherit;text-decoration:none}
+    /* --- compact page styles (matches your dark theme) --- */
+    :root {
+      --panel-bg: #131d32;
+      --box-bg: #0f1829;
+      --muted: #a9b4c9;
+      --accent: #4ad2ff;
+      --btn: #1f9bff;
+      --panel-border: #1d2944;
+    }
 
-  /* NAVBAR */
-  .top-nav{
-    width:100%;
-    background:#071025; /* slightly darker to match your site */
-    border-bottom:1px solid var(--border);
-    padding:12px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    position:sticky;
-    top:0;
-    z-index:40;
-  }
-  .nav-left{display:flex;align-items:center;gap:10px}
-  .nav-logo{width:32px;height:32px;border-radius:8px}
-  .nav-title{font-weight:600;font-size:18px;color:#dce7f7}
-  .nav-links{display:flex;align-items:center;gap:12px}
-  .nav-links a{font-size:15px;color:#a9c4e2;padding:6px}
-  .hamburger{display:none;font-size:22px;cursor:pointer}
-  @media (max-width:850px){
-    .nav-links{display:none;position:absolute;top:58px;right:0;background:var(--panel);width:100%;padding:12px 0;flex-direction:column}
-    .hamburger{display:block;color:var(--text)}
-    .nav-links.active{display:flex}
-  }
+    .br-root {
+      max-width: 1200px;
+      margin: 18px auto 80px;
+      padding: 20px;
+    }
 
-  /* HEADER */
-  .head{padding:36px 20px 12px;text-align:center}
-  .head h1{margin:0;font-size:32px;color:var(--text)}
-  .head p{margin-top:8px;color:var(--muted);font-size:14px}
+    .br-title {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .br-title h1 { font-size: 32px; margin-bottom:6px; }
+    .br-title p { color: var(--muted); margin-top:6px; }
 
-  /* LAYOUT */
-  .br-container{
-    max-width:1150px;margin:18px auto;padding:20px;display:grid;grid-template-columns:360px 1fr;gap:26px;
-  }
-  @media (max-width:900px){ .br-container{ grid-template-columns:1fr;padding:16px } }
+    .br-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .br-grid { grid-template-columns: 1fr; padding: 0 12px; }
+    }
 
-  /* LEFT PANEL */
-  .br-left{
-    background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;min-height:300px;
-  }
-  #drop-area{
-    background:var(--card);border:2px dashed #324a67;border-radius:10px;padding:28px;text-align:center;cursor:pointer;
-  }
-  #drop-area h3{font-size:18px;color:var(--text);margin:0}
-  .note-small{color:var(--muted);font-size:13px;margin-top:8px}
+    /* left panel */
+    .br-left {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 18px;
+    }
 
-  .br-btn{
-    width:100%;margin-top:14px;background:#1f2a44;border:1px solid #324364;color:#dae7ff;padding:12px;border-radius:10px;cursor:pointer;
-  }
-  .br-btn.small{padding:8px;font-size:14px;width:auto;border-radius:8px}
-  .br-btn:hover{background:#273556}
+    #drop-area {
+      background: var(--box-bg);
+      border: 2px dashed #3a4459;
+      border-radius: 12px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+    #drop-area:hover { border-color: var(--accent); background: #102742; }
+    #drop-area h3 { margin-bottom:6px; }
+    .note-small { color: var(--muted); font-size: 13px; margin-top:6px; }
 
-  /* CONTROLS (hidden until image loaded) */
-  .controls-section{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:block}
-  .hidden{display:none}
+    .br-btn {
+      width:100%;
+      margin-top:12px;
+      background: #1f2a44;
+      border: 1px solid #324364;
+      color: #dae7ff;
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition:0.15s;
+    }
+    .br-btn:hover { background:#273556; }
 
-  label{display:block;color:#9fcfff;margin-top:12px;margin-bottom:6px}
-  input[type=range]{width:100%}
+    .controls {
+      margin-top: 18px;
+      border-top: 1px solid var(--panel-border);
+      padding-top: 14px;
+    }
+    .controls h4 { color: var(--accent); margin-bottom:8px; }
+    .controls label { display:block; color:var(--muted); margin:8px 0 6px; font-size:0.95rem; }
+    .controls input[type="range"] { width:100%; }
 
-  .brush-row{display:flex;gap:10px;margin-top:10px}
-  .brush-row .active{background:var(--accent);color:#fff}
+    .small-row { display:flex; gap:8px; margin-top:12px; }
+    .small-row button { flex:1; padding:10px; border-radius:8px; border:none; cursor:pointer; }
+    .primary { background: var(--btn); color:white; border: none; }
+    .muted { background: #243249; color: #d8e9ff; border: 1px solid #324364; }
 
-  /* RIGHT PREVIEW */
-  .br-right{background:transparent;border-radius:12px;padding:6px}
-  .preview-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;min-height:360px;display:flex;align-items:center;justify-content:center}
-  canvas#previewCanvas{max-width:100%;border-radius:10px;border:1px solid #1e2c47;background:transparent;display:block}
+    /* right preview */
+    .br-right {
+      background: var(--box-bg);
+      border:1px solid var(--panel-border);
+      border-radius:12px;
+      padding: 18px;
+      min-height: 420px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-  /* LOADING OVERLAY */
-  #loadingBox{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(6,10,18,0.7);display:flex;align-items:center;justify-content:center;z-index:80}
-  #loadingBox .box{background:var(--panel);padding:18px;border-radius:10px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text)}
-  .spinner{width:56px;height:56px;border-radius:50%;border:6px solid rgba(255,255,255,0.08);border-top-color:var(--accent);animation:spin .9s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  #loadingBox.hidden{display:none}
+    .preview-wrap {
+      width: 70%;
+      max-width: 640px;
+      aspect-ratio: 3/2;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.02);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border: 1px solid #1e2c47;
+    }
 
-  /* FOOTER */
-  footer.vertical-footer{margin-top:30px;padding:30px 10px;border-top:1px solid var(--border);text-align:center;color:var(--muted)}
-  footer.vertical-footer ul{list-style:none;padding:0;margin:0 0 8px;display:flex;gap:18px;justify-content:center}
-  footer.vertical-footer ul li a{color:var(--muted);font-size:14px}
-  footer.vertical-footer p{margin:8px 0 0;font-size:13px;color:#97a6c0}
+    canvas#outputCanvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display:block;
+      background: transparent;
+    }
 
-  /* small helpers */
-  .row{display:flex;gap:8px;align-items:center}
+    .helper {
+      color: var(--muted);
+      font-size: 13px;
+      text-align:center;
+      margin-top: 10px;
+    }
+
+    .hidden { display:none !important; }
+
+    /* overlay loading */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(6,8,12,0.55);
+      z-index: 9999;
+    }
+    .loader {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 16px 20px;
+      border-radius: 10px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .loader .dot {
+      width:14px; height:14px; border-radius:50%;
+      background:var(--accent); animation: blink 1s infinite;
+    }
+    @keyframes blink { 0% { opacity:.2 } 50% { opacity:1 } 100% { opacity:.2 } }
+
+    /* small footer */
+    .br-footer { text-align:center; margin-top:18px; color:var(--muted); font-size:13px; }
   </style>
+
+  <!-- MediaPipe Selfie Segmentation (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 </head>
 <body>
 
-  <!-- NAVBAR (inline to avoid fetch issues) -->
-  <nav class="top-nav">
-    <div class="nav-left">
-      <img src="../assets/logo.png" class="nav-logo" alt="logo" />
-      <span class="nav-title">Free Image Resizer</span>
+  <!-- your site navbar is expected to be injected as you already do -->
+  <div id="navbar"></div>
+
+  <div class="br-root">
+    <div class="br-title">
+      <h1>AI Background Remover</h1>
+      <p class="tagline">Mode A — Remove background completely (transparent PNG). Fast & lightweight (MediaPipe).</p>
     </div>
 
-    <div class="hamburger" id="hamburger">☰</div>
+    <div class="br-grid">
+      <!-- LEFT -->
+      <div class="br-left">
+        <div id="drop-area">
+          <h3>Upload Image</h3>
+          <p class="note-small">Drop or click to browse</p>
+          <input id="fileInput" type="file" accept="image/*" style="display:none">
+        </div>
 
-    <div class="nav-links" id="mobileMenu">
-      <div class="dropdown">
-        <button class="dropbtn">Tools ▼</button>
-        <div class="dropdown-content">
-          <a href="../index.html">Image Resizer</a>
-          <a href="../compress.html">Image Compressor</a>
-          <a href="../image-to-pdf.html">Image → PDF</a>
+        <p class="note-small" style="text-align:center; margin:10px 0;">OR</p>
+
+        <button id="cameraBtn" class="br-btn">📷 Capture from Camera</button>
+
+        <div class="controls hidden" id="controlsPanel">
+          <h4>Refine output</h4>
+
+          <label for="blurRange">Edge smoothing</label>
+          <input id="blurRange" type="range" min="0" max="12" value="3">
+
+          <label for="alphaRange">Mask opacity (for softer edges)</label>
+          <input id="alphaRange" type="range" min="80" max="255" value="255">
+
+          <div class="small-row" style="margin-top:12px">
+            <button id="downloadBtn" class="primary">Download PNG</button>
+            <button id="resetBtn" class="muted">Reset</button>
+          </div>
+        </div>
+
+        <div class="br-footer" style="margin-top:14px">
+          Tip: Works best for photos with one or two people, plain backgrounds, and decent lighting.
         </div>
       </div>
 
-      <a href="../about.html">About Us</a>
-      <a href="../faq.html">FAQ</a>
-      <a href="../privacy.html">Privacy Policy</a>
-      <a href="../terms.html">Terms of Service</a>
-      <a href="../contact.html">Contact</a>
-    </div>
-  </nav>
-
-  <header class="head">
-    <h1>AI Background Remover</h1>
-    <p class="tagline">Remove background instantly — 100% browser-based, no file upload.</p>
-  </header>
-
-  <!-- TOOL -->
-  <div class="br-container">
-
-    <!-- LEFT -->
-    <div class="br-left">
-      <div id="drop-area">
-        <h3>Upload Image</h3>
-        <p class="note-small">Drop or click to browse</p>
-        <input id="fileInput" type="file" accept="image/*" hidden />
-      </div>
-
-      <p style="text-align:center;color:var(--muted);margin-top:10px">OR</p>
-
-      <button id="cameraBtn" class="br-btn">📷 Capture from Camera</button>
-
-      <!-- controls hidden until image processed -->
-      <div id="controlsSection" class="controls-section hidden">
-        <h3 style="color:var(--accent);margin:12px 0 6px">Refine Mask</h3>
-
-        <label for="smoothSlider">Edge Smoothness</label>
-        <input id="smoothSlider" type="range" min="0" max="20" value="4">
-
-        <label for="opacitySlider">Mask Opacity</label>
-        <input id="opacitySlider" type="range" min="0" max="100" value="100">
-
-        <div class="brush-row" style="margin-top:10px">
-          <button id="eraseBtn" class="br-btn small">🩸 Erase</button>
-          <button id="restoreBtn" class="br-btn small">🎨 Restore</button>
-          <div style="flex:1"></div>
-          <button id="downloadBtn" class="br-btn" style="width:auto">Download PNG</button>
+      <!-- RIGHT -->
+      <div class="br-right">
+        <div class="preview-wrap" id="previewWrap">
+          <canvas id="outputCanvas" width="640" height="480"></canvas>
         </div>
-      </div>
-    </div>
-
-    <!-- RIGHT PREVIEW -->
-    <div class="br-right">
-      <div class="preview-wrap">
-        <canvas id="previewCanvas"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer class="vertical-footer">
-    <ul>
-      <li><a href="../about.html">About Us</a></li>
-      <li><a href="../faq.html">FAQ</a></li>
-      <li><a href="../privacy.html">Privacy Policy</a></li>
-      <li><a href="../terms.html">Terms of Service</a></li>
-      <li><a href="../contact.html">Contact</a></li>
-    </ul>
-    <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
-  </footer>
-
-  <!-- LOADING (model + processing) -->
-  <div id="loadingBox" class="hidden">
-    <div class="box">
-      <div class="spinner"></div>
-      <div id="loadingText" style="color:var(--text)">Loading...</div>
+  <!-- Loading overlay -->
+  <div id="loading" class="loading-overlay hidden">
+    <div class="loader">
+      <div class="dot"></div>
+      <div style="color:#dce7f7">Processing — AI segmentation</div>
     </div>
   </div>
 
+  <!-- Footer year -->
+  <script> if(document.getElementById('year')) document.getElementById('year').textContent = new Date().getFullYear(); </script>
+
+  <!-- MAIN JS (MediaPipe SelfieSeg + image flow) -->
   <script>
-  // small nav mobile toggle
-  document.getElementById("hamburger").addEventListener("click", () => {
-    document.getElementById("mobileMenu").classList.toggle("active");
-  });
-  document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+  (function () {
+    // Elements
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('fileInput');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const outputCanvas = document.getElementById('outputCanvas');
+    const ctx = outputCanvas.getContext('2d', { willReadFrequently: true });
+    const controlsPanel = document.getElementById('controlsPanel');
+    const blurRange = document.getElementById('blurRange');
+    const alphaRange = document.getElementById('alphaRange');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const loading = document.getElementById('loading');
 
-  <script>
-  /* ------------------------------
-     Background Remover JS (inline)
-     Uses BodyPix model from CDN (loaded in head)
-     ------------------------------ */
+    let lastImage = null;   // HTMLImageElement
+    let cameraStream = null;
+    let mpCamera = null;
+    let selfieSeg = null;
+    let busy = false;
 
-  let net = null;
-  let originalImg = null;
-  let paintedMask = null; // Uint8Array of 0/1, length = w*h
-  let origImageData = null; // ImageData of original
-  let canvas = document.getElementById("previewCanvas");
-  let ctx = canvas.getContext("2d");
+    // UTIL: show/hide loader
+    function showLoading(v=true) { loading.classList.toggle('hidden', !v); }
+    function enableControls(v) { controlsPanel.classList.toggle('hidden', !v); }
 
-  // elements
-  const dropArea = document.getElementById("drop-area");
-  const fileInput = document.getElementById("fileInput");
-  const cameraBtn = document.getElementById("cameraBtn");
-  const loadingBox = document.getElementById("loadingBox");
-  const loadingText = document.getElementById("loadingText");
-
-  const controlsSection = document.getElementById("controlsSection");
-  const smoothSlider = document.getElementById("smoothSlider");
-  const opacitySlider = document.getElementById("opacitySlider");
-  const eraseBtn = document.getElementById("eraseBtn");
-  const restoreBtn = document.getElementById("restoreBtn");
-  const downloadBtn = document.getElementById("downloadBtn");
-
-  let brushMode = "erase";
-  let drawing = false;
-  let brushSize = 24;
-
-  function showLoading(msg='Loading...'){ loadingText.textContent = msg; loadingBox.classList.remove('hidden'); }
-  function hideLoading(){ loadingBox.classList.add('hidden'); }
-
-  // load BodyPix model
-  async function loadModel(){
-    try{
-      showLoading('Loading AI model (BodyPix)...');
-      net = await bodyPix.load({
-        architecture: 'MobileNetV1',
-        outputStride: 16,
-        multiplier: 0.75,
-        quantBytes: 2
-      });
-      hideLoading();
-      console.log('BodyPix loaded');
-    }catch(err){
-      hideLoading();
-      console.error('Failed to load BodyPix:', err);
-      alert('Failed to load AI model. Check console for details.');
-    }
-  }
-  loadModel();
-
-  // helpers for drag drop and click
-  dropArea.addEventListener('click', ()=> fileInput.click());
-  fileInput.addEventListener('change', e => {
-    if(e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
-    fileInput.value = '';
-  });
-
-  dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('active'); });
-  dropArea.addEventListener('dragleave', e => { dropArea.classList.remove('active'); });
-  dropArea.addEventListener('drop', e => {
-    e.preventDefault();
-    dropArea.classList.remove('active');
-    const f = e.dataTransfer.files && e.dataTransfer.files[0];
-    if(f) handleFile(f);
-  });
-
-  cameraBtn.addEventListener('click', ()=>{
-    const inp = document.createElement('input');
-    inp.type = 'file';
-    inp.accept = 'image/*';
-    inp.capture = 'environment';
-    inp.onchange = ()=> { if(inp.files && inp.files[0]) handleFile(inp.files[0]); };
-    inp.click();
-  });
-
-  // handle file
-  async function handleFile(file){
-    if(!file || !file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
-    try {
-      showLoading('Loading image...');
-      const img = new Image();
-      img.onload = async () => {
-        originalImg = img;
-        // draw original into offscreen canvas to get pixels
-        const oc = document.createElement('canvas');
-        oc.width = img.naturalWidth;
-        oc.height = img.naturalHeight;
-        const octx = oc.getContext('2d');
-        octx.drawImage(img, 0, 0);
-        origImageData = octx.getImageData(0,0,oc.width,oc.height);
-
-        // run segmentation
-        await runSegmentation(img);
-      };
-      img.onerror = (e)=> { hideLoading(); alert('Failed to load image.'); console.error(e); };
-      img.src = URL.createObjectURL(file);
-    } catch(err){
-      hideLoading();
-      console.error(err);
-      alert('Unexpected error while processing file.');
-    }
-  }
-
-  // segmentation using bodypix
-  async function runSegmentation(img){
-    if(!net){ alert('AI model not ready yet. Please wait a moment and try again.'); hideLoading(); return; }
-    try{
-      showLoading('Running segmentation...');
-      // To reduce memory & time, scale down large images for segmentation then upsample mask.
-      const maxDim = 1024; // segmentation size cap
-      let scale = 1;
-      if(Math.max(img.naturalWidth, img.naturalHeight) > maxDim) {
-        scale = maxDim / Math.max(img.naturalWidth, img.naturalHeight);
-      }
-
-      const seg = await net.segmentPerson(img, {
-        internalResolution: scale === 1 ? 'medium' : 'low',
-        segmentationThreshold: 0.7,
+    // initialize MediaPipe SelfieSeg
+    async function initModel() {
+      selfieSeg = new SelfieSegmentation({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
       });
 
-      // seg.data is a Uint8Array of 0/1 per pixel at segmentation width/height (same as image size used)
-      // BodyPix returns data corresponding to original image dimensions if provided an HTMLImageElement, so seg.width==img.width
-      const w = seg.width || img.naturalWidth;
-      const h = seg.height || img.naturalHeight;
-      const raw = seg.data; // Uint8Array
-      // Ensure mask length matches image pixels
-      paintedMask = new Uint8ClampedArray(w*h);
-      for(let i=0;i<w*h;i++) paintedMask[i] = raw[i] ? 1 : 0;
+      selfieSeg.setOptions({
+        modelSelection: 1, // 0-general, 1-higher quality for multiple people (choose 1)
+      });
 
-      // set canvas size to original image size
-      canvas.width = w;
-      canvas.height = h;
-
-      // show controls
-      controlsSection.classList.remove('hidden');
-      // default brush UI states
-      setBrushMode('erase');
-
-      // draw result
-      drawFinalImage();
-      hideLoading();
-    }catch(err){
-      hideLoading();
-      console.error('segmentation error', err);
-      alert('Segmentation failed. Check console for details.');
+      selfieSeg.onResults(onResults);
     }
-  }
 
-  // draw composite of original + mask to canvas
-  function drawFinalImage(){
-    if(!origImageData || !paintedMask) return;
-    const w = canvas.width;
-    const h = canvas.height;
-    // create output imagedata
-    const out = new ImageData(w,h);
-    const src = origImageData.data;
-    const dst = out.data;
-    const opacity = Math.max(0, Math.min(100, Number(opacitySlider.value) || 100)) / 100;
+    // compositing result: take original image, segmentation mask (in results), and produce RGBA w/ transparent background
+    async function onResults(results) {
+      // results.segmentationMask is a HTMLCanvasElement (MediaPipe supplies)
+      const mask = results.segmentationMask;
+      const src = results.image; // ImageBitmap / HTMLImageElement / HTMLVideoElement
 
-    for(let i=0;i<w*h;i++){
-      const m = paintedMask[i];
-      const si = i*4;
-      if(m === 1){
-        dst[si]   = src[si];
-        dst[si+1] = src[si+1];
-        dst[si+2] = src[si+2];
-        // apply opacity to alpha channel (orig may be 255)
-        dst[si+3] = Math.round((src[si+3] || 255) * opacity);
-      } else {
-        dst[si] = dst[si+1] = dst[si+2] = 0;
-        dst[si+3] = 0;
+      if (!mask || !src) return;
+
+      // ensure canvas size matches image
+      const w = src.width || src.videoWidth;
+      const h = src.height || src.videoHeight;
+      outputCanvas.width = w;
+      outputCanvas.height = h;
+
+      // draw original image to temp canvas
+      const tmp = document.createElement('canvas');
+      tmp.width = w; tmp.height = h;
+      const tctx = tmp.getContext('2d');
+      tctx.drawImage(src, 0, 0, w, h);
+
+      // draw segmentation mask to another canvas (mask is already a canvas)
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = mask.width || w;
+      maskCanvas.height = mask.height || h;
+      const mctx = maskCanvas.getContext('2d');
+      // mask returned by MediaPipe can be different dimension - draw scaled
+      mctx.drawImage(mask, 0, 0, maskCanvas.width, maskCanvas.height);
+
+      // Optional smoothing: blur the mask into a new canvas
+      const blur = Number(blurRange.value) || 0;
+      if (blur > 0) {
+        // apply blur filter by drawing into another canvas with context.filter
+        const blurred = document.createElement('canvas');
+        blurred.width = maskCanvas.width; blurred.height = maskCanvas.height;
+        const bctx = blurred.getContext('2d');
+        bctx.filter = `blur(${blur}px)`;
+        bctx.drawImage(maskCanvas, 0, 0);
+        bctx.filter = 'none';
+        // replace maskCanvas
+        maskCanvas.width = blurred.width;
+        maskCanvas.height = blurred.height;
+        mctx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+        mctx.drawImage(blurred, 0, 0);
       }
-    }
 
-    // put image then optionally feather blur by drawing onto temporary canvas with filter
-    const temp = document.createElement('canvas');
-    temp.width = w; temp.height = h;
-    const tctx = temp.getContext('2d');
-    tctx.putImageData(out,0,0);
+      // read image + mask pixel data
+      const srcData = tctx.getImageData(0,0,w,h);
+      const maskData = mctx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
 
-    // apply feather (smooth) if > 0
-    const smooth = Number(smoothSlider.value) || 0;
-    // draw back to main canvas with optional blur
-    ctx.clearRect(0,0,w,h);
-    if(smooth > 0){
-      ctx.filter = `blur(${smooth}px)`;
-      ctx.drawImage(temp,0,0);
-      ctx.filter = 'none';
-    } else {
-      ctx.drawImage(temp,0,0);
-    }
-  }
+      // If mask canvas is scaled, map coordinates accordingly
+      // We'll map mask pixel by proportional coordinates
+      const final = ctx.createImageData(w,h);
+      const alphaLimit = Number(alphaRange.value) || 255;
 
-  // brush editing
-  function setBrushMode(mode){
-    brushMode = mode;
-    if(mode === 'erase'){
-      eraseBtn.classList.add('active'); restoreBtn.classList.remove('active');
-    } else {
-      restoreBtn.classList.add('active'); eraseBtn.classList.remove('active');
-    }
-  }
-  eraseBtn.addEventListener('click', ()=> setBrushMode('erase'));
-  restoreBtn.addEventListener('click', ()=> setBrushMode('restore'));
+      for (let y=0; y<h; y++) {
+        for (let x=0; x<w; x++) {
+          const i = (y*w + x) * 4;
+          // get mask pixel from maskData with scaling
+          const mx = Math.floor(x * (maskCanvas.width / w));
+          const my = Math.floor(y * (maskCanvas.height / h));
+          const mi = (my*maskCanvas.width + mx) * 4;
+          // mask's R channel contains the score (0..255)
+          const maskVal = maskData.data[mi]; // 0..255
 
-  function getCanvasPos(e){
-    const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const x = Math.round((clientX - rect.left) * (canvas.width / rect.width));
-    const y = Math.round((clientY - rect.top) * (canvas.height / rect.height));
-    return {x,y};
-  }
+          // If maskVal > threshold -> keep pixel (person). Otherwise transparent.
+          // We use maskVal directly to produce soft alpha
+          const keepAlpha = Math.round((maskVal / 255) * alphaLimit);
 
-  function applyBrushAt(x,y){
-    if(!paintedMask) return;
-    const w = canvas.width, h = canvas.height;
-    const radius = brushSize;
-    const rx = Math.max(0, x - radius);
-    const ry = Math.max(0, y - radius);
-    const ex = Math.min(w-1, x + radius);
-    const ey = Math.min(h-1, y + radius);
-
-    for(let py = ry; py <= ey; py++){
-      for(let px = rx; px <= ex; px++){
-        const dx = px - x, dy = py - y;
-        if(dx*dx + dy*dy <= radius*radius){
-          const idx = py * w + px;
-          paintedMask[idx] = (brushMode === 'erase') ? 0 : 1;
+          final.data[i] = srcData.data[i];
+          final.data[i+1] = srcData.data[i+1];
+          final.data[i+2] = srcData.data[i+2];
+          final.data[i+3] = keepAlpha;
         }
       }
+
+      // put final to output canvas
+      ctx.clearRect(0,0, w, h);
+      ctx.putImageData(final, 0, 0);
+      busy = false;
+      showLoading(false);
+      enableControls(true);
     }
-    drawFinalImage();
-  }
 
-  // mouse + touch events
-  canvas.addEventListener('mousedown', e => { drawing = true; const p = getCanvasPos(e); applyBrushAt(p.x,p.y); });
-  canvas.addEventListener('mousemove', e => { if(drawing){ const p = getCanvasPos(e); applyBrushAt(p.x,p.y); }});
-  document.addEventListener('mouseup', ()=> drawing=false);
+    // send a static image to model
+    async function processImage(img) {
+      if (!selfieSeg) await initModel();
+      busy = true;
+      showLoading(true);
+      enableControls(false);
 
-  canvas.addEventListener('touchstart', e => { drawing = true; const p = getCanvasPos(e); applyBrushAt(p.x,p.y); e.preventDefault(); }, {passive:false});
-  canvas.addEventListener('touchmove', e => { if(drawing){ const p = getCanvasPos(e); applyBrushAt(p.x,p.y); } e.preventDefault(); }, {passive:false});
-  document.addEventListener('touchend', ()=> drawing=false);
+      // results callback will handle compositing
+      await selfieSeg.send({image: img});
+    }
 
-  // sliders -> redraw
-  smoothSlider.addEventListener('input', drawFinalImage);
-  opacitySlider.addEventListener('input', drawFinalImage);
+    // handle file input
+    dropArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      stopCameraIfRunning();
+      loadImageFile(f);
+      fileInput.value = '';
+    });
 
-  // download
-  downloadBtn.addEventListener('click', ()=>{
-    if(!canvas) return;
-    const url = canvas.toDataURL('image/png');
-    const a = document.createElement('a');
-    a.href = url; a.download = 'background-removed.png';
-    a.click();
-  });
+    // drag-and-drop
+    dropArea.addEventListener('dragover', (e)=>{ e.preventDefault(); dropArea.classList.add('active'); });
+    dropArea.addEventListener('dragleave', ()=> dropArea.classList.remove('active'));
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault(); dropArea.classList.remove('active');
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!f) return;
+      stopCameraIfRunning();
+      loadImageFile(f);
+    });
 
-  // small improvements: keyboard +/- to change brush size
-  window.addEventListener('keydown', e => {
-    if(e.key === '+' || e.key === '='){ brushSize = Math.min(200, brushSize + 4); }
-    if(e.key === '-' ){ brushSize = Math.max(4, brushSize - 4); }
-  });
+    // load image from file into an Image element and process
+    function loadImageFile(file) {
+      const img = new Image();
+      img.onload = () => {
+        lastImage = img;
+        processImage(img);
+      };
+      img.onerror = () => alert('Failed to load image.');
+      img.src = URL.createObjectURL(file);
+    }
 
-  // safety: if user navigates away while model loading, stop
-  window.addEventListener('beforeunload', ()=> { /* no op */ });
+    // Camera capture: use MediaPipe CameraUtils to continuously send frames until user stops.
+    cameraBtn.addEventListener('click', async () => {
+      // if camera running, stop it
+      if (cameraStream) {
+        stopCameraIfRunning();
+        cameraBtn.textContent = '📷 Capture from Camera';
+        return;
+      }
 
+      // prepare video element
+      const video = document.createElement('video');
+      video.style.display = 'none';
+      document.body.appendChild(video);
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false });
+        cameraStream = stream;
+        video.srcObject = stream;
+        await video.play();
+
+        // use MediaPipe's Camera helper to continuously send frames
+        mpCamera = new Camera(video, {
+          onFrame: async () => {
+            if (!selfieSeg) await initModel();
+            if (!busy) {
+              busy = true;
+              showLoading(true);
+              enableControls(false);
+              await selfieSeg.send({image: video});
+            }
+          },
+          width: 1280,
+          height: 720
+        });
+        mpCamera.start();
+        cameraBtn.textContent = 'Stop Camera';
+      } catch (err) {
+        alert('Cannot access camera: ' + err.message);
+        stopCameraIfRunning();
+      }
+    });
+
+    function stopCameraIfRunning() {
+      if (mpCamera && mpCamera.stop) {
+        try { mpCamera.stop(); } catch(e) {}
+        mpCamera = null;
+      }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+      }
+      const vids = document.querySelectorAll('video');
+      vids.forEach(v => { if (v && v.parentNode) v.parentNode.removeChild(v); });
+      cameraBtn.textContent = '📷 Capture from Camera';
+    }
+
+    // download
+    downloadBtn.addEventListener('click', () => {
+      if (!outputCanvas) return;
+      const url = outputCanvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cutout.png';
+      a.click();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      if (lastImage) {
+        processImage(lastImage);
+      } else {
+        ctx.clearRect(0,0, outputCanvas.width, outputCanvas.height);
+        enableControls(false);
+      }
+    });
+
+    // small UI hooks: while blur/alpha change reprocess last image for instant preview
+    let reprocessTimeout = null;
+    function scheduleReprocess() {
+      if (!lastImage) return;
+      if (reprocessTimeout) clearTimeout(reprocessTimeout);
+      reprocessTimeout = setTimeout(()=>{ processImage(lastImage); }, 180);
+    }
+    blurRange.addEventListener('input', scheduleReprocess);
+    alphaRange.addEventListener('input', scheduleReprocess);
+
+    // init model eagerly (optional) to reduce first-run latency
+    initModel().then(()=> { /* model ready */ }).catch(e => console.error('Model init error', e));
+
+    // clean up if user leaves page (stop camera)
+    window.addEventListener('beforeunload', stopCameraIfRunning);
+
+    // make sure navbar (if injected) doesn't block click events on drop area
+    // (your navbar injection happens earlier; this is defensive)
+    document.addEventListener('DOMContentLoaded', ()=> { if(typeof window.injectNavbar === 'function') window.injectNavbar(); });
+
+  })();
   </script>
+
 </body>
 </html>
