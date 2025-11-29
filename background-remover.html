@@ -1,22 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Background Remover — Free Image Resizer</title>
+<title>Background Remover — Free Image Resizer</title>
 
-  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+<link rel="icon" type="image/png" href="../assets/favicon.png" />
+<link rel="stylesheet" href="../style.css" />
 
-  <!-- Global CSS -->
-  <link rel="stylesheet" href="../style.css" />
+<!-- TensorFlow + BodyPix -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.7.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0.5/dist/body-pix.min.js"></script>
 
-  <!-- Page-specific CSS -->
-  <link rel="stylesheet" href="../assets/css/background-remover.css" />
+<style>
+/* === INTERNAL CSS — background-remover.css merged === */
 
-  <!-- TensorFlow.js + BodyPix -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.7.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0.5/dist/body-pix.min.js"></script>
+.br-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 25px;
+}
+@media (max-width: 900px) {
+  .br-container { grid-template-columns: 1fr; }
+}
+
+/* LEFT PANEL */
+.br-left-panel {
+  background:#131d32;
+  border:1px solid #1d2944;
+  border-radius:12px;
+  padding:20px;
+  height:fit-content;
+}
+
+#drop-area {
+  background:#0f1829;
+  border:2px dashed #3a4459;
+  border-radius:12px;
+  padding:40px 20px;
+  text-align:center;
+  cursor:pointer;
+}
+#drop-area:hover { background:#16223b; border-color:#4ad2ff; }
+
+.note-small { color:#a9b4c9; font-size:14px; }
+
+/* Camera button */
+.br-btn {
+  width:100%;
+  background:#1f2a44;
+  border:1px solid #324364;
+  padding:12px;
+  border-radius:10px;
+  color:#dae7ff;
+  margin-top:12px;
+  cursor:pointer;
+}
+.br-btn:hover { background:#273556; }
+
+/* Control panel */
+#controlsSection { margin-top:25px; border-top:1px solid #1d2944; padding-top:15px; display:none; }
+
+/* Sliders */
+input[type=range] {
+  width:100%;
+  margin:10px 0;
+}
+
+/* Brush buttons */
+.brush-buttons {
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.brush-buttons .small {
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #324364;
+  background:#1f2a44;
+  color:#dce7f7;
+  cursor:pointer;
+}
+.small:hover { background:#273556; }
+
+/* Download */
+#downloadBtn {
+  background:#1f9bff;
+  margin-top:20px;
+  border:none;
+  border-radius:10px;
+  padding:14px;
+  color:white;
+}
+#downloadBtn:hover { background:#38a8ff; }
+
+/* RIGHT PANEL */
+.br-preview-box {
+  background:#0f1829;
+  border:1px solid #1d2944;
+  border-radius:12px;
+  padding:15px;
+  min-height:400px;
+  text-align:center;
+}
+#previewCanvas {
+  max-width:100%;
+  border-radius:12px;
+  border:1px solid #1e2c47;
+}
+
+/* Loading Overlay */
+#loadingBox {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(10,15,30,0.85);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:9999;
+}
+.spinner {
+  width:60px; height:60px;
+  border-radius:50%;
+  border:6px solid rgba(255,255,255,0.2);
+  border-top-color:#4ad2ff;
+  animation:spin 1s infinite linear;
+}
+@keyframes spin { to { transform:rotate(360deg);} }
+#loadingBox p { color:white; margin-top:10px; }
+
+</style>
 </head>
 
 <body>
@@ -25,13 +145,13 @@
 <div id="navbar"></div>
 <script>
 fetch("../components/navbar.html")
-  .then(r => r.text())
-  .then(html => {
-    document.getElementById("navbar").innerHTML = html;
-    const ham = document.getElementById("hamburger");
-    const menu = document.getElementById("mobileMenu");
-    if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
-  });
+  .then(r=>r.text())
+  .then(html=>{
+    navbar.innerHTML = html;
+    let ham = document.getElementById("hamburger");
+    let menu = document.getElementById("mobileMenu");
+    if(ham && menu){ ham.onclick = ()=>menu.classList.toggle("active"); }
+});
 </script>
 
 <header class="head">
@@ -39,72 +159,197 @@ fetch("../components/navbar.html")
   <p class="tagline">Remove background instantly — 100% browser-based.</p>
 </header>
 
-<!-- MAIN TOOL -->
+<!-- TOOL -->
 <div class="br-container">
 
-  <div class="br-tool-layout">
+  <!-- LEFT PANEL -->
+  <div class="br-left-panel">
 
-    <!-- LEFT PANEL -->
-    <div class="br-left-panel">
-
-      <!-- Upload -->
-      <div id="drop-area">
-        <h3>Upload Image</h3>
-        <p class="note-small">Drop or click to browse</p>
-        <input id="fileInput" type="file" accept="image/*" hidden>
-      </div>
-
-      <p class="note-small" style="text-align:center; margin:14px 0;">OR</p>
-
-      <button id="cameraBtn" class="br-btn">📷 Capture from Camera</button>
-
-      <!-- Controls -->
-      <div id="controlsSection" class="hidden">
-        <h3 style="color:#7fc6ff; margin-top:22px;">Refine Mask</h3>
-
-        <label class="br-slider-label">Edge Smoothness</label>
-        <input type="range" id="smoothSlider" min="0" max="15" value="5" class="br-slider">
-
-        <label class="br-slider-label">Mask Opacity</label>
-        <input type="range" id="opacitySlider" min="0" max="100" value="100" class="br-slider">
-
-        <div class="br-brush-row">
-          <button id="eraseBtn" class="br-brush-btn">🩸 Erase</button>
-          <button id="restoreBtn" class="br-brush-btn">🎨 Restore</button>
-        </div>
-
-        <button id="downloadBtn" class="br-btn" style="margin-top:16px;">
-          Download PNG
-        </button>
-      </div>
-
+    <div id="drop-area">
+      <h3>Upload Image</h3>
+      <p class="note-small">Drop or click to browse</p>
+      <input id="fileInput" type="file" accept="image/*" hidden>
     </div>
 
-    <!-- RIGHT PANEL -->
-    <div class="br-preview-box">
-      <canvas id="previewCanvas"></canvas>
+    <p class="note-small" style="text-align:center;margin-top:10px;">or</p>
+
+    <button id="cameraBtn" class="br-btn">📷 Capture from Camera</button>
+
+    <div id="controlsSection">
+      <h3 style="color:#7fc6ff;">Refine Mask</h3>
+
+      <label>Edge Smoothness</label>
+      <input id="smoothSlider" type="range" min="0" max="15" value="5">
+
+      <label>Mask Opacity</label>
+      <input id="opacitySlider" type="range" min="0" max="100" value="100">
+
+      <div class="brush-buttons">
+        <button id="eraseBtn" class="small">🩸 Erase</button>
+        <button id="restoreBtn" class="small">🎨 Restore</button>
+      </div>
+
+      <button id="downloadBtn">Download PNG</button>
     </div>
 
   </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="br-preview-box">
+    <canvas id="previewCanvas"></canvas>
+  </div>
+
 </div>
 
 <!-- FOOTER -->
 <footer class="vertical-footer">
   <ul>
-    <li><a href="../about.html">About Us</a></li>
+    <li><a href="../about.html">About</a></li>
     <li><a href="../faq.html">FAQ</a></li>
     <li><a href="../privacy.html">Privacy Policy</a></li>
-    <li><a href="../terms.html">Terms of Service</a></li>
+    <li><a href="../terms.html">Terms</a></li>
     <li><a href="../contact.html">Contact</a></li>
   </ul>
-  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
+  <p>© <span id="year"></span> Free Image Resizer</p>
 </footer>
 
-<script>
-document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 
-<script src="../assets/js/background-remover.js" type="module"></script>
+<!-- === JAVASCRIPT === -->
+<script>
+let net = null;
+let original = null;
+let mask = null;
+let canvas = document.getElementById("previewCanvas");
+let ctx = canvas.getContext("2d");
+let brushMode = "erase";
+let isDrawing = false;
+
+/* Load AI model */
+async function loadModel(){
+  loadingBox.style.display="flex";
+  net = await bodyPix.load({ architecture:"MobileNetV1", multiplier:0.75 });
+  loadingBox.style.display="none";
+}
+loadModel();
+
+/* Elements */
+const dropArea = document.getElementById("drop-area");
+const fileInput = document.getElementById("fileInput");
+const cameraBtn = document.getElementById("cameraBtn");
+const controlsSection = document.getElementById("controlsSection");
+const smoothSlider = document.getElementById("smoothSlider");
+const opacitySlider = document.getElementById("opacitySlider");
+const eraseBtn = document.getElementById("eraseBtn");
+const restoreBtn = document.getElementById("restoreBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const loadingBox = document.getElementById("loadingBox");
+
+/* Upload Handling */
+dropArea.onclick = ()=>fileInput.click();
+fileInput.onchange = ()=>processFile(fileInput.files[0]);
+
+dropArea.ondragover = e=>e.preventDefault();
+dropArea.ondrop = e=>{
+  e.preventDefault();
+  processFile(e.dataTransfer.files[0]);
+};
+
+/* Camera */
+cameraBtn.onclick = ()=>{
+  let i=document.createElement("input");
+  i.type="file"; i.accept="image/*"; i.capture="environment";
+  i.onchange=()=>processFile(i.files[0]);
+  i.click();
+};
+
+function processFile(file){
+  if(!file) return;
+  let img=new Image();
+  img.onload = ()=>{ original = img; generateMask(); };
+  img.src = URL.createObjectURL(file);
+}
+
+/* MAIN SEGMENTATION */
+async function generateMask(){
+  loadingBox.style.display="flex";
+
+  canvas.width = original.width;
+  canvas.height = original.height;
+
+  let seg = await net.segmentPerson(original, { internalResolution:"medium" });
+
+  mask = new Uint8ClampedArray(seg.data); // editable mask
+
+  drawResult();
+  controlsSection.style.display="block";
+  loadingBox.style.display="none";
+}
+
+/* Draw final image */
+function drawResult(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  let temp = document.createElement("canvas");
+  temp.width = original.width;
+  temp.height = original.height;
+  temp.getContext("2d").drawImage(original,0,0);
+
+  let src = temp.getContext("2d").getImageData(0,0,temp.width,temp.height);
+  let out = ctx.createImageData(canvas.width, canvas.height);
+
+  let o = opacitySlider.value * 2.55;
+
+  for(let i=0;i<mask.length;i++){
+    let idx=i*4;
+    out.data[idx] = src.data[idx];
+    out.data[idx+1] = src.data[idx+1];
+    out.data[idx+2] = src.data[idx+2];
+    out.data[idx+3] = mask[i] ? o : 0;
+  }
+
+  ctx.putImageData(out,0,0);
+
+  if(smoothSlider.value>0){
+    ctx.filter = `blur(${smoothSlider.value}px)`;
+    ctx.drawImage(canvas,0,0);
+    ctx.filter = "none";
+  }
+}
+
+/* Brush Tools */
+eraseBtn.onclick = ()=>{ brushMode="erase"; eraseBtn.style.background="#1f9bff"; restoreBtn.style.background="#273556"; };
+restoreBtn.onclick = ()=>{ brushMode="restore"; restoreBtn.style.background="#1f9bff"; eraseBtn.style.background="#273556"; };
+
+canvas.onmousedown = e=>{ isDrawing=true; editMask(e); };
+canvas.onmousemove = e=>{ if(isDrawing) editMask(e); };
+document.onmouseup = ()=> isDrawing=false;
+
+function editMask(e){
+  let r=canvas.getBoundingClientRect();
+  let x=Math.round((e.clientX-r.left)*(canvas.width/r.width));
+  let y=Math.round((e.clientY-r.top)*(canvas.height/r.height));
+
+  let size=25;
+  for(let dy=-size; dy<size; dy++){
+    for(let dx=-size; dx<size; dx++){
+      let px=x+dx, py=y+dy;
+      if(px<0||py<0||px>=canvas.width||py>=canvas.height) continue;
+      let idx=py*canvas.width+px;
+      mask[idx] = (brushMode==="erase") ? 0 : 1;
+    }
+  }
+  drawResult();
+}
+
+/* Download */
+downloadBtn.onclick = ()=>{
+  let a=document.createElement("a");
+  a.href=canvas.toDataURL("image/png");
+  a.download="background-removed.png";
+  a.click();
+};
+</script>
 
 </body>
 </html>
