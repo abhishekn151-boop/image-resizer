@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Background Remover — Free Image Resizer</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="../style.css" />
+
+  <!-- Page-specific CSS -->
+  <link rel="stylesheet" href="../assets/css/background-remover.css" />
+
+  <!-- TensorFlow.js + BodyPix -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.7.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0.5/dist/body-pix.min.js"></script>
+
+  <meta name="description"
+        content="Remove background from images instantly using AI — fast, free, and browser-based. Privacy-first.">
+</head>
+
+<body>
+
+<!-- TOP NAVIGATION BAR -->
+  <div id="navbar"></div>
+<script>
+  fetch("components/navbar.html")
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("navbar").innerHTML = html;
+
+      // Attach hamburger listener AFTER navbar loads
+      const ham = document.getElementById("hamburger");
+      const menu = document.getElementById("mobileMenu");
+
+      if (ham && menu) {
+        ham.onclick = () => {
+          menu.classList.toggle("active");
+        };
+      }
+    });
+</script>
+
+<header class="head">
+  <h1>AI Background Remover</h1>
+  <p class="tagline">Remove background instantly — 100% browser-based, no file upload.</p>
+</header>
+
+
+<!-- MAIN TOOL WRAPPER -->
+<div class="br-container">
+
+  <!-- LEFT PANEL (UPLOAD + SETTINGS) -->
+  <div class="br-left">
+
+    <!-- Upload area -->
+    <div id="drop-area" class="drop-area" style="text-align:center;">
+      <h3>Upload Image</h3>
+      <p class="note-small">Drop or click to browse</p>
+      <input id="fileInput" type="file" accept="image/*" hidden>
+    </div>
+
+    <p class="note-small" style="text-align:center; margin:12px 0;">OR</p>
+
+    <!-- Camera capture -->
+    <button id="cameraBtn" class="br-btn">📷 Capture from Camera</button>
+
+    <!-- Loading status -->
+    <div id="loadingBox" class="loading-box hidden">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-section hidden" id="controlsSection">
+      <h3>Refine Mask</h3>
+
+      <label>Edge Smoothness</label>
+      <input type="range" id="smoothSlider" min="0" max="15" value="5">
+
+      <label>Mask Opacity</label>
+      <input type="range" id="opacitySlider" min="0" max="100" value="100">
+
+      <div class="brush-buttons">
+        <button id="eraseBtn" class="br-btn small">🩸 Erase</button>
+        <button id="restoreBtn" class="br-btn small">🎨 Restore</button>
+      </div>
+
+      <button id="downloadBtn" class="br-btn" style="margin-top:18px;">Download PNG</button>
+    </div>
+
+  </div>
+
+
+  <!-- RIGHT PANEL (PREVIEW) -->
+  <div class="br-right">
+    <canvas id="previewCanvas" class="preview-canvas"></canvas>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="vertical-footer">
+  <ul>
+    <li><a href="../about.html">About Us</a></li>
+    <li><a href="../faq.html">FAQ</a></li>
+    <li><a href="../privacy.html">Privacy Policy</a></li>
+    <li><a href="../terms.html">Terms of Service</a></li>
+    <li><a href="../contact.html">Contact</a></li>
+  </ul>
+  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+<!-- Main JS -->
+<script src="../assets/js/background-remover.js" type="module"></script>
+
+</body>
+</html>
