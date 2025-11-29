@@ -1,498 +1,456 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Background Remover — Free Image Resizer</title>
 
-  <!-- Theme CSS (your global stylesheet) -->
-  <link rel="stylesheet" href="../style.css" />
+  <!-- favicon and basic meta -->
+  <link rel="icon" href="../assets/favicon.png" />
+  <meta name="description" content="Remove background from images locally (MediaPipe) — fast & lightweight." />
 
-  <!-- Page-local styles -->
+  <!-- Minimal page CSS (keeps your theme + tool layout) -->
   <style>
-    /* --- compact page styles (matches your dark theme) --- */
-    :root {
-      --panel-bg: #131d32;
-      --box-bg: #0f1829;
-      --muted: #a9b4c9;
-      --accent: #4ad2ff;
-      --btn: #1f9bff;
-      --panel-border: #1d2944;
+    :root{
+      --bg:#0d1524; --panel:#131d32; --muted:#a9b4c9; --accent:#1f9bff; --card:#0f1829; --border:#1d2944;
+      --light:#dce7f7;
     }
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, sans-serif;background:var(--bg);color:var(--light);}
+    .container{max-width:1200px;margin:28px auto;padding:12px;}
+    header.head{text-align:center;padding:18px 8px;}
+    header.head h1{margin:0;font-size:30px;}
+    header.head p{margin:6px 0;color:var(--muted);font-size:14px;}
 
-    .br-root {
-      max-width: 1200px;
-      margin: 18px auto 80px;
-      padding: 20px;
-    }
-
-    .br-title {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-    .br-title h1 { font-size: 32px; margin-bottom:6px; }
-    .br-title p { color: var(--muted); margin-top:6px; }
-
-    .br-grid {
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      gap: 28px;
-      align-items: start;
-    }
-    @media (max-width: 900px) {
-      .br-grid { grid-template-columns: 1fr; padding: 0 12px; }
-    }
+    /* layout */
+    .br-wrapper{display:grid;grid-template-columns:360px 1fr;gap:24px;margin-top:18px;}
+    @media(max-width:900px){.br-wrapper{grid-template-columns:1fr;padding:0 12px;}}
 
     /* left panel */
-    .br-left {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 18px;
-    }
+    .left-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;min-height:380px}
+    .drop-area{background:var(--card);border:2px dashed #33445a;border-radius:10px;padding:36px;text-align:center;cursor:pointer}
+    .drop-area h3{margin:0;color:var(--light)}
+    .note-small{color:var(--muted);font-size:13px;margin-top:6px}
 
-    #drop-area {
-      background: var(--box-bg);
-      border: 2px dashed #3a4459;
-      border-radius: 12px;
-      padding: 28px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.18s;
-    }
-    #drop-area:hover { border-color: var(--accent); background: #102742; }
-    #drop-area h3 { margin-bottom:6px; }
-    .note-small { color: var(--muted); font-size: 13px; margin-top:6px; }
+    .btn{display:inline-block;padding:10px 14px;border-radius:8px;border:1px solid #324364;background:#1f2a44;color:var(--light);cursor:pointer}
+    .btn.primary{background:var(--accent);border:none;color:#fff}
+    .btn.small{padding:7px 10px;font-size:13px}
+    .controls{margin-top:16px}
 
-    .br-btn {
-      width:100%;
-      margin-top:12px;
-      background: #1f2a44;
-      border: 1px solid #324364;
-      color: #dae7ff;
-      border-radius: 10px;
-      padding: 12px;
-      cursor: pointer;
-      transition:0.15s;
-    }
-    .br-btn:hover { background:#273556; }
+    .control-label{color:var(--accent);font-weight:600;margin:10px 0 6px;display:block}
+    input[type="range"]{width:100%}
 
-    .controls {
-      margin-top: 18px;
-      border-top: 1px solid var(--panel-border);
-      padding-top: 14px;
-    }
-    .controls h4 { color: var(--accent); margin-bottom:8px; }
-    .controls label { display:block; color:var(--muted); margin:8px 0 6px; font-size:0.95rem; }
-    .controls input[type="range"] { width:100%; }
+    /* right panel */
+    .right-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;min-height:380px;display:flex;align-items:center;justify-content:center}
+    .preview-wrap{width:80%;max-width:720px;border-radius:10px;border:1px solid rgba(30,44,71,0.6);padding:24px;display:flex;align-items:center;justify-content:center;min-height:220px}
+    canvas{max-width:100%;height:auto;border-radius:8px;background:transparent}
 
-    .small-row { display:flex; gap:8px; margin-top:12px; }
-    .small-row button { flex:1; padding:10px; border-radius:8px; border:none; cursor:pointer; }
-    .primary { background: var(--btn); color:white; border: none; }
-    .muted { background: #243249; color: #d8e9ff; border: 1px solid #324364; }
+    /* footer small */
+    .tip{color:var(--muted);font-size:13px;margin-top:12px}
 
-    /* right preview */
-    .br-right {
-      background: var(--box-bg);
-      border:1px solid var(--panel-border);
-      border-radius:12px;
-      padding: 18px;
-      min-height: 420px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .preview-wrap {
-      width: 70%;
-      max-width: 640px;
-      aspect-ratio: 3/2;
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.02);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border: 1px solid #1e2c47;
-    }
-
-    canvas#outputCanvas {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display:block;
-      background: transparent;
-    }
-
-    .helper {
-      color: var(--muted);
-      font-size: 13px;
-      text-align:center;
-      margin-top: 10px;
-    }
-
-    .hidden { display:none !important; }
-
-    /* overlay loading */
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: rgba(6,8,12,0.55);
-      z-index: 9999;
-    }
-    .loader {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      padding: 16px 20px;
-      border-radius: 10px;
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-    .loader .dot {
-      width:14px; height:14px; border-radius:50%;
-      background:var(--accent); animation: blink 1s infinite;
-    }
-    @keyframes blink { 0% { opacity:.2 } 50% { opacity:1 } 100% { opacity:.2 } }
-
-    /* small footer */
-    .br-footer { text-align:center; margin-top:18px; color:var(--muted); font-size:13px; }
+    /* small helpers */
+    .row{display:flex;gap:8px;align-items:center}
+    .muted{color:var(--muted);font-size:13px}
   </style>
 
-  <!-- MediaPipe Selfie Segmentation (CDN) -->
+  <!-- MediaPipe SelfieSegmentation -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 </head>
 <body>
-
-  <!-- your site navbar is expected to be injected as you already do -->
-  <div id="navbar"></div>
-
-  <div class="br-root">
-    <div class="br-title">
+  <div class="container">
+    <header class="head">
       <h1>AI Background Remover</h1>
-      <p class="tagline">Mode A — Remove background completely (transparent PNG). Fast & lightweight (MediaPipe).</p>
-    </div>
+      <p>Mode A — Fast, lightweight, humans-only (MediaPipe). Upload or capture, then refine edges.</p>
+    </header>
 
-    <div class="br-grid">
-      <!-- LEFT -->
-      <div class="br-left">
-        <div id="drop-area">
+    <div class="br-wrapper">
+
+      <!-- LEFT: controls -->
+      <div class="left-panel">
+        <div id="dropArea" class="drop-area" title="Click to open file browser or drop an image">
           <h3>Upload Image</h3>
           <p class="note-small">Drop or click to browse</p>
-          <input id="fileInput" type="file" accept="image/*" style="display:none">
+          <input id="fileInput" type="file" accept="image/*" style="display:none" />
         </div>
 
-        <p class="note-small" style="text-align:center; margin:10px 0;">OR</p>
+        <p class="note-small" style="text-align:center;margin:12px 0">OR</p>
 
-        <button id="cameraBtn" class="br-btn">📷 Capture from Camera</button>
+        <button id="cameraBtn" class="btn" style="width:100%">📷 Capture from Camera</button>
 
-        <div class="controls hidden" id="controlsPanel">
-          <h4>Refine output</h4>
+        <div class="controls" id="controls" style="display:none">
 
-          <label for="blurRange">Edge smoothing</label>
-          <input id="blurRange" type="range" min="0" max="12" value="3">
+          <label class="control-label">Refine output</label>
+          <div class="muted">Edge smoothing</div>
+          <input id="blurRange" type="range" min="0" max="20" value="4">
 
-          <label for="alphaRange">Mask opacity (for softer edges)</label>
-          <input id="alphaRange" type="range" min="80" max="255" value="255">
+          <div style="height:10px"></div>
+          <div class="muted">Mask opacity (for softer edges)</div>
+          <input id="opacityRange" type="range" min="60" max="255" value="255">
 
-          <div class="small-row" style="margin-top:12px">
-            <button id="downloadBtn" class="primary">Download PNG</button>
-            <button id="resetBtn" class="muted">Reset</button>
+          <div style="height:12px"></div>
+          <div class="row">
+            <button id="downloadBtn" class="btn primary">Download PNG</button>
+            <button id="resetBtn" class="btn small">Reset</button>
+            <div style="flex:1"></div>
           </div>
+
+          <p class="tip">Tip: Works best for photos with 1–2 people, plain backgrounds and decent lighting. Use the blur slider to smooth edges. Reset to reload.</p>
         </div>
 
-        <div class="br-footer" style="margin-top:14px">
-          Tip: Works best for photos with one or two people, plain backgrounds, and decent lighting.
+      </div>
+
+      <!-- RIGHT: preview -->
+      <div class="right-panel">
+        <div class="preview-wrap">
+          <canvas id="previewCanvas"></canvas>
         </div>
       </div>
 
-      <!-- RIGHT -->
-      <div class="br-right">
-        <div class="preview-wrap" id="previewWrap">
-          <canvas id="outputCanvas" width="640" height="480"></canvas>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- Loading overlay -->
-  <div id="loading" class="loading-overlay hidden">
-    <div class="loader">
-      <div class="dot"></div>
-      <div style="color:#dce7f7">Processing — AI segmentation</div>
-    </div>
-  </div>
+<script>
+/* ===========================
+   Single-file background remover
+   - MediaPipe SelfieSegmentation
+   - Morphology (dilate/erode via simple radius)
+   - GPU blur for feathering (canvas filter)
+   - Alpha compositing & download PNG
+   =========================== */
 
-  <!-- Footer year -->
-  <script> if(document.getElementById('year')) document.getElementById('year').textContent = new Date().getFullYear(); </script>
+const fileInput = document.getElementById('fileInput');
+const dropArea = document.getElementById('dropArea');
+const cameraBtn = document.getElementById('cameraBtn');
+const previewCanvas = document.getElementById('previewCanvas');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn = document.getElementById('resetBtn');
+const controlsDiv = document.getElementById('controls');
+const blurRange = document.getElementById('blurRange');
+const opacityRange = document.getElementById('opacityRange');
 
-  <!-- MAIN JS (MediaPipe SelfieSeg + image flow) -->
-  <script>
-  (function () {
-    // Elements
-    const dropArea = document.getElementById('drop-area');
-    const fileInput = document.getElementById('fileInput');
-    const cameraBtn = document.getElementById('cameraBtn');
-    const outputCanvas = document.getElementById('outputCanvas');
-    const ctx = outputCanvas.getContext('2d', { willReadFrequently: true });
-    const controlsPanel = document.getElementById('controlsPanel');
-    const blurRange = document.getElementById('blurRange');
-    const alphaRange = document.getElementById('alphaRange');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const loading = document.getElementById('loading');
+const ctx = previewCanvas.getContext('2d');
 
-    let lastImage = null;   // HTMLImageElement
-    let cameraStream = null;
-    let mpCamera = null;
-    let selfieSeg = null;
-    let busy = false;
+let originalImg = null;              // HTMLImageElement (original)
+let workingImageCanvas = null;       // resized source canvas
+let maskFloat = null;                // Float32Array mask (0..1)
+let maskW = 0, maskH = 0;
+let selfieSeg = null;
 
-    // UTIL: show/hide loader
-    function showLoading(v=true) { loading.classList.toggle('hidden', !v); }
-    function enableControls(v) { controlsPanel.classList.toggle('hidden', !v); }
+// performance / quality limit
+const MAX_DIM = 1200; // largest image dimension for processing
 
-    // initialize MediaPipe SelfieSeg
-    async function initModel() {
-      selfieSeg = new SelfieSegmentation({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
-      });
+/* ---------- helpers ---------- */
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function sizeFor(img){
+  const w = img.naturalWidth || img.width;
+  const h = img.naturalHeight || img.height;
+  const max = Math.max(w,h);
+  if(max <= MAX_DIM) return {w,h};
+  const scale = MAX_DIM / max;
+  return {w:Math.round(w*scale), h:Math.round(h*scale)};
+}
 
-      selfieSeg.setOptions({
-        modelSelection: 1, // 0-general, 1-higher quality for multiple people (choose 1)
-      });
+/* ---------- init MediaPipe ---------- */
+selfieSeg = new SelfieSegmentation({locateFile: (file) => {
+  return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+}});
+selfieSeg.setOptions({modelSelection: 1}); // 0 or 1 (1 = general/higher-quality)
+selfieSeg.onResults(onSegmentationResult);
 
-      selfieSeg.onResults(onResults);
+/* ---------- UI events ---------- */
+dropArea.addEventListener('click', ()=>fileInput.click());
+dropArea.addEventListener('dragover', (e)=>{ e.preventDefault(); dropArea.style.opacity = 0.9; });
+dropArea.addEventListener('dragleave', ()=>{ dropArea.style.opacity = 1; });
+dropArea.addEventListener('drop', (e)=>{ e.preventDefault(); dropArea.style.opacity = 1; if(e.dataTransfer.files && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+
+fileInput.addEventListener('change', ()=>{ if(fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+cameraBtn.addEventListener('click', ()=> {
+  // mobile/back camera capture fallback: use file input with capture attribute
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.capture = 'environment';
+  inp.onchange = ()=> { if(inp.files && inp.files[0]) handleFile(inp.files[0]); };
+  inp.click();
+});
+
+downloadBtn.addEventListener('click', ()=> {
+  // download canvas as PNG with alpha
+  previewCanvas.toBlob(blob=>{
+    if(!blob) return alert('Failed to prepare PNG.');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bg-removed.png';
+    a.click();
+  }, 'image/png');
+});
+
+resetBtn.addEventListener('click', ()=> {
+  if(!originalImg) return;
+  drawOriginalToCanvas(originalImg);
+  // re-run segmentation to refresh mask
+  processImageForMask(originalImg);
+});
+
+blurRange.addEventListener('input', ()=> {
+  if(maskFloat) renderComposite();
+});
+opacityRange.addEventListener('input', ()=> {
+  if(maskFloat) renderComposite();
+});
+
+/* ---------- handle file ---------- */
+async function handleFile(file){
+  if(!file || !file.type.startsWith('image/')) { alert('Please choose an image file'); return; }
+  const img = new Image();
+  img.onload = async ()=>{
+    originalImg = img;
+    // resize into working canvas for segmentation (keeps speed & memory)
+    const sz = sizeFor(img);
+    workingImageCanvas = document.createElement('canvas');
+    workingImageCanvas.width = sz.w;
+    workingImageCanvas.height = sz.h;
+    workingImageCanvas.getContext('2d').drawImage(img,0,0,sz.w,sz.h);
+    // show original (resized) while processing
+    drawOriginalToCanvas(img);
+    // show controls
+    controlsDiv.style.display = 'block';
+    // run segmentation (MediaPipe)
+    await processImageForMask(workingImageCanvas);
+  };
+  img.onerror = ()=>alert('Failed to load image');
+  img.src = URL.createObjectURL(file);
+}
+
+/* ---------- draw original image (fit preview) ---------- */
+function drawOriginalToCanvas(img){
+  // fit preview canvas to resized working canvas or original img
+  const sz = workingImageCanvas ? {w:workingImageCanvas.width,h:workingImageCanvas.height} : sizeFor(img);
+  previewCanvas.width = Math.min(sz.w, 900);
+  previewCanvas.height = Math.round(previewCanvas.width * (sz.h / sz.w));
+  const drawCtx = previewCanvas.getContext('2d');
+  drawCtx.clearRect(0,0, previewCanvas.width, previewCanvas.height);
+  // draw scaled original into preview area for display
+  // compute scale from working canvas to preview canvas
+  if(workingImageCanvas){
+    drawCtx.drawImage(workingImageCanvas, 0, 0, workingImageCanvas.width, workingImageCanvas.height, 0, 0, previewCanvas.width, previewCanvas.height);
+  } else {
+    drawCtx.drawImage(img, 0, 0, previewCanvas.width, previewCanvas.height);
+  }
+}
+
+/* ---------- process image through MediaPipe ---------- */
+async function processImageForMask(source){
+  // source can be a canvas or image element
+  // Ensure selfieSeg is ready
+  // Pass an ImageBitmap or HTMLCanvasElement
+  try {
+    // draw source into an offscreen canvas equal to workingImageCanvas size
+    let input = source;
+    if(!(source instanceof HTMLCanvasElement || source instanceof HTMLImageElement || source instanceof ImageBitmap)){
+      // nothing
     }
+    await selfieSeg.send({image: source}); // onResults will be called
+  } catch(err){
+    console.error(err);
+    alert('Segmentation failed: ' + (err.message || err));
+  }
+}
 
-    // compositing result: take original image, segmentation mask (in results), and produce RGBA w/ transparent background
-    async function onResults(results) {
-      // results.segmentationMask is a HTMLCanvasElement (MediaPipe supplies)
-      const mask = results.segmentationMask;
-      const src = results.image; // ImageBitmap / HTMLImageElement / HTMLVideoElement
+/* ---------- on segmentation result ---------- */
+async function onSegmentationResult(results){
+  // results.segmentationMask is an ImageBitmap (RGBA mask)
+  if(!results.segmentationMask){
+    console.warn('No segmentationMask');
+    return;
+  }
 
-      if (!mask || !src) return;
+  // Draw mask into temporary canvas (same size as workingImageCanvas)
+  maskW = workingImageCanvas.width;
+  maskH = workingImageCanvas.height;
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = maskW;
+  maskCanvas.height = maskH;
+  const mctx = maskCanvas.getContext('2d');
+  // draw segmentationMask (ImageBitmap) full size
+  mctx.drawImage(results.segmentationMask, 0, 0, maskW, maskH);
 
-      // ensure canvas size matches image
-      const w = src.width || src.videoWidth;
-      const h = src.height || src.videoHeight;
-      outputCanvas.width = w;
-      outputCanvas.height = h;
+  // Extract alpha (some versions provide grayscale in RGBA channels)
+  const md = mctx.getImageData(0,0,maskW,maskH).data;
+  maskFloat = new Float32Array(maskW * maskH);
+  for(let i=0, j=0;i<md.length;i+=4, j++){
+    // take red channel or alpha; mask tends to be grayscale in channels
+    const r = md[i]; // 0..255
+    maskFloat[j] = r / 255;
+  }
 
-      // draw original image to temp canvas
-      const tmp = document.createElement('canvas');
-      tmp.width = w; tmp.height = h;
-      const tctx = tmp.getContext('2d');
-      tctx.drawImage(src, 0, 0, w, h);
+  // refine mask: morphological cleanup (dilate then erode) to remove holes
+  maskFloat = morphClean(maskFloat, maskW, maskH, 1); // radius 1 small cleanup
 
-      // draw segmentation mask to another canvas (mask is already a canvas)
-      const maskCanvas = document.createElement('canvas');
-      maskCanvas.width = mask.width || w;
-      maskCanvas.height = mask.height || h;
-      const mctx = maskCanvas.getContext('2d');
-      // mask returned by MediaPipe can be different dimension - draw scaled
-      mctx.drawImage(mask, 0, 0, maskCanvas.width, maskCanvas.height);
+  // render composite to preview
+  renderComposite();
+}
 
-      // Optional smoothing: blur the mask into a new canvas
-      const blur = Number(blurRange.value) || 0;
-      if (blur > 0) {
-        // apply blur filter by drawing into another canvas with context.filter
-        const blurred = document.createElement('canvas');
-        blurred.width = maskCanvas.width; blurred.height = maskCanvas.height;
-        const bctx = blurred.getContext('2d');
-        bctx.filter = `blur(${blur}px)`;
-        bctx.drawImage(maskCanvas, 0, 0);
-        bctx.filter = 'none';
-        // replace maskCanvas
-        maskCanvas.width = blurred.width;
-        maskCanvas.height = blurred.height;
-        mctx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
-        mctx.drawImage(blurred, 0, 0);
-      }
-
-      // read image + mask pixel data
-      const srcData = tctx.getImageData(0,0,w,h);
-      const maskData = mctx.getImageData(0,0,maskCanvas.width,maskCanvas.height);
-
-      // If mask canvas is scaled, map coordinates accordingly
-      // We'll map mask pixel by proportional coordinates
-      const final = ctx.createImageData(w,h);
-      const alphaLimit = Number(alphaRange.value) || 255;
-
-      for (let y=0; y<h; y++) {
-        for (let x=0; x<w; x++) {
-          const i = (y*w + x) * 4;
-          // get mask pixel from maskData with scaling
-          const mx = Math.floor(x * (maskCanvas.width / w));
-          const my = Math.floor(y * (maskCanvas.height / h));
-          const mi = (my*maskCanvas.width + mx) * 4;
-          // mask's R channel contains the score (0..255)
-          const maskVal = maskData.data[mi]; // 0..255
-
-          // If maskVal > threshold -> keep pixel (person). Otherwise transparent.
-          // We use maskVal directly to produce soft alpha
-          const keepAlpha = Math.round((maskVal / 255) * alphaLimit);
-
-          final.data[i] = srcData.data[i];
-          final.data[i+1] = srcData.data[i+1];
-          final.data[i+2] = srcData.data[i+2];
-          final.data[i+3] = keepAlpha;
+/* ---------- morphological cleaning (simple) ----------
+   We'll perform a fast distance-like dilation then erosion using max/min in neighborhood.
+   radius param small (0,1,2). Keep it lightweight.
+*/
+function morphClean(mask, w, h, radius){
+  if(radius <= 0) return mask;
+  // dilation
+  const dil = new Float32Array(w*h);
+  const r = radius;
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      let maxv = 0;
+      const j0 = (y-r) < 0 ? 0 : y-r;
+      const j1 = (y+r) >= h ? h-1 : y+r;
+      const i0 = (x-r) < 0 ? 0 : x-r;
+      const i1 = (x+r) >= w ? w-1 : x+r;
+      for(let yy=j0; yy<=j1; yy++){
+        let base = yy*w;
+        for(let xx=i0; xx<=i1; xx++){
+          const v = mask[base + xx];
+          if(v > maxv) maxv = v;
+          if(maxv >= 1) break;
         }
+        if(maxv >= 1) break;
       }
-
-      // put final to output canvas
-      ctx.clearRect(0,0, w, h);
-      ctx.putImageData(final, 0, 0);
-      busy = false;
-      showLoading(false);
-      enableControls(true);
+      dil[y*w + x] = maxv;
     }
-
-    // send a static image to model
-    async function processImage(img) {
-      if (!selfieSeg) await initModel();
-      busy = true;
-      showLoading(true);
-      enableControls(false);
-
-      // results callback will handle compositing
-      await selfieSeg.send({image: img});
+  }
+  // erosion on dilated
+  const ero = new Float32Array(w*h);
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      let minv = 1;
+      const j0 = (y-r) < 0 ? 0 : y-r;
+      const j1 = (y+r) >= h ? h-1 : y+r;
+      const i0 = (x-r) < 0 ? 0 : x-r;
+      const i1 = (x+r) >= w ? w-1 : x+r;
+      for(let yy=j0; yy<=j1; yy++){
+        let base = yy*w;
+        for(let xx=i0; xx<=i1; xx++){
+          const v = dil[base + xx];
+          if(v < minv) minv = v;
+          if(minv <= 0) break;
+        }
+        if(minv <= 0) break;
+      }
+      ero[y*w + x] = minv;
     }
+  }
+  return ero;
+}
 
-    // handle file input
-    dropArea.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (ev) => {
-      const f = ev.target.files && ev.target.files[0];
-      if (!f) return;
-      stopCameraIfRunning();
-      loadImageFile(f);
-      fileInput.value = '';
-    });
+/* ---------- composite & render ----------
+   Steps:
+   - create mask canvas (grayscale alpha) from maskFloat
+   - apply blur (via ctx.filter = 'blur(px)') for feather
+   - composite original (workingImageCanvas) with mask alpha into previewCanvas; keep preview scaled to fit
+*/
+function renderComposite(){
+  if(!maskFloat || !workingImageCanvas) return;
 
-    // drag-and-drop
-    dropArea.addEventListener('dragover', (e)=>{ e.preventDefault(); dropArea.classList.add('active'); });
-    dropArea.addEventListener('dragleave', ()=> dropArea.classList.remove('active'));
-    dropArea.addEventListener('drop', (e) => {
-      e.preventDefault(); dropArea.classList.remove('active');
-      const f = e.dataTransfer.files && e.dataTransfer.files[0];
-      if (!f) return;
-      stopCameraIfRunning();
-      loadImageFile(f);
-    });
+  // create mask canvas at full working resolution
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = maskW;
+  maskCanvas.height = maskH;
+  const mctx = maskCanvas.getContext('2d');
+  const imgData = mctx.createImageData(maskW, maskH);
+  // build RGBA mask (use maskFloat)
+  for(let i=0, j=0;i<imgData.data.length;i+=4,j++){
+    const v = clamp(Math.round(maskFloat[j]*255),0,255);
+    imgData.data[i] = v;
+    imgData.data[i+1] = v;
+    imgData.data[i+2] = v;
+    imgData.data[i+3] = 255;
+  }
+  mctx.putImageData(imgData,0,0);
 
-    // load image from file into an Image element and process
-    function loadImageFile(file) {
-      const img = new Image();
-      img.onload = () => {
-        lastImage = img;
-        processImage(img);
-      };
-      img.onerror = () => alert('Failed to load image.');
-      img.src = URL.createObjectURL(file);
-    }
+  // apply blur (GPU accelerated)
+  const blurPx = parseInt(blurRange.value,10) || 0;
+  if(blurPx > 0){
+    // use a second canvas to draw blurred mask
+    const blurred = document.createElement('canvas');
+    blurred.width = maskW;
+    blurred.height = maskH;
+    const bctx = blurred.getContext('2d');
+    bctx.filter = `blur(${blurPx}px)`;
+    bctx.drawImage(maskCanvas,0,0);
+    // replace maskCanvas
+    maskCanvas.width = maskW; // reset
+    mctx.clearRect(0,0,maskW,maskH);
+    mctx.drawImage(blurred,0,0);
+  }
 
-    // Camera capture: use MediaPipe CameraUtils to continuously send frames until user stops.
-    cameraBtn.addEventListener('click', async () => {
-      // if camera running, stop it
-      if (cameraStream) {
-        stopCameraIfRunning();
-        cameraBtn.textContent = '📷 Capture from Camera';
-        return;
-      }
+  // get resulting mask alpha as Float32Array (0..1)
+  const mData = mctx.getImageData(0,0,maskW,maskH).data;
+  const finalMask = new Float32Array(maskW*maskH);
+  for(let i=0,j=0;i<mData.length;i+=4,j++){
+    finalMask[j] = mData[i] / 255; // R channel
+  }
 
-      // prepare video element
-      const video = document.createElement('video');
-      video.style.display = 'none';
-      document.body.appendChild(video);
+  // apply mask opacity slider (0..255)
+  const op = Number(opacityRange.value) / 255.0;
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false });
-        cameraStream = stream;
-        video.srcObject = stream;
-        await video.play();
+  // create output canvas at working resolution
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = maskW;
+  outCanvas.height = maskH;
+  const outCtx = outCanvas.getContext('2d');
 
-        // use MediaPipe's Camera helper to continuously send frames
-        mpCamera = new Camera(video, {
-          onFrame: async () => {
-            if (!selfieSeg) await initModel();
-            if (!busy) {
-              busy = true;
-              showLoading(true);
-              enableControls(false);
-              await selfieSeg.send({image: video});
-            }
-          },
-          width: 1280,
-          height: 720
-        });
-        mpCamera.start();
-        cameraBtn.textContent = 'Stop Camera';
-      } catch (err) {
-        alert('Cannot access camera: ' + err.message);
-        stopCameraIfRunning();
-      }
-    });
+  // draw original image into out canvas
+  outCtx.clearRect(0,0,maskW,maskH);
+  outCtx.drawImage(workingImageCanvas,0,0);
 
-    function stopCameraIfRunning() {
-      if (mpCamera && mpCamera.stop) {
-        try { mpCamera.stop(); } catch(e) {}
-        mpCamera = null;
-      }
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(t => t.stop());
-        cameraStream = null;
-      }
-      const vids = document.querySelectorAll('video');
-      vids.forEach(v => { if (v && v.parentNode) v.parentNode.removeChild(v); });
-      cameraBtn.textContent = '📷 Capture from Camera';
-    }
+  // get pixel data of original
+  const srcData = outCtx.getImageData(0,0,maskW,maskH);
+  const dst = outCtx.createImageData(maskW,maskH);
 
-    // download
-    downloadBtn.addEventListener('click', () => {
-      if (!outputCanvas) return;
-      const url = outputCanvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'cutout.png';
-      a.click();
-    });
+  // compose: dst.rgb = src.rgb, dst.a = finalMask * op
+  for(let i=0, j=0;i<dst.data.length;i+=4,j++){
+    const r = srcData.data[i], g = srcData.data[i+1], b = srcData.data[i+2];
+    const a = clamp(finalMask[j] * op, 0, 1);
+    dst.data[i]   = r;
+    dst.data[i+1] = g;
+    dst.data[i+2] = b;
+    dst.data[i+3] = Math.round(a * 255);
+  }
 
-    resetBtn.addEventListener('click', () => {
-      if (lastImage) {
-        processImage(lastImage);
-      } else {
-        ctx.clearRect(0,0, outputCanvas.width, outputCanvas.height);
-        enableControls(false);
-      }
-    });
+  // put dst into outCtx
+  outCtx.clearRect(0,0,maskW,maskH);
+  outCtx.putImageData(dst,0,0);
 
-    // small UI hooks: while blur/alpha change reprocess last image for instant preview
-    let reprocessTimeout = null;
-    function scheduleReprocess() {
-      if (!lastImage) return;
-      if (reprocessTimeout) clearTimeout(reprocessTimeout);
-      reprocessTimeout = setTimeout(()=>{ processImage(lastImage); }, 180);
-    }
-    blurRange.addEventListener('input', scheduleReprocess);
-    alphaRange.addEventListener('input', scheduleReprocess);
+  // draw scaled to previewCanvas (fit)
+  // set preview canvas size to a reasonable preview width while preserving aspect ratio
+  const PREVIEW_MAX_W = Math.min(900, maskW);
+  const scale = PREVIEW_MAX_W / maskW;
+  previewCanvas.width = Math.round(maskW * scale);
+  previewCanvas.height = Math.round(maskH * scale);
 
-    // init model eagerly (optional) to reduce first-run latency
-    initModel().then(()=> { /* model ready */ }).catch(e => console.error('Model init error', e));
+  // clear and draw
+  ctx.clearRect(0,0, previewCanvas.width, previewCanvas.height);
+  // draw the outCanvas directly scaled (preserves alpha)
+  ctx.drawImage(outCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
+}
 
-    // clean up if user leaves page (stop camera)
-    window.addEventListener('beforeunload', stopCameraIfRunning);
+/* ---------- optionally, you may resize working canvas differently ---------- */
+/* done */
 
-    // make sure navbar (if injected) doesn't block click events on drop area
-    // (your navbar injection happens earlier; this is defensive)
-    document.addEventListener('DOMContentLoaded', ()=> { if(typeof window.injectNavbar === 'function') window.injectNavbar(); });
-
-  })();
-  </script>
-
+/* ---------- Done: load a small default model warmup when page starts ---------- */
+(async function warmup(){
+  // create a tiny blank canvas to warm the model (non-blocking)
+  const tmp = document.createElement('canvas');
+  tmp.width = 10; tmp.height = 10;
+  const tctx = tmp.getContext('2d');
+  tctx.fillStyle = 'black'; tctx.fillRect(0,0,10,10);
+  try{
+    // Send a tiny image to initialize WebGL / WASM backend
+    await selfieSeg.initialize ? selfieSeg.initialize() : Promise.resolve();
+    // don't await selfieSeg.send here because model will load when needed
+  }catch(e){ console.warn('warmup error',e); }
+})();
+</script>
 </body>
 </html>
