@@ -21,24 +21,17 @@
 
 <body>
 
-<!-- TOP NAVIGATION BAR -->
-  <div id="navbar"></div>
+<!-- NAVBAR -->
+<div id="navbar"></div>
 <script>
-  fetch("../components/navbar.html")
-    .then(r => r.text())
-    .then(html => {
-      document.getElementById("navbar").innerHTML = html;
-
-      // Attach hamburger listener AFTER navbar loads
-      const ham = document.getElementById("hamburger");
-      const menu = document.getElementById("mobileMenu");
-
-      if (ham && menu) {
-        ham.onclick = () => {
-          menu.classList.toggle("active");
-        };
-      }
-    });
+fetch("../components/navbar.html")
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById("navbar").innerHTML = html;
+    const ham = document.getElementById("hamburger");
+    const menu = document.getElementById("mobileMenu");
+    if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
+  });
 </script>
 
 <header class="head">
@@ -54,41 +47,40 @@
     <!-- LEFT PANEL -->
     <div class="br-left-panel">
 
+      <!-- Upload -->
       <div id="drop-area">
         <h3>Upload Image</h3>
         <p class="note-small">Drop or click to browse</p>
         <input id="fileInput" type="file" accept="image/*" hidden>
       </div>
 
-      <p class="note-small" style="text-align:center; margin-top: 14px;">OR</p>
+      <p class="note-small" style="text-align:center; margin:14px 0;">OR</p>
 
-      <button id="cameraBtn" class="br-btn">
-        📷 Capture from Camera
-      </button>
+      <button id="cameraBtn" class="br-btn">📷 Capture from Camera</button>
 
-      <!-- CONTROLS -->
+      <!-- Controls -->
       <div id="controlsSection" class="hidden">
-
-        <h3 style="margin-top:22px; color:#7fc6ff;">Refine Mask</h3>
+        <h3 style="color:#7fc6ff; margin-top:22px;">Refine Mask</h3>
 
         <label class="br-slider-label">Edge Smoothness</label>
-        <input id="smoothSlider" type="range" min="0" max="15" value="5" class="br-slider">
+        <input type="range" id="smoothSlider" min="0" max="15" value="5" class="br-slider">
 
         <label class="br-slider-label">Mask Opacity</label>
-        <input id="opacitySlider" type="range" min="0" max="100" value="100" class="br-slider">
+        <input type="range" id="opacitySlider" min="0" max="100" value="100" class="br-slider">
 
         <div class="br-brush-row">
           <button id="eraseBtn" class="br-brush-btn">🩸 Erase</button>
           <button id="restoreBtn" class="br-brush-btn">🎨 Restore</button>
         </div>
 
-        <button id="downloadBtn">Download PNG</button>
-
+        <button id="downloadBtn" class="br-btn" style="margin-top:16px;">
+          Download PNG
+        </button>
       </div>
 
     </div>
 
-    <!-- RIGHT PANEL (PREVIEW) -->
+    <!-- RIGHT PANEL -->
     <div class="br-preview-box">
       <canvas id="previewCanvas"></canvas>
     </div>
@@ -109,7 +101,7 @@
 </footer>
 
 <script>
-  document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 <script src="../assets/js/background-remover.js" type="module"></script>
