@@ -242,7 +242,10 @@ async function onSegmentationResult(results){
   maskFloat = morphClean(maskFloat, maskW, maskH, 1);
 
   // advanced matting pass -> ImageData with alpha channel
-  const matteImageData = advancedMatting(workingImageCanvas, maskFloat, maskW, maskH);
+let matteImageData = advancedMatting(workingImageCanvas, maskFloat, maskW, maskH);
+
+// 🔥 remove white edges EVEN MORE (soft feather)
+boxBlurAlpha(matteImageData, maskW, maskH, 2); // radius 2 = smooth, natural, remove.bg-like
 
   // draw matteImageData into preview canvas scaled to fit
   // create a temporary canvas to hold the result then scale into preview
