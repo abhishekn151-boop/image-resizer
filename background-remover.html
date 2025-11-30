@@ -124,6 +124,19 @@ function sizeFor(img){
   const scale = MAX_DIM / max;
   return {w:Math.round(w*scale), h:Math.round(h*scale)};
 }
+  
+  /* Resize maskFloat (segmentation mask) from small size → full resolution */
+function resizeMaskFloat(maskSmall, sw, sh, dw, dh) {
+  const maskLarge = new Float32Array(dw * dh);
+  for (let y = 0; y < dh; y++) {
+    const sy = Math.floor((y / dh) * sh);
+    for (let x = 0; x < dw; x++) {
+      const sx = Math.floor((x / dw) * sw);
+      maskLarge[y * dw + x] = maskSmall[sy * sw + sx];
+    }
+  }
+  return maskLarge;
+}
 
 /* Initialize MediaPipe SelfieSegmentation */
 selfieSeg = new SelfieSegmentation({locateFile: (file) => {
@@ -150,8 +163,9 @@ cameraBtn.addEventListener('click', ()=> {
 });
 
 downloadBtn.addEventListener('click', ()=> {
-  previewCanvas.toBlob(blob => {
-    if(!blob) return alert('Failed to prepare PNG.');
+  if (!window.finalOutputCanvas) return alert("Image not ready.");
+
+  window.finalOutputCanvas.toBlob(blob => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'bg-removed.png';
@@ -217,55 +231,70 @@ async function processImageForMask(source){
 
 /* onResults from MediaPipe */
 async function onSegmentationResult(results){
-  if(!results.segmentationMask){
-    console.warn('No segmentationMask');
-    return;
-  }
+  if (!results.segmentationMask) return;
 
-  // draw mask into a canvas sized to workingImageCanvas
+  // Dimensions of resized working image
   maskW = workingImageCanvas.width;
   maskH = workingImageCanvas.height;
+
+  // Extract mask from MediaPipe
   const maskCanvas = document.createElement('canvas');
   maskCanvas.width = maskW;
   maskCanvas.height = maskH;
+
   const mctx = maskCanvas.getContext('2d');
   mctx.drawImage(results.segmentationMask, 0, 0, maskW, maskH);
 
-  // extract grayscale (R) -> float mask 0..1
   const md = mctx.getImageData(0,0,maskW,maskH).data;
   maskFloat = new Float32Array(maskW * maskH);
-  for(let i=0, j=0;i<md.length;i+=4,j++){
-    maskFloat[j] = md[i] / 255; // use red channel, 0..1
+  for (let i = 0, j = 0; i < md.length; i += 4, j++) {
+    maskFloat[j] = md[i] / 255; // grayscale
   }
 
-  // small morphological cleanup to remove holes (radius 1)
+  // Clean up noise in mask
   maskFloat = morphClean(maskFloat, maskW, maskH, 1);
 
-  // advanced matting pass -> ImageData with alpha channel
-let matteImageData = advancedMatting(workingImageCanvas, maskFloat, maskW, maskH);
+  // NOW → upscale mask to full resolution original image
+  const fullW = originalImg.naturalWidth;
+  const fullH = originalImg.naturalHeight;
 
-// 🔥 remove white edges EVEN MORE (soft feather)
-boxBlurAlpha(matteImageData, maskW, maskH, 2); // radius 2 = smooth, natural, remove.bg-like
+  const maskFull = resizeMaskFloat(maskFloat, maskW, maskH, fullW, fullH);
 
-  // draw matteImageData into preview canvas scaled to fit
-  // create a temporary canvas to hold the result then scale into preview
+  // Convert original image → canvas (full size)
+  const fullCanvas = document.createElement("canvas");
+  fullCanvas.width = fullW;
+  fullCanvas.height = fullH;
+  fullCanvas.getContext("2d").drawImage(originalImg, 0, 0, fullW, fullH);
+
+  // Apply advanced matting on full resolution
+  let matteImageData = advancedMatting(fullCanvas, maskFull, fullW, fullH);
+
+  // Feather clean (optional)
+  boxBlurAlpha(matteImageData, fullW, fullH, 2);
+
+  // Output canvas for preview (scaled)
   const outCanvas = document.createElement('canvas');
-  outCanvas.width = maskW;
-  outCanvas.height = maskH;
+  outCanvas.width = fullW;
+  outCanvas.height = fullH;
   const outCtx = outCanvas.getContext('2d');
   outCtx.putImageData(matteImageData, 0, 0);
 
-  // scale to preview canvas
-  const PREVIEW_MAX_W = Math.min(900, maskW);
-  const scale = PREVIEW_MAX_W / maskW;
-  previewCanvas.width = Math.round(maskW * scale);
-  previewCanvas.height = Math.round(maskH * scale);
-  ctx.clearRect(0,0, previewCanvas.width, previewCanvas.height);
-  // draw with smoothing
-  ctx.imageSmoothingEnabled = true;
-  ctx.drawImage(outCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
-}
+  // Scale to preview
+  const PREVIEW_MAX_W = Math.min(900, fullW);
+  const scale = PREVIEW_MAX_W / fullW;
 
+  previewCanvas.width = Math.round(fullW * scale);
+  previewCanvas.height = Math.round(fullH * scale);
+
+  ctx.clearRect(0,0,previewCanvas.width, previewCanvas.height);
+  ctx.imageSmoothingEnabled = true;
+
+  ctx.drawImage(outCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
+
+  // ⭐ Important: store final output for download
+  window.finalOutputCanvas = outCanvas;
+}
+  
 /* simple morphological clean (dilate then erode) */
 function morphClean(mask, w, h, radius){
   if(radius <= 0) return mask;
