@@ -269,9 +269,12 @@ async function onSegmentationResult(results){
   // Apply advanced matting on full resolution
   let matteImageData = advancedMatting(fullCanvas, maskFull, fullW, fullH);
 
-  // Feather clean (optional)
-  boxBlurAlpha(matteImageData, fullW, fullH, 2);
+// Feather blur for soft edges
+boxBlurAlpha(matteImageData, fullW, fullH, 2);
 
+// ⭐ NEW: remove bright/white color spill (halo fix)
+removeColorSpill(matteImageData, fullW, fullH);
+  
   // Output canvas for preview (scaled)
   const outCanvas = document.createElement('canvas');
   outCanvas.width = fullW;
@@ -471,6 +474,60 @@ function boxBlurAlpha(imageData, w, h, radius) {
       const inY = y + radius + 1;
       if(outY >= 0) sum -= tmp[(outY*w + x)*4 + 3];
       if(inY < h) sum += tmp[(inY*w + x)*4 + 3];
+    }
+  }
+}
+
+  function removeColorSpill(imageData, width, height) {
+  const d = imageData.data;
+  const copy = new Uint8ClampedArray(d); // backup
+
+  // Parameters (tweakable)
+  const brightnessThreshold = 190; // what counts as "too white"
+  const alphaThreshold = 40;       // spill only on low-alpha edges
+
+  for (let i = 0; i < d.length; i += 4) {
+
+    const r = copy[i], g = copy[i+1], b = copy[i+2];
+    const a = copy[i+3];
+
+    // Check for white/light pixels + low alpha = halo candidate
+    const brightness = (r + g + b) / 3;
+
+    if (brightness > brightnessThreshold && a < alphaThreshold) {
+      // Neighbor-based spill cleanup
+      // Look for nearby "good" pixels (alpha > 150)
+      let nr = 0, ng = 0, nb = 0, count = 0;
+
+      // 3×3 neighborhood
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+
+          const x = ((i / 4) % width) + dx;
+          const y = Math.floor((i / 4) / width) + dy;
+
+          if (x < 0 || y < 0 || x >= width || y >= height) continue;
+
+          const ni = (y * width + x) * 4;
+          const na = copy[ni + 3];
+
+          if (na > 150) {
+            nr += copy[ni];
+            ng += copy[ni + 1];
+            nb += copy[ni + 2];
+            count++;
+          }
+        }
+      }
+
+      if (count > 0) {
+        // Replace spill pixel by nearby real color
+        d[i]   = nr / count;
+        d[i+1] = ng / count;
+        d[i+2] = nb / count;
+
+        // Keep alpha same (soft)
+      }
     }
   }
 }
