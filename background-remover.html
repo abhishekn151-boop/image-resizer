@@ -315,79 +315,84 @@ function morphClean(mask, w, h, radius){
    - maskArray: Float32Array (0..1)
    - returns ImageData(width,height) with correct alpha (0..255)
 */
+/* ---------- Remove.bg-style Clean Edge Matting (NO WHITE HALOS) ---------- */
 function advancedMatting(originalCanvas, maskArray, width, height) {
-  // draw original into temp canvas (ensure same size)
-  const tmp = document.createElement('canvas');
-  tmp.width = width;
-  tmp.height = height;
-  const tctx = tmp.getContext('2d');
+  const tmpCanvas = document.createElement("canvas");
+  tmpCanvas.width = width;
+  tmpCanvas.height = height;
+
+  const tctx = tmpCanvas.getContext("2d");
   tctx.drawImage(originalCanvas, 0, 0, width, height);
 
-  const src = tctx.getImageData(0,0,width,height);
+  const src = tctx.getImageData(0, 0, width, height);
   const dst = tctx.createImageData(width, height);
 
-  // compute average background color from four corners (small square)
-  const sampleOffset = 6;
-  let sumR=0,sumG=0,sumB=0, samples=0;
-  const points = [
-    [sampleOffset, sampleOffset],
-    [width - sampleOffset - 1, sampleOffset],
-    [sampleOffset, height - sampleOffset - 1],
-    [width - sampleOffset - 1, height - sampleOffset - 1]
+  /* ----------------------------------------------------
+     STEP 1 — Detect background color from corners
+  -----------------------------------------------------*/
+  let sumR = 0, sumG = 0, sumB = 0;
+  const corners = [
+    5 * width + 5,
+    5 * width + (width - 5),
+    (height - 5) * width + 5,
+    (height - 5) * width + (width - 5)
   ];
-  points.forEach(([x,y])=>{
-    const idx = (y * width + x) * 4;
+
+  corners.forEach(i => {
+    const idx = i * 4;
     sumR += src.data[idx];
-    sumG += src.data[idx+1];
-    sumB += src.data[idx+2];
-    samples++;
+    sumG += src.data[idx + 1];
+    sumB += src.data[idx + 2];
   });
-  const bgR = sumR / samples;
-  const bgG = sumG / samples;
-  const bgB = sumB / samples;
 
-  // constants for matting tuning
-  const DIST_THRESHOLD = 60;   // color distance threshold from bg
-  const HALO_REDUCTION = 130;  // reduce alpha for likely halo pixels
-  const SOFTEN_RANGE = 60;     // how soft/transition
+  const bgR = sumR / 4;
+  const bgG = sumG / 4;
+  const bgB = sumB / 4;
 
-  // produce per-pixel alpha using mask and color-distance heuristics
-  for(let i=0;i<width*height;i++){
-    const si = i*4;
-    const r = src.data[si], g = src.data[si+1], b = src.data[si+2];
-    // base mask (0..1)
-    const m = clamp(maskArray[i] || 0, 0, 1);
-    // compute color distance to estimated bg color
-    const dist = Math.abs(r - bgR) + Math.abs(g - bgG) + Math.abs(b - bgB);
+  /* ----------------------------------------------------
+     STEP 2 — Halo-free alpha calculation
+  -----------------------------------------------------*/
+  for (let i = 0; i < width * height; i++) {
+    const idx = i * 4;
 
-    // convert m -> baseAlpha (0..255)
-    let baseAlpha = Math.round(m * 255);
+    const r = src.data[idx];
+    const g = src.data[idx + 1];
+    const b = src.data[idx + 2];
 
-    // If pixel is close to background color and mask is uncertain, reduce alpha to remove halo
-    if(dist < DIST_THRESHOLD && baseAlpha < 230) {
-      // scale reduction based on how close to bg color. Closer => more reduction.
-      const reduce = Math.round(((DIST_THRESHOLD - dist) / DIST_THRESHOLD) * HALO_REDUCTION);
-      baseAlpha = baseAlpha - reduce;
+    const base = maskArray[i] * 255; // soft alpha
+
+    // Color distance from background
+    const dist =
+      Math.abs(r - bgR) +
+      Math.abs(g - bgG) +
+      Math.abs(b - bgB);
+
+    let alpha = base;
+
+    /* ----------------------------------------------------
+       HALO REMOVAL: aggressively remove light edges
+    -----------------------------------------------------*/
+    if (dist < 70 && base < 230) {
+      alpha = Math.max(0, base - 160);  // remove white halo
     }
 
-    // Soft transition (optional gentle feathering near boundary)
-    // if mask is partially transparent, slightly ramp alpha to avoid hard edge
-    if(baseAlpha > 0 && baseAlpha < 255) {
-      // increase alpha slightly based on original mask strength to avoid too thin hair
-      const ramp = Math.round((m) * 30); // small boost
-      baseAlpha = clamp(baseAlpha + ramp, 0, 255);
-    }
+    /* ----------------------------------------------------
+       HARD EDGE SHRINK (1–2 px) – eliminates outline
+    -----------------------------------------------------*/
+    if (base < 80) alpha = 0;
 
-    // clamp and write
-    dst.data[si]   = r;
-    dst.data[si+1] = g;
-    dst.data[si+2] = b;
-    dst.data[si+3] = clamp(Math.round(baseAlpha), 0, 255);
+    /* ----------------------------------------------------
+       ALPHA GAMMA (smooth clean edges like remove.bg)
+    -----------------------------------------------------*/
+    alpha = Math.pow(alpha / 255, 1.5) * 255; // tighter edge
+
+    alpha = Math.min(255, Math.max(0, alpha));
+
+    dst.data[idx] = r;
+    dst.data[idx + 1] = g;
+    dst.data[idx + 2] = b;
+    dst.data[idx + 3] = alpha;
   }
-
-  // Optional mild blur pass on alpha to smooth edges in the output image data.
-  // We'll do a separable box blur on alpha channel (lightweight).
-  boxBlurAlpha(dst, width, height, 1);
 
   return dst;
 }
