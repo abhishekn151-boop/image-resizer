@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Background Remover — Free Image Resizer</title>
 
-  <!-- favicon and basic meta -->
   <link rel="icon" href="../assets/favicon.png" />
   <meta name="description" content="Remove background from images locally (MediaPipe) — fast & lightweight." />
 
-  <!-- Minimal page CSS (keeps your theme + tool layout) -->
   <style>
     :root{
       --bg:#0d1524; --panel:#131d32; --muted:#a9b4c9; --accent:#1f9bff; --card:#0f1829; --border:#1d2944;
@@ -21,11 +19,9 @@
     header.head h1{margin:0;font-size:30px;}
     header.head p{margin:6px 0;color:var(--muted);font-size:14px;}
 
-    /* layout */
     .br-wrapper{display:grid;grid-template-columns:360px 1fr;gap:24px;margin-top:18px;}
     @media(max-width:900px){.br-wrapper{grid-template-columns:1fr;padding:0 12px;}}
 
-    /* left panel */
     .left-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;min-height:380px}
     .drop-area{background:var(--card);border:2px dashed #33445a;border-radius:10px;padding:36px;text-align:center;cursor:pointer}
     .drop-area h3{margin:0;color:var(--light)}
@@ -36,20 +32,16 @@
     .btn.small{padding:7px 10px;font-size:13px}
     .controls{margin-top:16px}
 
-    .control-label{color:var(--accent);font-weight:600;margin:10px 0 6px;display:block}
-    input[type="range"]{width:100%}
-
     /* right panel */
     .right-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;min-height:380px;display:flex;align-items:center;justify-content:center}
     .preview-wrap{width:80%;max-width:720px;border-radius:10px;border:1px solid rgba(30,44,71,0.6);padding:24px;display:flex;align-items:center;justify-content:center;min-height:220px}
     canvas{max-width:100%;height:auto;border-radius:8px;background:transparent}
 
-    /* footer small */
     .tip{color:var(--muted);font-size:13px;margin-top:12px}
 
-    /* small helpers */
     .row{display:flex;gap:8px;align-items:center}
     .muted{color:var(--muted);font-size:13px}
+    .small-note{font-size:12px;color:var(--muted);margin-top:8px}
   </style>
 
   <!-- MediaPipe SelfieSegmentation -->
@@ -59,7 +51,7 @@
   <div class="container">
     <header class="head">
       <h1>AI Background Remover</h1>
-      <p>Mode A — Fast, lightweight, humans-only (MediaPipe). Upload or capture, then refine edges.</p>
+      <p>Mode A — Fast, lightweight, humans-only (MediaPipe). Pure matting (no sliders) for best edges.</p>
     </header>
 
     <div class="br-wrapper">
@@ -77,23 +69,13 @@
         <button id="cameraBtn" class="btn" style="width:100%">📷 Capture from Camera</button>
 
         <div class="controls" id="controls" style="display:none">
-
-          <label class="control-label">Refine output</label>
-          <div class="muted">Edge smoothing</div>
-          <input id="blurRange" type="range" min="0" max="20" value="4">
-
-          <div style="height:10px"></div>
-          <div class="muted">Mask opacity (for softer edges)</div>
-          <input id="opacityRange" type="range" min="60" max="255" value="255">
-
           <div style="height:12px"></div>
           <div class="row">
             <button id="downloadBtn" class="btn primary">Download PNG</button>
             <button id="resetBtn" class="btn small">Reset</button>
             <div style="flex:1"></div>
           </div>
-
-          <p class="tip">Tip: Works best for photos with 1–2 people, plain backgrounds and decent lighting. Use the blur slider to smooth edges. Reset to reload.</p>
+          <p class="small-note">Tip: Best results on photos with 1–2 people, plain backgrounds and good lighting.</p>
         </div>
 
       </div>
@@ -101,7 +83,7 @@
       <!-- RIGHT: preview -->
       <div class="right-panel">
         <div class="preview-wrap">
-          <canvas id="previewCanvas"></canvas>
+          <canvas id="previewCanvas" width="640" height="480"></canvas>
         </div>
       </div>
 
@@ -109,13 +91,11 @@
   </div>
 
 <script>
-/* ===========================
-   Single-file background remover
-   - MediaPipe SelfieSegmentation
-   - Morphology (dilate/erode via simple radius)
-   - GPU blur for feathering (canvas filter)
-   - Alpha compositing & download PNG
-   =========================== */
+/* Single-file background remover:
+   - MediaPipe SelfieSegmentation -> soft mask (0..1)
+   - advancedMatting(maskFloat, workingCanvas) -> ImageData with alpha (removes halo)
+   - Draw result to preview canvas scaled
+*/
 
 const fileInput = document.getElementById('fileInput');
 const dropArea = document.getElementById('dropArea');
@@ -124,21 +104,17 @@ const previewCanvas = document.getElementById('previewCanvas');
 const downloadBtn = document.getElementById('downloadBtn');
 const resetBtn = document.getElementById('resetBtn');
 const controlsDiv = document.getElementById('controls');
-const blurRange = document.getElementById('blurRange');
-const opacityRange = document.getElementById('opacityRange');
 
 const ctx = previewCanvas.getContext('2d');
 
-let originalImg = null;              // HTMLImageElement (original)
-let workingImageCanvas = null;       // resized source canvas
-let maskFloat = null;                // Float32Array mask (0..1)
+let originalImg = null;
+let workingImageCanvas = null; // resized source for segmentation & matting
+let maskFloat = null; // Float32Array (0..1)
 let maskW = 0, maskH = 0;
 let selfieSeg = null;
 
-// performance / quality limit
-const MAX_DIM = 1200; // largest image dimension for processing
+const MAX_DIM = 1200; // cap for processing size
 
-/* ---------- helpers ---------- */
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function sizeFor(img){
   const w = img.naturalWidth || img.width;
@@ -149,23 +125,22 @@ function sizeFor(img){
   return {w:Math.round(w*scale), h:Math.round(h*scale)};
 }
 
-/* ---------- init MediaPipe ---------- */
+/* Initialize MediaPipe SelfieSegmentation */
 selfieSeg = new SelfieSegmentation({locateFile: (file) => {
   return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
 }});
-selfieSeg.setOptions({modelSelection: 1}); // 0 or 1 (1 = general/higher-quality)
+selfieSeg.setOptions({modelSelection: 1});
 selfieSeg.onResults(onSegmentationResult);
 
-/* ---------- UI events ---------- */
-dropArea.addEventListener('click', ()=>fileInput.click());
+/* UI events */
+dropArea.addEventListener('click', ()=> fileInput.click());
 dropArea.addEventListener('dragover', (e)=>{ e.preventDefault(); dropArea.style.opacity = 0.9; });
 dropArea.addEventListener('dragleave', ()=>{ dropArea.style.opacity = 1; });
 dropArea.addEventListener('drop', (e)=>{ e.preventDefault(); dropArea.style.opacity = 1; if(e.dataTransfer.files && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
 
-fileInput.addEventListener('change', ()=>{ if(fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]); });
+fileInput.addEventListener('change', ()=> { if(fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]); });
 
 cameraBtn.addEventListener('click', ()=> {
-  // mobile/back camera capture fallback: use file input with capture attribute
   const inp = document.createElement('input');
   inp.type = 'file';
   inp.accept = 'image/*';
@@ -175,8 +150,7 @@ cameraBtn.addEventListener('click', ()=> {
 });
 
 downloadBtn.addEventListener('click', ()=> {
-  // download canvas as PNG with alpha
-  previewCanvas.toBlob(blob=>{
+  previewCanvas.toBlob(blob => {
     if(!blob) return alert('Failed to prepare PNG.');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -188,116 +162,110 @@ downloadBtn.addEventListener('click', ()=> {
 resetBtn.addEventListener('click', ()=> {
   if(!originalImg) return;
   drawOriginalToCanvas(originalImg);
-  // re-run segmentation to refresh mask
-  processImageForMask(originalImg);
+  processImageForMask(workingImageCanvas);
 });
 
-blurRange.addEventListener('input', ()=> {
-  if(maskFloat) renderComposite();
-});
-opacityRange.addEventListener('input', ()=> {
-  if(maskFloat) renderComposite();
-});
-
-/* ---------- handle file ---------- */
+/* File handling */
 async function handleFile(file){
   if(!file || !file.type.startsWith('image/')) { alert('Please choose an image file'); return; }
   const img = new Image();
-  img.onload = async ()=>{
+  img.onload = async () => {
     originalImg = img;
-    // resize into working canvas for segmentation (keeps speed & memory)
+    // prepare working canvas (resized for speed)
     const sz = sizeFor(img);
     workingImageCanvas = document.createElement('canvas');
     workingImageCanvas.width = sz.w;
     workingImageCanvas.height = sz.h;
-    workingImageCanvas.getContext('2d').drawImage(img,0,0,sz.w,sz.h);
-    // show original (resized) while processing
-    drawOriginalToCanvas(img);
-    // show controls
+    const wc = workingImageCanvas.getContext('2d');
+    wc.drawImage(img, 0, 0, sz.w, sz.h);
+
+    // show controls and draw original preview while segmentation runs
     controlsDiv.style.display = 'block';
-    // run segmentation (MediaPipe)
+    drawOriginalToCanvas(img);
+
+    // run segmentation
     await processImageForMask(workingImageCanvas);
   };
-  img.onerror = ()=>alert('Failed to load image');
+  img.onerror = ()=> alert('Failed to load image');
   img.src = URL.createObjectURL(file);
 }
 
-/* ---------- draw original image (fit preview) ---------- */
+/* Draw original image (fits preview area) */
 function drawOriginalToCanvas(img){
-  // fit preview canvas to resized working canvas or original img
   const sz = workingImageCanvas ? {w:workingImageCanvas.width,h:workingImageCanvas.height} : sizeFor(img);
   previewCanvas.width = Math.min(sz.w, 900);
   previewCanvas.height = Math.round(previewCanvas.width * (sz.h / sz.w));
-  const drawCtx = previewCanvas.getContext('2d');
-  drawCtx.clearRect(0,0, previewCanvas.width, previewCanvas.height);
-  // draw scaled original into preview area for display
-  // compute scale from working canvas to preview canvas
+  const dctx = previewCanvas.getContext('2d');
+  dctx.clearRect(0,0,previewCanvas.width, previewCanvas.height);
   if(workingImageCanvas){
-    drawCtx.drawImage(workingImageCanvas, 0, 0, workingImageCanvas.width, workingImageCanvas.height, 0, 0, previewCanvas.width, previewCanvas.height);
+    dctx.drawImage(workingImageCanvas, 0,0, workingImageCanvas.width, workingImageCanvas.height, 0,0, previewCanvas.width, previewCanvas.height);
   } else {
-    drawCtx.drawImage(img, 0, 0, previewCanvas.width, previewCanvas.height);
+    dctx.drawImage(img, 0, 0, previewCanvas.width, previewCanvas.height);
   }
 }
 
-/* ---------- process image through MediaPipe ---------- */
+/* Process image for mask using MediaPipe */
 async function processImageForMask(source){
-  // source can be a canvas or image element
-  // Ensure selfieSeg is ready
-  // Pass an ImageBitmap or HTMLCanvasElement
   try {
-    // draw source into an offscreen canvas equal to workingImageCanvas size
-    let input = source;
-    if(!(source instanceof HTMLCanvasElement || source instanceof HTMLImageElement || source instanceof ImageBitmap)){
-      // nothing
-    }
-    await selfieSeg.send({image: source}); // onResults will be called
+    // MediaPipe accepts canvas or image
+    await selfieSeg.send({image: source});
   } catch(err){
-    console.error(err);
+    console.error('Segmentation error', err);
     alert('Segmentation failed: ' + (err.message || err));
   }
 }
 
-/* ---------- on segmentation result ---------- */
+/* onResults from MediaPipe */
 async function onSegmentationResult(results){
-  // results.segmentationMask is an ImageBitmap (RGBA mask)
   if(!results.segmentationMask){
     console.warn('No segmentationMask');
     return;
   }
 
-  // Draw mask into temporary canvas (same size as workingImageCanvas)
+  // draw mask into a canvas sized to workingImageCanvas
   maskW = workingImageCanvas.width;
   maskH = workingImageCanvas.height;
   const maskCanvas = document.createElement('canvas');
   maskCanvas.width = maskW;
   maskCanvas.height = maskH;
   const mctx = maskCanvas.getContext('2d');
-  // draw segmentationMask (ImageBitmap) full size
   mctx.drawImage(results.segmentationMask, 0, 0, maskW, maskH);
 
-  // Extract alpha (some versions provide grayscale in RGBA channels)
+  // extract grayscale (R) -> float mask 0..1
   const md = mctx.getImageData(0,0,maskW,maskH).data;
   maskFloat = new Float32Array(maskW * maskH);
-  for(let i=0, j=0;i<md.length;i+=4, j++){
-    // take red channel or alpha; mask tends to be grayscale in channels
-    const r = md[i]; // 0..255
-    maskFloat[j] = r / 255;
+  for(let i=0, j=0;i<md.length;i+=4,j++){
+    maskFloat[j] = md[i] / 255; // use red channel, 0..1
   }
 
-  // refine mask: morphological cleanup (dilate then erode) to remove holes
-  maskFloat = morphClean(maskFloat, maskW, maskH, 1); // radius 1 small cleanup
+  // small morphological cleanup to remove holes (radius 1)
+  maskFloat = morphClean(maskFloat, maskW, maskH, 1);
 
-  // render composite to preview
-  renderComposite();
+  // advanced matting pass -> ImageData with alpha channel
+  const matteImageData = advancedMatting(workingImageCanvas, maskFloat, maskW, maskH);
+
+  // draw matteImageData into preview canvas scaled to fit
+  // create a temporary canvas to hold the result then scale into preview
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = maskW;
+  outCanvas.height = maskH;
+  const outCtx = outCanvas.getContext('2d');
+  outCtx.putImageData(matteImageData, 0, 0);
+
+  // scale to preview canvas
+  const PREVIEW_MAX_W = Math.min(900, maskW);
+  const scale = PREVIEW_MAX_W / maskW;
+  previewCanvas.width = Math.round(maskW * scale);
+  previewCanvas.height = Math.round(maskH * scale);
+  ctx.clearRect(0,0, previewCanvas.width, previewCanvas.height);
+  // draw with smoothing
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(outCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
 }
 
-/* ---------- morphological cleaning (simple) ----------
-   We'll perform a fast distance-like dilation then erosion using max/min in neighborhood.
-   radius param small (0,1,2). Keep it lightweight.
-*/
+/* simple morphological clean (dilate then erode) */
 function morphClean(mask, w, h, radius){
   if(radius <= 0) return mask;
-  // dilation
   const dil = new Float32Array(w*h);
   const r = radius;
   for(let y=0;y<h;y++){
@@ -319,7 +287,6 @@ function morphClean(mask, w, h, radius){
       dil[y*w + x] = maxv;
     }
   }
-  // erosion on dilated
   const ero = new Float32Array(w*h);
   for(let y=0;y<h;y++){
     for(let x=0;x<w;x++){
@@ -343,178 +310,145 @@ function morphClean(mask, w, h, radius){
   return ero;
 }
 
-  /* ---------- True Background Matting Refinement ---------- */
+/* Advanced matting:
+   - originalCanvas: source image canvas (workingImageCanvas)
+   - maskArray: Float32Array (0..1)
+   - returns ImageData(width,height) with correct alpha (0..255)
+*/
 function advancedMatting(originalCanvas, maskArray, width, height) {
-  const tmpCanvas = document.createElement("canvas");
-  tmpCanvas.width = width;
-  tmpCanvas.height = height;
-  const tctx = tmpCanvas.getContext("2d");
+  // draw original into temp canvas (ensure same size)
+  const tmp = document.createElement('canvas');
+  tmp.width = width;
+  tmp.height = height;
+  const tctx = tmp.getContext('2d');
   tctx.drawImage(originalCanvas, 0, 0, width, height);
 
-  const src = tctx.getImageData(0, 0, width, height);
+  const src = tctx.getImageData(0,0,width,height);
   const dst = tctx.createImageData(width, height);
 
-  // Detect average background color from 4 corners
-  let sumR = 0, sumG = 0, sumB = 0, count = 4;
-  const corners = [
-    5 * width + 5,
-    5 * width + (width - 5),
-    (height - 5) * width + 5,
-    (height - 5) * width + (width - 5)
+  // compute average background color from four corners (small square)
+  const sampleOffset = 6;
+  let sumR=0,sumG=0,sumB=0, samples=0;
+  const points = [
+    [sampleOffset, sampleOffset],
+    [width - sampleOffset - 1, sampleOffset],
+    [sampleOffset, height - sampleOffset - 1],
+    [width - sampleOffset - 1, height - sampleOffset - 1]
   ];
-
-  corners.forEach((i) => {
-    const idx = i * 4;
+  points.forEach(([x,y])=>{
+    const idx = (y * width + x) * 4;
     sumR += src.data[idx];
-    sumG += src.data[idx + 1];
-    sumB += src.data[idx + 2];
+    sumG += src.data[idx+1];
+    sumB += src.data[idx+2];
+    samples++;
   });
+  const bgR = sumR / samples;
+  const bgG = sumG / samples;
+  const bgB = sumB / samples;
 
-  const bgR = sumR / count;
-  const bgG = sumG / count;
-  const bgB = sumB / count;
+  // constants for matting tuning
+  const DIST_THRESHOLD = 60;   // color distance threshold from bg
+  const HALO_REDUCTION = 130;  // reduce alpha for likely halo pixels
+  const SOFTEN_RANGE = 60;     // how soft/transition
 
-  // Pixel-wise matting pass
-  for (let i = 0; i < width * height; i++) {
-    const idx = i * 4;
+  // produce per-pixel alpha using mask and color-distance heuristics
+  for(let i=0;i<width*height;i++){
+    const si = i*4;
+    const r = src.data[si], g = src.data[si+1], b = src.data[si+2];
+    // base mask (0..1)
+    const m = clamp(maskArray[i] || 0, 0, 1);
+    // compute color distance to estimated bg color
+    const dist = Math.abs(r - bgR) + Math.abs(g - bgG) + Math.abs(b - bgB);
 
-    const r = src.data[idx];
-    const g = src.data[idx + 1];
-    const b = src.data[idx + 2];
-    const baseAlpha = Math.round(maskArray[i] * 255);
+    // convert m -> baseAlpha (0..255)
+    let baseAlpha = Math.round(m * 255);
 
-    // Color distance from background
-    const dist =
-      Math.abs(r - bgR) +
-      Math.abs(g - bgG) +
-      Math.abs(b - bgB);
-
-    let alpha = baseAlpha;
-
-    // Remove white/bright halos near edges
-    if (dist < 50 && baseAlpha < 200) {
-      alpha = Math.max(0, baseAlpha - 130);
+    // If pixel is close to background color and mask is uncertain, reduce alpha to remove halo
+    if(dist < DIST_THRESHOLD && baseAlpha < 230) {
+      // scale reduction based on how close to bg color. Closer => more reduction.
+      const reduce = Math.round(((DIST_THRESHOLD - dist) / DIST_THRESHOLD) * HALO_REDUCTION);
+      baseAlpha = baseAlpha - reduce;
     }
 
-    // Soft clamp
-    alpha = Math.min(255, Math.max(0, alpha));
+    // Soft transition (optional gentle feathering near boundary)
+    // if mask is partially transparent, slightly ramp alpha to avoid hard edge
+    if(baseAlpha > 0 && baseAlpha < 255) {
+      // increase alpha slightly based on original mask strength to avoid too thin hair
+      const ramp = Math.round((m) * 30); // small boost
+      baseAlpha = clamp(baseAlpha + ramp, 0, 255);
+    }
 
-    dst.data[idx] = r;
-    dst.data[idx + 1] = g;
-    dst.data[idx + 2] = b;
-    dst.data[idx + 3] = alpha;
+    // clamp and write
+    dst.data[si]   = r;
+    dst.data[si+1] = g;
+    dst.data[si+2] = b;
+    dst.data[si+3] = clamp(Math.round(baseAlpha), 0, 255);
   }
+
+  // Optional mild blur pass on alpha to smooth edges in the output image data.
+  // We'll do a separable box blur on alpha channel (lightweight).
+  boxBlurAlpha(dst, width, height, 1);
 
   return dst;
 }
 
-/* ---------- composite & render ----------
-   Steps:
-   - create mask canvas (grayscale alpha) from maskFloat
-   - apply blur (via ctx.filter = 'blur(px)') for feather
-   - composite original (workingImageCanvas) with mask alpha into previewCanvas; keep preview scaled to fit
-*/
-function renderComposite(){
-  if(!maskFloat || !workingImageCanvas) return;
+/* lightweight box blur applied to alpha channel only */
+function boxBlurAlpha(imageData, w, h, radius) {
+  if(radius <= 0) return;
+  const src = imageData.data;
+  const tmp = new Uint8ClampedArray(src.length);
+  tmp.set(src);
 
-  // create mask canvas at full working resolution
-  const maskCanvas = document.createElement('canvas');
-  maskCanvas.width = maskW;
-  maskCanvas.height = maskH;
-  const mctx = maskCanvas.getContext('2d');
-  const imgData = mctx.createImageData(maskW, maskH);
-  // build RGBA mask (use maskFloat)
-  for(let i=0, j=0;i<imgData.data.length;i+=4,j++){
-    const v = clamp(Math.round(maskFloat[j]*255),0,255);
-    imgData.data[i] = v;
-    imgData.data[i+1] = v;
-    imgData.data[i+2] = v;
-    imgData.data[i+3] = 255;
-  }
-  mctx.putImageData(imgData,0,0);
-
-  // apply blur (GPU accelerated)
-  const blurPx = parseInt(blurRange.value,10) || 0;
-  if(blurPx > 0){
-    // use a second canvas to draw blurred mask
-    const blurred = document.createElement('canvas');
-    blurred.width = maskW;
-    blurred.height = maskH;
-    const bctx = blurred.getContext('2d');
-    bctx.filter = `blur(${blurPx}px)`;
-    bctx.drawImage(maskCanvas,0,0);
-    // replace maskCanvas
-    maskCanvas.width = maskW; // reset
-    mctx.clearRect(0,0,maskW,maskH);
-    mctx.drawImage(blurred,0,0);
+  // horizontal pass
+  const window = radius*2 + 1;
+  for(let y=0;y<h;y++){
+    let sum = 0;
+    // initial window
+    for(let x=-radius; x<=radius; x++){
+      const xi = clamp(x,0,w-1);
+      sum += tmp[(y*w + xi)*4 + 3];
+    }
+    for(let x=0;x<w;x++){
+      const dstIdx = (y*w + x)*4 + 3;
+      src[dstIdx] = Math.round(sum / window);
+      // slide window
+      const outX = x - radius;
+      const inX = x + radius + 1;
+      if(outX >= 0) sum -= tmp[(y*w + outX)*4 + 3];
+      if(inX < w) sum += tmp[(y*w + inX)*4 + 3];
+    }
   }
 
-  // get resulting mask alpha as Float32Array (0..1)
-  const mData = mctx.getImageData(0,0,maskW,maskH).data;
-  const finalMask = new Float32Array(maskW*maskH);
-  for(let i=0,j=0;i<mData.length;i+=4,j++){
-    finalMask[j] = mData[i] / 255; // R channel
+  // vertical pass (use tmp as source, src as destination)
+  tmp.set(src); // copy current alpha
+  for(let x=0;x<w;x++){
+    let sum = 0;
+    for(let y=-radius; y<=radius; y++){
+      const yi = clamp(y,0,h-1);
+      sum += tmp[(yi*w + x)*4 + 3];
+    }
+    for(let y=0;y<h;y++){
+      const dstIdx = (y*w + x)*4 + 3;
+      src[dstIdx] = Math.round(sum / window);
+      const outY = y - radius;
+      const inY = y + radius + 1;
+      if(outY >= 0) sum -= tmp[(outY*w + x)*4 + 3];
+      if(inY < h) sum += tmp[(inY*w + x)*4 + 3];
+    }
   }
-
-  // apply mask opacity slider (0..255)
-  const op = Number(opacityRange.value) / 255.0;
-
-  // create output canvas at working resolution
-  const outCanvas = document.createElement('canvas');
-  outCanvas.width = maskW;
-  outCanvas.height = maskH;
-  const outCtx = outCanvas.getContext('2d');
-
-  // draw original image into out canvas
-  outCtx.clearRect(0,0,maskW,maskH);
-  outCtx.drawImage(workingImageCanvas,0,0);
-
-  // get pixel data of original
-  const srcData = outCtx.getImageData(0,0,maskW,maskH);
-  const dst = outCtx.createImageData(maskW,maskH);
-
-  // compose: dst.rgb = src.rgb, dst.a = finalMask * op
-  for(let i=0, j=0;i<dst.data.length;i+=4,j++){
-    const r = srcData.data[i], g = srcData.data[i+1], b = srcData.data[i+2];
-    const a = clamp(finalMask[j] * op, 0, 1);
-    dst.data[i]   = r;
-    dst.data[i+1] = g;
-    dst.data[i+2] = b;
-    dst.data[i+3] = Math.round(a * 255);
-  }
-
-  // put dst into outCtx
-  outCtx.clearRect(0,0,maskW,maskH);
-  outCtx.putImageData(dst,0,0);
-
-  // draw scaled to previewCanvas (fit)
-  // set preview canvas size to a reasonable preview width while preserving aspect ratio
-  const PREVIEW_MAX_W = Math.min(900, maskW);
-  const scale = PREVIEW_MAX_W / maskW;
-  previewCanvas.width = Math.round(maskW * scale);
-  previewCanvas.height = Math.round(maskH * scale);
-
-  // clear and draw
-  ctx.clearRect(0,0, previewCanvas.width, previewCanvas.height);
-  // draw the outCanvas directly scaled (preserves alpha)
-  ctx.drawImage(outCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
 }
 
-/* ---------- optionally, you may resize working canvas differently ---------- */
-/* done */
-
-/* ---------- Done: load a small default model warmup when page starts ---------- */
+/* Warmup (non-blocking) */
 (async function warmup(){
-  // create a tiny blank canvas to warm the model (non-blocking)
   const tmp = document.createElement('canvas');
   tmp.width = 10; tmp.height = 10;
   const tctx = tmp.getContext('2d');
   tctx.fillStyle = 'black'; tctx.fillRect(0,0,10,10);
-  try{
-    // Send a tiny image to initialize WebGL / WASM backend
-    await selfieSeg.initialize ? selfieSeg.initialize() : Promise.resolve();
-    // don't await selfieSeg.send here because model will load when needed
-  }catch(e){ console.warn('warmup error',e); }
+  try {
+    if(selfieSeg.initialize) await selfieSeg.initialize();
+  } catch(e) {
+    console.warn('Warmup failed', e);
+  }
 })();
 </script>
 </body>
