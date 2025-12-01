@@ -108,46 +108,50 @@ fetch("components/navbar.html")
   });
 </script>
 
+<!-- ADDED WRAPPER OPENING -->
+<div class="wrap">
+
 <header class="head" style="max-width:1150px;margin:18px auto 0;padding:0 15px;">
   <h1>Word → PDF Converter</h1>
   <p class="tagline">Fast & stable DOCX → PDF conversion — fully client-side.</p>
 </header>
-  <div class="convert-container">
+<div class="convert-container">
 
-    <div class="panel">
-      <h3 style="color:#7fc6ff;margin:0 0 10px;">Upload DOCX</h3>
+  <div class="panel">
+    <h3 style="color:#7fc6ff;margin:0 0 10px;">Upload DOCX</h3>
 
-      <div id="dropArea" class="drop" role="button">
-        <div style="font-weight:600;">Drop .docx here</div>
-        <div class="muted">or click to browse</div>
-        <input id="fileInput" type="file" accept=".docx" hidden>
-      </div>
-
-      <label class="muted">Output filename</label>
-      <input id="outName" class="small-input" value="document.pdf">
-
-      <label class="muted">PDF quality (scale)</label>
-      <input id="pdfScale" class="small-input" type="number" value="1" min="0.5" max="2" step="0.1">
-
-      <button id="convertBtn" class="btn" disabled>Convert to PDF</button>
-      <button id="resetBtn" class="btn secondary">Reset</button>
-
-      <div id="status" class="muted">No document loaded.</div>
+    <div id="dropArea" class="drop" role="button">
+      <div style="font-weight:600;">Drop .docx here</div>
+      <div class="muted">or click to browse</div>
+      <input id="fileInput" type="file" accept=".docx" hidden>
     </div>
 
-    <div class="preview-panel panel">
-      <div id="previewWrapper" class="doc-preview doc-preview-responsive">
-        <div id="noPreview" class="muted">No document loaded. Preview appears here.</div>
-        <!-- Mammoth HTML will be injected here for preview -->
-      </div>
-    </div>
+    <label class="muted">Output filename</label>
+    <input id="outName" class="small-input" value="document.pdf">
 
+    <label class="muted">PDF quality (scale)</label>
+    <input id="pdfScale" class="small-input" type="number" value="1" min="0.5" max="2" step="0.1">
+
+    <button id="convertBtn" class="btn" disabled>Convert to PDF</button>
+    <button id="resetBtn" class="btn secondary">Reset</button>
+
+    <div id="status" class="muted">No document loaded.</div>
   </div>
+
+  <div class="preview-panel panel">
+    <div id="previewWrapper" class="doc-preview doc-preview-responsive">
+      <div id="noPreview" class="muted">No document loaded. Preview appears here.</div>
+      <!-- Mammoth HTML will be injected here for preview -->
+    </div>
+  </div>
+
+</div> <!-- end .convert-container -->
+
+</div> <!-- CLOSE wrapper (.wrap) added here -->
 
 <!-- Offscreen containers used during pagination -->
 <div id="paginatorOffscreen" class="offscreen" aria-hidden="true"></div>
 <div id="pdfPagesContainer" class="offscreen" aria-hidden="true"></div>
-
   <!-- FOOTER -->
 <footer class="vertical-footer">
   <ul>
