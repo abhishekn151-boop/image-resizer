@@ -368,6 +368,33 @@ wrapper.style.overflow = 'hidden';
   
 /* reset */
 resetBtn.addEventListener('click', () => location.reload());
+  document.body.insertAdjacentHTML("beforeend", `
+  <div id="testBox" style="
+     width:500px;
+     height:200px;
+     background:white;
+     color:#000;
+     font-size:30px;
+     padding:20px;
+     border:2px solid red;
+     position:relative;
+     z-index:99999;
+  ">
+     TEST PDF BOX — If the PDF works, this box must appear in the PDF.
+  </div>
+`);
+
+document.getElementById("convertBtn").addEventListener("click", async () => {
+  const opt = {
+    margin: 10,
+    filename: "test.pdf",
+    html2canvas: { scale: 1, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  await html2pdf().set(opt).from(document.getElementById("testBox")).save();
+});
+
 </script>
 
 </body>
