@@ -3,63 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>JPG ↔ PNG Converter — Free Image Resizer</title>
+  <title>JPG to PNG Converter — Free Image Resizer</title>
 
   <link rel="icon" type="image/png" href="assets/favicon.png" />
-  <meta name="description" content="Convert a JPG to PNG or PNG to JPG instantly, client-side, without quality loss." />
+  <meta name="description" content="Convert JPG images to PNG instantly — simple and free." />
 
-  <!-- Global CSS -->
+  <!-- Global Site CSS -->
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* Layout like Image → PDF */
     .convert-container {
-      max-width: 1150px;
+      max-width: 950px;
       margin: 30px auto;
       padding: 15px;
       display: grid;
-      grid-template-columns: 330px 1fr;
+      grid-template-columns: 320px 1fr;
       gap: 25px;
     }
     @media (max-width:900px){
       .convert-container { grid-template-columns: 1fr; }
     }
 
-    /* SETTINGS PANEL (left) */
-    .convert-settings {
+    .convert-left {
       background:#131d32;
       padding:20px;
-      border:1px solid #1d2944;
       border-radius:10px;
+      border:1px solid #1d2944;
       height: fit-content;
     }
 
-    .head h1 { margin:0; }
-    .tagline { color: #9fbfe6; margin-top:6px; }
-
-    /* Upload area */
     .drop-area {
       background:#0f1829;
       border:1px dashed #1e2c47;
-      padding:18px;
+      padding:25px;
       border-radius:10px;
       color:#cfe9ff;
       text-align:center;
       cursor:pointer;
     }
     .drop-area.active {
-      border-color: #4aa8ff;
-      box-shadow: 0 0 18px rgba(31,155,255,0.08);
-    }
-
-    .small-input {
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid #2b3b5a;
-      background:#0f1829;
-      color:#e8ecf4;
-      margin-top:12px;
+      border-color:#4aa8ff;
+      box-shadow:0 0 10px rgba(31,155,255,0.2);
     }
 
     .generate-btn {
@@ -74,438 +58,69 @@
       font-size:16px;
     }
 
-    .muted {
-      color:#9fb1d6;
-      font-size:13px;
-    }
-
-    /* PREVIEW PANEL (right) */
     .preview-box {
       background:#0f1829;
       border:1px solid #1d2944;
       padding:20px;
       border-radius:10px;
       min-height:260px;
-      display:flex;
-      gap:20px;
-      align-items:flex-start;
       color:#dceeff;
-    }
-
-    .preview-left {
-      flex: 1;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      align-items:center;
     }
 
     .preview-img {
       max-width:100%;
-      max-height:420px;
       border-radius:8px;
-      background:#091224;
       object-fit:contain;
+      margin-bottom:15px;
       border:1px solid #26354f;
     }
 
-    .file-info {
-      width:100%;
+    .meta-box {
       background:#0b1422;
       padding:12px;
       border-radius:8px;
       border:1px solid #162636;
-      font-size:13px;
+      font-size:14px;
       color:#cfe9ff;
     }
 
-    .action-row {
-      display:flex;
-      gap:10px;
-      width:100%;
-    }
-
-    .btn-outline {
-      flex:1;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid #2b3b5a;
-      background:transparent;
-      color:#cfe9ff;
-      cursor:pointer;
-    }
-
+    .muted { color:#9fb1d6; }
     .hidden { display:none; }
-
   </style>
 </head>
 
 <body>
 
-<!-- NAVBAR (loaded dynamically) -->
+<!-- NAVBAR -->
 <div id="navbar"></div>
 <script>
-  fetch("components/navbar.html")
-    .then(r => r.text())
-    .then(html => {
-      document.getElementById("navbar").innerHTML = html;
-      const ham = document.getElementById("hamburger");
-      const menu = document.getElementById("mobileMenu");
-      if (ham && menu) {
-        ham.onclick = () => menu.classList.toggle("active");
-      }
-    });
+fetch("components/navbar.html")
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById("navbar").innerHTML = html;
+
+    const ham = document.getElementById("hamburger");
+    const menu = document.getElementById("mobileMenu");
+    if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
+  });
 </script>
 
-<header class="head" style="max-width:1150px;margin:18px auto 0;padding:0 15px;">
-  <h1>JPG ↔ PNG Converter</h1>
-  <p class="tagline">Convert JPG to PNG or PNG to JPG instantly — client-side, no uploads.</p>
+<header class="head" style="max-width:950px;margin:20px auto 0;padding:0 15px;">
+  <h1>JPG to PNG Converter</h1>
+  <p class="tagline">Upload a JPG image and download a PNG version instantly.</p>
 </header>
 
 <!-- MAIN TOOL -->
 <div class="convert-container">
 
-  <!-- SETTINGS -->
-  <div class="convert-settings">
+  <!-- LEFT PANEL -->
+  <div class="convert-left">
 
-    <h3 style="color:#7fc6ff;">Upload Image</h3>
-    <div id="drop-area" class="drop-area" style="padding:20px;">
-      <h3 id="drop-title">Drop a JPG or PNG here</h3>
-      <p class="muted">or click to browse — single image only</p>
-      <input id="fileInput" type="file" accept="image/jpeg, image/png" hidden>
+    <h3 style="color:#7fc6ff;">Upload JPG Image</h3>
+    <div id="drop-area" class="drop-area">
+      <h3>Drop JPG here</h3>
+      <p class="muted">or click to browse</p>
+      <input id="fileInput" type="file" accept="image/jpeg" hidden>
     </div>
 
-    <h3 style="margin-top:18px; color:#7fc6ff;">Conversion</h3>
-    <select id="formatSelect" class="small-input" title="Choose output format">
-      <option value="png">Convert to PNG</option>
-      <option value="jpg">Convert to JPG</option>
-    </select>
-
-    <label style="margin-top:12px; display:block;" class="muted">JPEG Quality (when converting to JPG)</label>
-    <input id="qualityRange" type="range" min="0.2" max="1" step="0.05" value="0.95" class="small-input" style="padding:6px;height:36px;">
-    <div style="display:flex; justify-content:space-between; font-size:13px; color:#9fb1d6; margin-top:6px;">
-      <span>0.2</span><span id="qualityVal">0.95</span><span>1.0</span>
-    </div>
-
-    <button id="convertBtn" class="generate-btn">Convert & Download</button>
-
-    <button id="resetBtn" class="btn-outline" style="margin-top:12px;">Reset</button>
-
-    <p class="muted" style="margin-top:10px;">Conversion happens in your browser — images are never uploaded to any server.</p>
-  </div>
-
-  <!-- PREVIEW -->
-  <div class="preview-box">
-    <div class="preview-left">
-      <img id="previewImg" class="preview-img hidden" alt="Preview">
-      <div id="placeholder" style="width:100%; text-align:center; color:#9fb1d6;">
-        <div style="font-size:18px; margin-bottom:8px;">No image selected</div>
-        <div class="muted">Choose a JPG or PNG on the left to preview and convert.</div>
-      </div>
-    </div>
-
-    <div style="width:320px;">
-      <div class="file-info" id="fileInfo">
-        <strong id="fileName">—</strong>
-        <div style="margin-top:8px;">
-          <div>Type: <span id="fileType">—</span></div>
-          <div>Dimensions: <span id="fileDim">—</span></div>
-          <div>Size: <span id="fileSize">—</span></div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px;">
-        <div style="font-size:13px; color:#9fb1d6; margin-bottom:6px;">Actions</div>
-        <div class="action-row">
-          <button id="downloadBtn" class="generate-btn">Download</button>
-          <button id="openBtn" class="btn-outline">Open</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- FOOTER -->
-<footer class="vertical-footer">
-  <ul>
-    <li><a href="about.html">About Us</a></li>
-    <li><a href="privacy.html">Privacy Policy</a></li>
-    <li><a href="terms.html">Terms of Service</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="faq.html">FAQ</a></li>
-  </ul>
-  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
-</footer>
-
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-
-<script>
-/* ----------------------------
-   BASIC ELEMENTS
------------------------------ */
-const dropArea = document.getElementById("drop-area");
-const fileInput = document.getElementById("fileInput");
-const previewImg = document.getElementById("previewImg");
-const placeholder = document.getElementById("placeholder");
-const fileNameEl = document.getElementById("fileName");
-const fileTypeEl = document.getElementById("fileType");
-const fileDimEl = document.getElementById("fileDim");
-const fileSizeEl = document.getElementById("fileSize");
-const formatSelect = document.getElementById("formatSelect");
-const convertBtn = document.getElementById("convertBtn");
-const resetBtn = document.getElementById("resetBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-const openBtn = document.getElementById("openBtn");
-const qualityRange = document.getElementById("qualityRange");
-const qualityVal = document.getElementById("qualityVal");
-
-let currentFile = null;     // File object
-let currentURL = null;      // Object URL for preview
-let convertedBlobURL = null; // result URL after conversion (for download/open)
-
-/* ----------------------------
-   UI HELPERS
------------------------------ */
-function resetAll() {
-  if (currentURL) { URL.revokeObjectURL(currentURL); currentURL = null; }
-  if (convertedBlobURL) { URL.revokeObjectURL(convertedBlobURL); convertedBlobURL = null; }
-  currentFile = null;
-  previewImg.src = "";
-  previewImg.classList.add("hidden");
-  placeholder.style.display = "block";
-  fileNameEl.textContent = "—";
-  fileTypeEl.textContent = "—";
-  fileDimEl.textContent = "—";
-  fileSizeEl.textContent = "—";
-  downloadBtn.disabled = true;
-  openBtn.disabled = true;
-}
-
-/* ----------------------------
-   DRAG & DROP + FILE SELECT
------------------------------ */
-dropArea.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", (e) => {
-  handleFile(e.target.files[0]);
-  fileInput.value = "";
-});
-
-dropArea.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropArea.classList.add("active");
-});
-dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active"));
-dropArea.addEventListener("drop", (e) => {
-  e.preventDefault();
-  dropArea.classList.remove("active");
-  handleFile(e.dataTransfer.files[0]);
-});
-
-/* ----------------------------
-   FILE HANDLER (SINGLE IMAGE)
------------------------------ */
-function handleFile(file) {
-  if (!file) return;
-  if (!file.type.startsWith("image/")) {
-    alert("Please select a JPG or PNG image.");
-    return;
-  }
-
-  // only accept png or jpeg
-  if (!(file.type === "image/png" || file.type === "image/jpeg")) {
-    alert("Only JPG (JPEG) and PNG are supported.");
-    return;
-  }
-
-  resetAll();
-
-  currentFile = file;
-  currentURL = URL.createObjectURL(file);
-
-  const img = new Image();
-  img.onload = () => {
-    previewImg.src = currentURL;
-    previewImg.classList.remove("hidden");
-    placeholder.style.display = "none";
-
-    fileNameEl.textContent = file.name;
-    fileTypeEl.textContent = file.type;
-    fileDimEl.textContent = img.naturalWidth + " × " + img.naturalHeight + " px";
-    fileSizeEl.textContent = humanFileSize(file.size);
-
-    // enable actions
-    downloadBtn.disabled = false;
-    openBtn.disabled = false;
-  };
-  img.onerror = () => {
-    alert("Failed to load image preview.");
-    resetAll();
-  };
-  img.src = currentURL;
-}
-
-/* ----------------------------
-   UTILS
------------------------------ */
-function humanFileSize(bytes) {
-  const thresh = 1024;
-  if (Math.abs(bytes) < thresh) return bytes + " B";
-  const units = ["KB","MB","GB","TB","PB","EB","ZB","YB"];
-  let u = -1;
-  do {
-    bytes /= thresh;
-    ++u;
-  } while(Math.abs(bytes) >= thresh && u < units.length - 1);
-  return bytes.toFixed(1)+" "+units[u];
-}
-
-/* ----------------------------
-   QUALITY SLIDER DISPLAY
------------------------------ */
-qualityRange.addEventListener("input", () => {
-  qualityVal.textContent = qualityRange.value;
-});
-
-/* ----------------------------
-   CONVERT IMAGE (core logic)
-   - Uses canvas to convert
-   - For PNG -> JPG: fills background white because JPG has no alpha
-   - For JPG -> PNG: preserves pixels & alpha (if any)
------------------------------ */
-async function convertImageToFormat(file, outFormat, quality = 0.95) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext("2d");
-
-        // If converting to JPG and source has transparency, paint white background
-        if (outFormat === "jpg") {
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        ctx.drawImage(img, 0, 0);
-
-        const mime = outFormat === "png" ? "image/png" : "image/jpeg";
-        // Use toBlob for binary blob
-        canvas.toBlob((blob) => {
-          URL.revokeObjectURL(url);
-          if (!blob) return reject(new Error("Conversion failed (no blob)."));
-          resolve(blob);
-        }, mime, outFormat === "jpg" ? Number(quality) : 1.0);
-      } catch (err) {
-        URL.revokeObjectURL(url);
-        reject(err);
-      }
-    };
-    img.onerror = (e) => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Failed to load image for conversion."));
-    };
-    img.src = url;
-  });
-}
-
-/* ----------------------------
-   BUTTONS
------------------------------ */
-
-convertBtn.addEventListener("click", async () => {
-  if (!currentFile) return alert("Please choose an image first.");
-
-  convertBtn.disabled = true;
-  convertBtn.textContent = "Converting...";
-
-  try {
-    const target = formatSelect.value; // 'png' or 'jpg'
-    const q = Number(qualityRange.value) || 0.95;
-
-    const resultBlob = await convertImageToFormat(currentFile, target, q);
-
-    // create download URL
-    if (convertedBlobURL) URL.revokeObjectURL(convertedBlobURL);
-    convertedBlobURL = URL.createObjectURL(resultBlob);
-
-    // auto-download
-    const outName = (currentFile.name.split(".").slice(0, -1).join(".") || "image") + "." + target;
-    triggerDownload(convertedBlobURL, outName);
-
-    // update preview to the converted result (so user sees exact output)
-    previewImg.src = convertedBlobURL;
-    previewImg.classList.remove("hidden");
-    placeholder.style.display = "none";
-
-    // update file info to reflect new format/size (approx)
-    fileNameEl.textContent = outName;
-    fileTypeEl.textContent = target === "png" ? "image/png" : "image/jpeg";
-
-    // try to estimate size (not exact until user downloads), show bytes if available
-    const sizeReadable = humanFileSize(resultBlob.size);
-    fileSizeEl.textContent = sizeReadable;
-
-    // keep download/open buttons active
-    downloadBtn.disabled = false;
-    openBtn.disabled = false;
-
-  } catch (err) {
-    console.error(err);
-    alert("Conversion failed. See console for details.");
-  } finally {
-    convertBtn.disabled = false;
-    convertBtn.textContent = "Convert & Download";
-  }
-});
-
-resetBtn.addEventListener("click", () => {
-  if (!confirm("Reset and remove the selected image?")) return;
-  resetAll();
-});
-
-/* Download & Open buttons use the last converted blob if available,
-   otherwise fall back to original file preview URL */
-downloadBtn.addEventListener("click", () => {
-  if (!currentFile && !convertedBlobURL) return;
-  if (convertedBlobURL) {
-    const outName = (fileNameEl.textContent || "image");
-    triggerDownload(convertedBlobURL, outName);
-  } else {
-    // download original file
-    triggerDownload(currentURL, currentFile.name);
-  }
-});
-
-openBtn.addEventListener("click", () => {
-  const url = convertedBlobURL || currentURL;
-  if (!url) return;
-  window.open(url, "_blank");
-});
-
-/* ----------------------------
-   HELPER: trigger download anchor
------------------------------ */
-function triggerDownload(url, filename) {
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
-/* ----------------------------
-   INIT
------------------------------ */
-resetAll();
-
-</script>
-
-</body>
-</html>
+    <button id="convertBtn" class="generate-btn" disabled>Convert
