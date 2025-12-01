@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="assets/favicon.png" />
 <meta name="description" content="DOCX → PDF with automatic A4 pagination (no heading detection required)." />
 
-<!-- Local libraries (or change to CDN if you prefer) -->
+<!-- Local libraries -->
 <script src="libs/jszip.min.js"></script>
 <script src="libs/mammoth.browser.min.js"></script>
 <script src="libs/html2pdf.bundle.min.js"></script>
@@ -46,12 +46,12 @@
     cursor:pointer;
     color:#9ec6ff;
   }
-  .small-input { width:100%; padding:10px; border-radius:8px; border:1px solid #23364f; background:#081220; color:#dfefff; margin-top:10px; box-sizing:border-box; }
+
+  .small-input { width:100%; padding:10px; border-radius:8px; border:1px solid #23364f; background:#081220; color:#dfefff; margin-top:10px; }
   .btn { width:100%; padding:10px; border-radius:8px; border:none; background:#1f9bff; color:white; font-size:15px; cursor:pointer; margin-top:12px; }
   .btn.secondary { background:#55616f; }
   .muted { color:#9fb1d6; font-size:14px; margin-top:10px; }
 
-  /* Preview area */
   .preview-panel {
     background:#071424;
     border:1px solid #1b2b3f;
@@ -61,8 +61,6 @@
     box-sizing:border-box;
   }
 
-  /* The actual "page" preview: we'll show one long rendered document for quick preview.
-     The PDF uses paged slices created at runtime. */
   .doc-preview {
     background:white;
     color:#111;
@@ -76,70 +74,81 @@
     overflow:auto;
   }
 
-  /* hidden offscreen containers used by the paginator */
   .offscreen { position:absolute; left:-99999px; top:0; width:0; height:0; overflow:hidden; visibility:hidden; }
 
-  /* pages we create for html2pdf */
   .pdf-page {
     width:210mm;
     height:297mm;
-    box-sizing:border-box;
     background:white;
-    margin-bottom:8px;
     overflow:hidden;
+    margin-bottom:8px;
+    box-sizing:border-box;
   }
 
-  /* smaller helper for responsive doc preview (not used for PDF) */
   .doc-preview-responsive { max-width:100%; }
 </style>
 </head>
 <body>
+
+<!-- NAVBAR -->
+<div id="navbar"></div>
+<script>
+fetch("components/navbar.html")
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById("navbar").innerHTML = html;
+    const ham = document.getElementById("hamburger");
+    const menu = document.getElementById("mobileMenu");
+    if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
+  });
+</script>
+
+<!-- OPEN WRAPPER (Correct Location) -->
 <div class="wrap">
-  <h1>Word → PDF Converter (Auto A4 Pagination)</h1>
 
-  <div class="convert-container">
+<h1>Word → PDF Converter (Auto A4 Pagination)</h1>
+<div class="convert-container">
 
-    <div class="panel">
-      <h3 style="color:#7fc6ff;margin:0 0 10px;">Upload DOCX</h3>
+  <div class="panel">
+    <h3 style="color:#7fc6ff;margin:0 0 10px;">Upload DOCX</h3>
 
-      <div id="dropArea" class="drop" role="button">
-        <div style="font-weight:600;">Drop .docx here</div>
-        <div class="muted">or click to browse</div>
-        <input id="fileInput" type="file" accept=".docx" hidden>
-      </div>
-
-      <label class="muted">Output filename</label>
-      <input id="outName" class="small-input" value="document.pdf">
-
-      <label class="muted">PDF quality (scale)</label>
-      <input id="pdfScale" class="small-input" type="number" value="1" min="0.5" max="2" step="0.1">
-
-      <button id="convertBtn" class="btn" disabled>Convert to PDF</button>
-      <button id="resetBtn" class="btn secondary">Reset</button>
-
-      <div id="status" class="muted">No document loaded.</div>
+    <div id="dropArea" class="drop" role="button">
+      <div style="font-weight:600;">Drop .docx here</div>
+      <div class="muted">or click to browse</div>
+      <input id="fileInput" type="file" accept=".docx" hidden>
     </div>
 
-    <div class="preview-panel panel">
-      <div id="previewWrapper" class="doc-preview doc-preview-responsive">
-        <div id="noPreview" class="muted">No document loaded. Preview appears here.</div>
-        <!-- Mammoth HTML will be injected here for preview -->
-      </div>
-    </div>
+    <label class="muted">Output filename</label>
+    <input id="outName" class="small-input" value="document.pdf">
 
+    <label class="muted">PDF quality (scale)</label>
+    <input id="pdfScale" class="small-input" type="number" value="1" min="0.5" max="2" step="0.1">
+
+    <button id="convertBtn" class="btn" disabled>Convert to PDF</button>
+    <button id="resetBtn" class="btn secondary">Reset</button>
+
+    <div id="status" class="muted">No document loaded.</div>
   </div>
-</div>
 
-<!-- Offscreen containers used during pagination -->
+  <div class="preview-panel panel">
+    <div id="previewWrapper" class="doc-preview doc-preview-responsive">
+      <div id="noPreview" class="muted">No document loaded. Preview appears here.</div>
+    </div>
+  </div>
+
+</div> <!-- end convert-container -->
+
+<!-- FIXED: Offscreen containers MUST be inside .wrap -->
 <div id="paginatorOffscreen" class="offscreen" aria-hidden="true"></div>
 <div id="pdfPagesContainer" class="offscreen" aria-hidden="true"></div>
 
+</div> <!-- CLOSE WRAP -->
 <script>
 /* ---------- Utilities ---------- */
-const mmToPx = (mm) => (mm / 25.4) * 96; // CSS px at 96dpi
+const mmToPx = (mm) => (mm / 25.4) * 96;
 const A4 = { w_mm: 210, h_mm: 297 };
-const pageCssWidthPx = Math.round(mmToPx(A4.w_mm));   // CSS px width for A4
-const pageCssHeightPx = Math.round(mmToPx(A4.h_mm));  // CSS px height for A4
+const pageCssWidthPx = Math.round(mmToPx(A4.w_mm));
+const pageCssHeightPx = Math.round(mmToPx(A4.h_mm));
 
 /* ---------- Elements ---------- */
 const dropArea = document.getElementById('dropArea');
@@ -158,189 +167,102 @@ const pdfPagesContainer = document.getElementById('pdfPagesContainer');
 let currentDocHtml = "";
 let currentFileName = "";
 
-/* ---------- Drag & drop & file select ---------- */
+/* drag drop */
 dropArea.onclick = () => fileInput.click();
-
-dropArea.addEventListener("dragover", (e) => { e.preventDefault(); dropArea.classList.add('active'); });
-dropArea.addEventListener("dragleave", () => dropArea.classList.remove('active'));
-dropArea.addEventListener("drop", (e) => {
+dropArea.addEventListener("dragover", e => { e.preventDefault(); });
+dropArea.addEventListener("drop", e => {
   e.preventDefault();
-  dropArea.classList.remove('active');
-  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
 });
-
 fileInput.addEventListener('change', () => {
-  if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
+  if (fileInput.files[0]) handleFile(fileInput.files[0]);
   fileInput.value = '';
 });
 
-/* ---------- Handle DOCX -> HTML via Mammoth ---------- */
+/* DOCX -> HTML */
 async function handleFile(file) {
-  if (!file) return;
-  currentFileName = file.name || 'document.docx';
-  if (!/\.docx$/i.test(currentFileName)) {
-    alert('Please upload a .docx file.');
-    return;
-  }
-
+  currentFileName = file.name;
   status.textContent = 'Parsing DOCX...';
   convertBtn.disabled = true;
   previewWrapper.innerHTML = '';
-  noPreview.classList.remove('hidden');
 
   try {
     const ab = await file.arrayBuffer();
     const result = await mammoth.convertToHtml({ arrayBuffer: ab });
     currentDocHtml = result.value || '';
-    showPreview(currentDocHtml);
+    previewWrapper.innerHTML = currentDocHtml;
+    noPreview.style.display = 'none';
     status.textContent = 'Document loaded.';
     convertBtn.disabled = false;
   } catch (err) {
-    console.error('Mammoth error', err);
     alert('Failed to parse DOCX.');
-    status.textContent = 'Load failed.';
   }
 }
 
-/* ---------- Show a friendly preview (not paginated) ---------- */
-function showPreview(html) {
-  previewWrapper.innerHTML = html || '<div class="muted">Empty document.</div>';
-  noPreview.style.display = 'none';
-}
-
-/* ---------- Pagination: slice by visual height (A4) ---------- */
+/* pagination builder */
 function buildPagedDocument(html, scale = 1) {
-  // Clear previous containers
   paginatorOffscreen.innerHTML = '';
   pdfPagesContainer.innerHTML = '';
 
-  // 1) Create an offscreen renderer with fixed A4 CSS width so layout matches pages
   const render = document.createElement('div');
-  render.style.width = pageCssWidthPx + 'px'; // fixed width for layout
-  render.style.boxSizing = 'border-box';
-  render.style.padding = '20px'; // match preview padding if desired
-  // Make fonts/styles similar to preview for consistent layout
+  render.style.width = pageCssWidthPx + 'px';
+  render.style.padding = '20px';
   render.style.fontFamily = '"Times New Roman", Georgia, serif';
   render.style.lineHeight = '1.45';
   render.innerHTML = html;
 
-  // Append to offscreen so images/font metrics are computed
   paginatorOffscreen.appendChild(render);
 
-  // Ensure images will load and use CORS attribute if needed (try best-effort)
   render.querySelectorAll('img').forEach(img => {
-    try { img.setAttribute('crossorigin', 'anonymous'); } catch (e) {}
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
-    img.loading = 'lazy';
   });
 
-  // Wait a tick to allow layout and images to settle
-  return new Promise((resolve) => {
-    // small delay for images to layout; increase if your docs have many images
+  return new Promise(resolve => {
     setTimeout(() => {
       const totalHeight = render.scrollHeight;
-      const pageHeight = pageCssHeightPx; // CSS px per page (A4)
-      const pages = Math.max(1, Math.ceil(totalHeight / pageHeight));
+      const pageHeight = pageCssHeightPx;
+      const pages = Math.ceil(totalHeight / pageHeight);
 
       for (let i = 0; i < pages; i++) {
-        const pageWrap = document.createElement('div');
-        pageWrap.className = 'pdf-page';
-        pageWrap.style.width = pageCssWidthPx + 'px';
-        pageWrap.style.height = pageCssHeightPx + 'px';
-        pageWrap.style.boxSizing = 'border-box';
-        pageWrap.style.overflow = 'hidden';
-        pageWrap.style.position = 'relative';
-        pageWrap.style.background = 'white';
+        const page = document.createElement('div');
+        page.className = 'pdf-page';
 
-        // clone full render for each page and translate it upward so only the slice shows
         const clone = render.cloneNode(true);
-        clone.style.boxSizing = 'border-box';
-        clone.style.margin = '0';
         clone.style.position = 'absolute';
-        clone.style.left = '0';
-        clone.style.top = '0';
         clone.style.transform = `translateY(-${i * pageHeight}px)`;
-        // Give clone the same width
-        clone.style.width = pageCssWidthPx + 'px';
 
-        pageWrap.appendChild(clone);
-        pdfPagesContainer.appendChild(pageWrap);
+        page.appendChild(clone);
+        pdfPagesContainer.appendChild(page);
       }
 
-      resolve({
-        pages,
-        container: pdfPagesContainer
-      });
-    }, 350); // 350ms is a balance for images; increase if needed
+      resolve({ pages, container: pdfPagesContainer });
+    }, 350);
   });
 }
 
-/* ---------- Convert to PDF ---------- */
+/* convert */
 convertBtn.addEventListener('click', async () => {
-  if (!currentDocHtml) { alert('No document loaded.'); return; }
-
-  convertBtn.disabled = true;
   status.textContent = 'Preparing pages...';
 
   const scale = Number(pdfScaleEl.value) || 1;
+  const { container } = await buildPagedDocument(currentDocHtml, scale);
 
-  try {
-    // Build the paged container
-    const { pages, container } = await buildPagedDocument(currentDocHtml, scale);
+  const opt = {
+    margin: 10,
+    filename: outName.value.trim() || 'document.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
 
-    status.textContent = `Rendering ${pages} page(s)...`;
-
-    // html2pdf options: use mm units, ensure page size A4
-    const opt = {
-      margin: 10,
-      filename: (outName.value && outName.value.trim()) ? outName.value.trim() : 'document.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: scale, useCORS: true, allowTaint: false, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
-
-    // Temporarily append the container to body visible area for html2pdf
-    // but keep it hidden from user by positioning offscreen but visible to html2canvas
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '0';
-    wrapper.appendChild(container);
-    document.body.appendChild(wrapper);
-
-    // html2pdf will paginate each .pdf-page element as a single page (we created them)
-    await html2pdf().set(opt).from(container).save();
-
-    // cleanup
-    document.body.removeChild(wrapper);
-    pdfPagesContainer.innerHTML = '';
-    paginatorOffscreen.innerHTML = '';
-
-    status.textContent = 'PDF created and downloaded.';
-  } catch (err) {
-    console.error('PDF generation error', err);
-    alert('PDF generation failed. See console.');
-    status.textContent = 'PDF failed.';
-  } finally {
-    convertBtn.disabled = false;
-  }
+  await html2pdf().set(opt).from(container).save();
+  status.textContent = 'PDF created.';
 });
 
-/* ---------- Reset ---------- */
-resetBtn.addEventListener('click', () => {
-  currentDocHtml = '';
-  previewWrapper.innerHTML = '<div id="noPreview" class="muted">No document loaded. Preview appears here.</div>';
-  noPreview.style.display = '';
-  convertBtn.disabled = true;
-  status.textContent = 'No document loaded.';
-  pdfPagesContainer.innerHTML = '';
-  paginatorOffscreen.innerHTML = '';
-});
-
-/* ---------- Init ---------- */
-status.textContent = 'No document loaded.';
+/* reset */
+resetBtn.addEventListener('click', () => location.reload());
 </script>
+
 </body>
 </html>
