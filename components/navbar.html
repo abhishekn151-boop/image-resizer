@@ -1,139 +1,30 @@
-<nav class="navbar">
-  <div class="nav-container">
-
-    <!-- Logo -->
-    <a href="index.html" class="nav-logo">
-      <img src="assets/favicon.png" alt="logo" class="nav-logo-img">
-      <span class="nav-logo-text">Free Image Resizer</span>
-    </a>
-
-    <!-- Desktop Menu -->
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="tools.html">Tools</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="privacy.html">Privacy</a></li>
-      <li><a href="terms.html">Terms</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="faq.html">FAQ</a></li>
-    </ul>
-
-    <!-- Hamburger Icon -->
-    <div id="hamburger" class="hamburger">
-      <span></span><span></span><span></span>
-    </div>
-
+<nav class="top-nav">
+  <div class="nav-left">
+    <img src="assets/logo.png" class="nav-logo" alt="Free Image Resizer logo">
+    <span class="nav-title">Free Image Resizer</span>
   </div>
 
-  <!-- Mobile Menu -->
-  <ul id="mobileMenu" class="mobile-menu">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="tools.html">Tools</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="privacy.html">Privacy</a></li>
-    <li><a href="terms.html">Terms</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="faq.html">FAQ</a></li>
-  </ul>
+  <div class="hamburger" id="hamburger">☰</div>
+
+  <div class="nav-links" id="mobileMenu">
+
+    <!-- TOOLS DROPDOWN MENU -->
+    <div class="dropdown">
+      <button class="dropbtn">Tools ▼</button>
+      <div class="dropdown-content">
+        <a href="index.html">Image Resizer</a>
+        <a href="compress.html">Image Compressor</a>
+         <a href="image-to-pdf.html">Image → PDF</a>
+        <a href="jpg-png-converter.html">JPG → PNG</a>
+        <a href="png-to-jpg-converter.html">PNG → JPG</a>
+        <a href="word-to-pdf-converter.html">Word to PDF</a>
+      </div>
+    </div>
+
+    <a href="about.html">About Us</a>
+    <a href="faq.html">FAQ</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="contact.html">Contact</a>
+  </div>
 </nav>
-
-<style>
-/* Navbar container */
-.navbar {
-  background:#0f1829;
-  border-bottom:1px solid #1d2944;
-  padding: 12px 0;
-  position: sticky;
-  top:0;
-  z-index:1000;
-}
-
-.nav-container {
-  max-width:1150px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding: 0 15px;
-}
-
-/* Logo */
-.nav-logo {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  text-decoration:none;
-}
-.nav-logo-img {
-  width:28px;
-  height:28px;
-}
-.nav-logo-text {
-  color:#eaf3ff;
-  font-size:18px;
-  font-weight:600;
-}
-
-/* Desktop links */
-.nav-links {
-  list-style:none;
-  display:flex;
-  gap:22px;
-  align-items:center;
-}
-.nav-links li a {
-  text-decoration:none;
-  color:#cfe9ff;
-  font-size:15px;
-}
-.nav-links li a:hover {
-  color:#1f9bff;
-}
-
-/* Hamburger */
-.hamburger {
-  display:none;
-  flex-direction:column;
-  gap:4px;
-  cursor:pointer;
-}
-.hamburger span {
-  width:24px;
-  height:3px;
-  background:#e8ecf4;
-  border-radius:3px;
-}
-
-/* Mobile menu */
-.mobile-menu {
-  display:none;
-  flex-direction:column;
-  list-style:none;
-  padding:0;
-  margin:0;
-  background:#0f1829;
-  border-top:1px solid #1d2944;
-}
-.mobile-menu li a {
-  display:block;
-  padding:12px 18px;
-  color:#cfe9ff;
-  text-decoration:none;
-}
-.mobile-menu li a:hover {
-  background:#122033;
-}
-
-/* Mobile Responsive */
-@media (max-width:900px) {
-  .nav-links {
-    display:none;
-  }
-  .hamburger {
-    display:flex;
-  }
-  .mobile-menu.active {
-    display:flex;
-  }
-}
-</style>
