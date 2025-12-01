@@ -12,13 +12,11 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- Libraries (CDN) -->
-  <!-- mammoth: DOCX -> HTML -->
   <script src="https://unpkg.com/mammoth@1.4.17/mammoth.browser.min.js"></script>
-  <!-- html2pdf bundle (includes html2canvas + jsPDF) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 
   <style>
-    /* Keep same layout & equal height fix */
+    /* Layout & equal-height */
     .convert-container {
       max-width: 1150px;
       margin: 30px auto;
@@ -102,6 +100,7 @@
       gap:10px;
     }
 
+    /* DOC preview area: white background (PDF pages will be white) */
     .doc-preview {
       background: white;
       color: #111;
@@ -110,14 +109,30 @@
       border:1px solid #d8dce6;
       overflow:auto;
       height: calc(100% - 64px); /* leave room for toolbar */
+      box-sizing: border-box;
+      font-family: "Times New Roman", Georgia, serif;
+      line-height: 1.45;
+      font-size: 14px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Strong override for Mammoth generated content so text never appears faint */
+    .doc-preview, .doc-preview * {
+      color: #111 !important;
+    }
+    /* Remove transparent backgrounds from nested elements */
+    .doc-preview *[style] {
+      /* sanitize extremely light inline color values by removing them — JS will try to normalize more smartly */
+      background: transparent !important;
     }
 
     /* Make mammoth generated HTML look reasonable */
     .doc-preview h1, .doc-preview h2, .doc-preview h3 {
-      color:#0b2b4a;
-      margin: 12px 0;
+      color:#0b2b4a !important;
+      margin: 12px 0 !important;
     }
-    .doc-preview p { line-height:1.5; margin:8px 0; color:#111; }
+    .doc-preview p { line-height:1.5; margin:8px 0 !important; color:#111 !important; }
     .doc-preview img { max-width:100%; height:auto; display:block; margin:8px 0; }
     .doc-preview table { width:100%; border-collapse:collapse; margin:8px 0; }
     .doc-preview table td, .doc-preview table th { border:1px solid #ccc; padding:6px; }
@@ -148,7 +163,7 @@ fetch("components/navbar.html")
 
 <header class="head" style="max-width:1150px;margin:18px auto 0;padding:0 15px;">
   <h1>Word → PDF Converter</h1>
-  <p class="tagline">Advanced client-side DOCX to PDF using Mammoth + html2pdf (preserves text, headings, lists, tables & images).</p>
+  <p class="tagline">Advanced client-side DOCX → PDF using Mammoth + html2pdf. Improved color normalization for readable PDFs.</p>
 </header>
 
 <div class="convert-container">
@@ -244,17 +259,42 @@ let currentDocHtml = "";
 let currentBlobUrl = null;
 
 /* ----------------------------
-   Drag & drop + file select
+   Drag & drop + file select (FIXED)
 ----------------------------- */
-dropArea.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", () => handleFile(fileInput.files[0]));
 
-dropArea.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("active"); });
-dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active"));
-dropArea.addEventListener("drop", e => {
+// Click (more reliable than addEventListener)
+dropArea.onclick = function () {
+  fileInput.dispatchEvent(
+    new MouseEvent("click", { bubbles: true })
+  );
+};
+
+// Browse
+fileInput.addEventListener("change", () => {
+  if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
+  fileInput.value = ""; // reset
+});
+
+// Drag over
+dropArea.addEventListener("dragover", (e) => {
   e.preventDefault();
+  e.stopPropagation();
+  dropArea.classList.add("active");
+});
+
+// Drag leave
+dropArea.addEventListener("dragleave", () => {
   dropArea.classList.remove("active");
-  handleFile(e.dataTransfer.files[0]);
+});
+
+// Drop (CRITICAL FIX)
+dropArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dropArea.classList.remove("active");
+  if (e.dataTransfer.files.length > 0) {
+    handleFile(e.dataTransfer.files[0]);
+  }
 });
 
 /* ----------------------------
@@ -291,9 +331,14 @@ async function handleFile(file) {
     const html = result.value; // generated HTML string
     currentDocHtml = html;
 
-    // Insert into preview area — wrap with a container for styling
+    // Inject into preview area — wrap with a container for styling
     docPreview.innerHTML = "<div id='mammothInner' class='mammoth-inner'>" + html + "</div>";
-    noPreview?.remove?.();
+    // remove placeholder if present
+    const placeholder = document.getElementById("noPreview");
+    if (placeholder) placeholder.remove();
+
+    // Post-process the generated HTML to normalize colors and inline styles that are too light
+    normalizeGeneratedHtml(document.getElementById("mammothInner"));
 
     // Post-process images: ensure they are not too wide (keep responsive)
     docPreview.querySelectorAll("img").forEach(img => {
@@ -315,6 +360,71 @@ async function handleFile(file) {
 }
 
 /* ----------------------------
+   Normalize generated HTML colors
+   - Force dark color for all text nodes
+   - Remove extremely light color inline styles coming from Word's themes
+----------------------------- */
+function normalizeGeneratedHtml(container) {
+  if (!container) return;
+
+  // Walk all elements and fix inline color styles that are very light or look like theme tokens
+  const els = container.querySelectorAll("*");
+  for (const el of els) {
+    // Remove any background color inline styles (prevent transparency issues)
+    if (el.style && el.style.backgroundColor) {
+      el.style.backgroundColor = "transparent";
+    }
+
+    // If color is set inline, parse it and decide whether to override
+    const inlineColor = el.style && (el.style.color || el.style.fill);
+    if (inlineColor) {
+      const rgb = parseColor(inlineColor);
+      if (rgb) {
+        const luminance = (0.2126*rgb.r + 0.7152*rgb.g + 0.0722*rgb.b)/255;
+        // If luminance is very high (very light color), override to dark
+        if (luminance > 0.85) {
+          el.style.color = "#111";
+        }
+      } else {
+        // if unknown format, just clear and set dark
+        el.style.color = "#111";
+      }
+    }
+    // Enforce readable font color if nothing set
+    el.style.color = el.style.color || "#111";
+    // Ensure font variants are legible
+    el.style.lineHeight = el.style.lineHeight || "1.45";
+    el.style.fontFamily = el.style.fontFamily || '"Times New Roman", Georgia, serif';
+  }
+
+  // Fine-grain: ensure top-level block text is dark
+  container.style.color = "#111";
+  container.style.background = "transparent";
+}
+
+/* Parse CSS color strings (simple) */
+function parseColor(colorStr) {
+  if (!colorStr) return null;
+  colorStr = colorStr.trim().toLowerCase();
+
+  // rgb or rgba
+  const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (m) return { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]) };
+
+  // hex #rrggbb or #rgb
+  const mh = colorStr.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (mh) {
+    let hex = mh[1];
+    if (hex.length === 3) {
+      hex = hex.split("").map(ch => ch+ch).join("");
+    }
+    return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
+  }
+
+  return null;
+}
+
+/* ----------------------------
    Convert preview HTML -> PDF (html2pdf)
 ----------------------------- */
 convertBtn.addEventListener("click", async () => {
@@ -323,14 +433,20 @@ convertBtn.addEventListener("click", async () => {
   convertBtn.disabled = true;
   convertBtn.textContent = "Converting to PDF...";
 
-  // choose element to render
+  // element to render
   const element = document.getElementById("mammothInner") || docPreview;
 
-  // html2pdf options
+  // Ensure images have crossorigin attribute (useCORS)
+  element.querySelectorAll("img").forEach(img => {
+    try { img.setAttribute("crossorigin","anonymous"); } catch(e){}
+  });
+
   const filename = (outName.value && outName.value.trim()) ? outName.value.trim() : "document.pdf";
   const scale = Number(pdfScale.value) || 1;
+
+  // html2pdf options
   const opt = {
-    margin:       10,
+    margin:       10, // mm
     filename:     filename,
     image:        { type: 'jpeg', quality: 0.98 },
     html2canvas:  { scale: scale, useCORS: true, allowTaint: false, logging: false },
@@ -338,17 +454,14 @@ convertBtn.addEventListener("click", async () => {
     pagebreak:    { mode: ['css', 'legacy'] }
   };
 
-  // If 'auto' we will try to size width to content by using a temporary container width measurement.
+  // If auto: keep 'a4' but render content width — html2pdf will paginate
   if (pdfFormat.value === 'auto') {
-    // keep jsPDF format 'a4' but we'll not strictly rely on it — html2pdf will paginate based on rendered content
     opt.jsPDF.format = 'a4';
   }
 
   try {
     statusText.textContent = "Rendering PDF — this may take a few seconds...";
-    // run html2pdf
     await html2pdf().set(opt).from(element).save();
-
     statusText.textContent = "PDF ready and downloaded.";
   } catch (err) {
     console.error(err);
@@ -360,15 +473,15 @@ convertBtn.addEventListener("click", async () => {
   }
 });
 
-/* Download PDF via the dedicated 'Download PDF' toolbar button (same as convert) */
+/* Download toolbar button triggers same */
 downloadHtmlBtn.addEventListener("click", () => convertBtn.click());
 
-/* Open preview in new tab */
+/* Open preview in new tab (clean HTML wrapper) */
 openPreviewBtn.addEventListener("click", () => {
   const previewHtml = currentDocHtml || "<p>No preview</p>";
   const win = window.open("", "_blank");
   if (!win) return alert("Pop-up blocked. Allow pop-ups to open preview.");
-  win.document.write("<html><head><title>Preview</title></head><body>" + previewHtml + "</body></html>");
+  win.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Preview</title></head><body>" + previewHtml + "</body></html>");
   win.document.close();
 });
 
