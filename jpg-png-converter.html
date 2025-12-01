@@ -123,4 +123,161 @@ fetch("components/navbar.html")
       <input id="fileInput" type="file" accept="image/jpeg" hidden>
     </div>
 
-    <button id="convertBtn" class="generate-btn" disabled>Convert
+    <button id="convertBtn" class="generate-btn" disabled>Convert to PNG</button>
+
+  </div>
+
+  <!-- RIGHT PANEL (PREVIEW) -->
+  <div class="preview-box">
+
+    <div id="noPreview" class="muted" style="text-align:center;">
+      No image selected. Upload a JPG to preview it here.
+    </div>
+
+    <img id="previewImg" class="preview-img hidden">
+
+    <div id="metaBox" class="meta-box hidden">
+      <strong id="fileName">—</strong>
+      <div style="margin-top:8px;">
+        <div>Dimensions: <span id="fileDim">—</span></div>
+        <div>Size: <span id="fileSize">—</span></div>
+        <div>Type: <span id="fileType">JPG (image/jpeg)</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="vertical-footer">
+  <ul>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="privacy.html">Privacy Policy</a></li>
+    <li><a href="terms.html">Terms of Service</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+  </ul>
+  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
+</footer>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+<script>
+/* ELEMENTS */
+const dropArea = document.getElementById("drop-area");
+const fileInput = document.getElementById("fileInput");
+const previewImg = document.getElementById("previewImg");
+const metaBox = document.getElementById("metaBox");
+const noPreview = document.getElementById("noPreview");
+const convertBtn = document.getElementById("convertBtn");
+const fileNameEl = document.getElementById("fileName");
+const fileDimEl = document.getElementById("fileDim");
+const fileSizeEl = document.getElementById("fileSize");
+
+let currentFile = null;
+let currentURL = null;
+
+/* --- Drag & Drop --- */
+dropArea.addEventListener("click", () => fileInput.click());
+
+dropArea.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropArea.classList.add("active");
+});
+dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active"));
+dropArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropArea.classList.remove("active");
+  handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener("change", () => {
+  handleFile(fileInput.files[0]);
+  fileInput.value = "";
+});
+
+/* --- File Handler --- */
+function handleFile(file) {
+  if (!file) return;
+  if (file.type !== "image/jpeg") {
+    alert("Only JPG images are supported.");
+    return;
+  }
+
+  currentFile = file;
+
+  if (currentURL) URL.revokeObjectURL(currentURL);
+  currentURL = URL.createObjectURL(file);
+
+  const img = new Image();
+  img.onload = () => {
+    previewImg.src = currentURL;
+    previewImg.classList.remove("hidden");
+    noPreview.classList.add("hidden");
+    metaBox.classList.remove("hidden");
+
+    fileNameEl.textContent = file.name;
+    fileDimEl.textContent = img.naturalWidth + " × " + img.naturalHeight + " px";
+    fileSizeEl.textContent = readable(file.size);
+    convertBtn.disabled = false;
+  };
+  img.src = currentURL;
+}
+
+/* --- Convert JPG → PNG --- */
+convertBtn.addEventListener("click", async () => {
+  if (!currentFile) return;
+
+  convertBtn.disabled = true;
+  convertBtn.textContent = "Converting...";
+
+  try {
+    const img = new Image();
+    img.src = currentURL;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        download(url, currentFile.name.replace(/\.jpe?g$/i,"") + ".png");
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    };
+  } catch (err) {
+    alert("Conversion failed.");
+  }
+
+  convertBtn.disabled = false;
+  convertBtn.textContent = "Convert to PNG";
+});
+
+/* --- Download helper --- */
+function download(url, name) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/* --- Size formatting --- */
+function readable(bytes) {
+  if (bytes < 1024) return bytes + " B";
+  let units = ["KB","MB","GB"];
+  let i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return (bytes / Math.pow(1024, i)).toFixed(1) + " " + units[i-1];
+}
+</script>
+
+</body>
+</html>
