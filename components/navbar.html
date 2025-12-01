@@ -259,17 +259,42 @@ let currentDocHtml = "";
 let currentBlobUrl = null;
 
 /* ----------------------------
-   Drag & drop + file select
+   Drag & drop + file select (FIXED)
 ----------------------------- */
-dropArea.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", () => handleFile(fileInput.files[0]));
 
-dropArea.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("active"); });
-dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active"));
-dropArea.addEventListener("drop", e => {
+// Click (more reliable than addEventListener)
+dropArea.onclick = function () {
+  fileInput.dispatchEvent(
+    new MouseEvent("click", { bubbles: true })
+  );
+};
+
+// Browse
+fileInput.addEventListener("change", () => {
+  if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
+  fileInput.value = ""; // reset
+});
+
+// Drag over
+dropArea.addEventListener("dragover", (e) => {
   e.preventDefault();
+  e.stopPropagation();
+  dropArea.classList.add("active");
+});
+
+// Drag leave
+dropArea.addEventListener("dragleave", () => {
   dropArea.classList.remove("active");
-  handleFile(e.dataTransfer.files[0]);
+});
+
+// Drop (CRITICAL FIX)
+dropArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dropArea.classList.remove("active");
+  if (e.dataTransfer.files.length > 0) {
+    handleFile(e.dataTransfer.files[0]);
+  }
 });
 
 /* ----------------------------
