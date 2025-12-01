@@ -108,6 +108,7 @@
 </style>
 </head>
 <body>
+  <div id="renderArea" style="position:relative; width:100%; min-height:10px;"></div>
 
 <!-- NAVBAR -->
 <div id="navbar"></div>
@@ -345,7 +346,7 @@ async function buildPagedDocument(html, scale = 1) {
     clone.style.webkitTransform = clone.style.transform;
 
     pageWrap.appendChild(clone);
-    pdfPagesContainer.appendChild(pageWrap);
+// IMPORTANT: pages must be appended directly to a NEW NORMAL BLOCK CONTAINER (not offscreen)
   }
 
   // return pages count and container (pdfPagesContainer holds .pdf-page children now)
@@ -363,53 +364,39 @@ convertBtn.addEventListener('click', async () => {
   try {
     const scale = Number(pdfScaleEl.value) || 1;
 
-    // Build pages (this waits for images)
     const { pages, container } = await buildPagedDocument(currentDocHtml, scale);
-    console.log('Pages built:', pages, 'container children:', container.children.length);
 
     status.textContent = `Rendering ${pages} page(s)...`;
 
-    // Create wrapper visible to html2canvas — positioned absolute at top:0 (overlays briefly)
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = '0';
-    wrapper.style.top = '0';
-    wrapper.style.width = pageCssWidthPx + 'px';
-    wrapper.style.height = (pageCssHeightPx * pages) + 'px';
-    wrapper.style.zIndex = '999999';
-    wrapper.style.background = 'white';
-    wrapper.style.overflow = 'hidden';
-    // DO NOT hide via opacity:0 or visibility:hidden — html2canvas won't capture then.
+    // Prepare visible render area
+    const renderArea = document.getElementById("renderArea");
+    renderArea.innerHTML = ""; // clear old pages
 
-    // append the container (pdfPagesContainer) into wrapper — this moves it in DOM
-    wrapper.appendChild(container);
-    document.body.appendChild(wrapper);
+    // Move pages into renderArea (IMPORTANT!!)
+    Array.from(container.children).forEach(page => {
+      page.style.position = "relative";  // ensure visible
+      page.style.left = "0";
+      page.style.top = "0";
+      renderArea.appendChild(page);
+    });
 
-    // give browser a frame to render
+    // Ensure DOM rendered
     await new Promise(r => requestAnimationFrame(r));
 
     const opt = {
-      margin: 10,
-      filename: (outName.value && outName.value.trim()) ? outName.value.trim() : 'document.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: scale, useCORS: true, allowTaint: false, logging: false },
+      margin: 0,
+      filename: outName.value.trim() || 'document.pdf',
+      html2canvas: { scale, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    console.log("CONTAINER HEIGHT:", container.offsetHeight);
-    console.log("CHILDREN:", container.children.length);
-    console.log("HTML PREVIEW (snippet):", container.innerHTML.slice(0,200));
-
-    // Trigger html2pdf on the wrapper (wrapper contains the pages)
-    await html2pdf().set(opt).from(wrapper).save();
-
-    // cleanup
-    if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
-    pdfPagesContainer.innerHTML = '';
-    paginatorOffscreen.innerHTML = '';
+    await html2pdf().set(opt).from(renderArea).save();
 
     status.textContent = 'PDF created and downloaded.';
+
+    // cleanup
+    renderArea.innerHTML = "";
+
   } catch (err) {
     console.error('PDF generation error:', err);
     alert('PDF generation failed — check console.');
