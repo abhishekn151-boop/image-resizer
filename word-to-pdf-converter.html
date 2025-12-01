@@ -76,11 +76,11 @@
 
   .offscreen {
     position: absolute;
-    top: -9999px;    /* move visually offscreen */
+    top: 0;
     left: 0;
-    opacity: 1;      /* MUST BE VISIBLE for html2canvas */
+    visibility: hidden;   /* invisible but RENDERED */
+    opacity: 1 !important;
     pointer-events: none;
-    z-index: 9999;
 }
 
   .pdf-page {
@@ -340,6 +340,11 @@ convertBtn.addEventListener('click', async () => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] }
     };
+
+  console.log('Pages built:', pages);
+  console.log("CONTAINER HEIGHT:", container.offsetHeight);
+  console.log("CHILDREN:", container.children.length);
+  console.log("HTML PREVIEW:", container.innerHTML.slice(0,200));
 
     // Trigger html2pdf
     await html2pdf().set(opt).from(container).save();
