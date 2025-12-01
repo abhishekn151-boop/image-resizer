@@ -154,8 +154,9 @@
 <!-- Offscreen containers used during pagination -->
 <div id="paginatorOffscreen" class="offscreen" aria-hidden="true"></div>
 <div id="pdfPagesContainer" class="offscreen" aria-hidden="true"></div>
-  <!-- FOOTER -->
-<footer class="vertical-footer">
+
+<!-- FOOTER -->
+  <footer class="vertical-footer">
   <ul>
     <li><a href="about.html">About Us</a></li>
     <li><a href="privacy.html">Privacy Policy</a></li>
@@ -165,7 +166,10 @@
   </ul>
   <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
 </footer>
-<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 
 <script>
 /* ---------- Utilities ---------- */
