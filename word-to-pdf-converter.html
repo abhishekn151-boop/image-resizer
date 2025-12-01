@@ -74,7 +74,14 @@
     overflow:auto;
   }
 
-  .offscreen { position:absolute; left:-99999px; top:0; width:0; height:0; overflow:hidden; visibility:hidden; }
+  .offscreen {
+    position: fixed;
+    top: 0;
+    left: -200vw;   /* move offscreen but keep full size */
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+}
 
   .pdf-page {
     width:210mm;
@@ -229,7 +236,7 @@ function buildPagedDocument(html, scale = 1) {
         page.className = 'pdf-page';
 
         const clone = render.cloneNode(true);
-        clone.style.position = 'absolute';
+        clone.style.position = 'relative';
         clone.style.transform = `translateY(-${i * pageHeight}px)`;
 
         page.appendChild(clone);
