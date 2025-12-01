@@ -322,9 +322,11 @@ convertBtn.addEventListener('click', async () => {
     // set height to contain all pages (helps html2canvas compute)
     wrapper.style.height = (pageCssHeightPx * pages) + 'px';
     wrapper.style.overflow = 'hidden';
-    wrapper.style.opacity = '0';           // invisible to user
-    wrapper.style.pointerEvents = 'none';
-    wrapper.style.zIndex = '999999';
+    // Must remain visible to html2canvas
+wrapper.style.opacity = '1';          
+wrapper.style.visibility = 'hidden';  // hides from user but still renderable
+wrapper.style.pointerEvents = 'none';
+wrapper.style.zIndex = '999999';
     wrapper.appendChild(container);
 
     document.body.appendChild(wrapper);
