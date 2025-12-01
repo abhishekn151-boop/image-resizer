@@ -94,80 +94,45 @@
 </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>Word → PDF Converter (Auto A4 Pagination)</h1>
 
-<!-- TOP NAVIGATION BAR -->
-  <div id="navbar"></div>
-<script>
-  fetch("components/navbar.html")
-    .then(r => r.text())
-    .then(html => {
-      document.getElementById("navbar").innerHTML = html;
+  <div class="convert-container">
 
-      // Attach hamburger listener AFTER navbar loads
-      const ham = document.getElementById("hamburger");
-      const menu = document.getElementById("mobileMenu");
+    <div class="panel">
+      <h3 style="color:#7fc6ff;margin:0 0 10px;">Upload DOCX</h3>
 
-      if (ham && menu) {
-        ham.onclick = () => {
-          menu.classList.toggle("active");
-        };
-      }
-    });
-</script>
-  <h1>Word → PDF Converter</h1>
-  <p class="tagline">Fast & stable DOCX → PDF conversion — fully client-side.</p>
-</header>
-<div class="convert-container">
+      <div id="dropArea" class="drop" role="button">
+        <div style="font-weight:600;">Drop .docx here</div>
+        <div class="muted">or click to browse</div>
+        <input id="fileInput" type="file" accept=".docx" hidden>
+      </div>
 
-  <div class="panel">
-    <h3 style="color:#7fc6ff;margin:0 0 10px;">Upload DOCX</h3>
+      <label class="muted">Output filename</label>
+      <input id="outName" class="small-input" value="document.pdf">
 
-    <div id="dropArea" class="drop" role="button">
-      <div style="font-weight:600;">Drop .docx here</div>
-      <div class="muted">or click to browse</div>
-      <input id="fileInput" type="file" accept=".docx" hidden>
+      <label class="muted">PDF quality (scale)</label>
+      <input id="pdfScale" class="small-input" type="number" value="1" min="0.5" max="2" step="0.1">
+
+      <button id="convertBtn" class="btn" disabled>Convert to PDF</button>
+      <button id="resetBtn" class="btn secondary">Reset</button>
+
+      <div id="status" class="muted">No document loaded.</div>
     </div>
 
-    <label class="muted">Output filename</label>
-    <input id="outName" class="small-input" value="document.pdf">
-
-    <label class="muted">PDF quality (scale)</label>
-    <input id="pdfScale" class="small-input" type="number" value="1" min="0.5" max="2" step="0.1">
-
-    <button id="convertBtn" class="btn" disabled>Convert to PDF</button>
-    <button id="resetBtn" class="btn secondary">Reset</button>
-
-    <div id="status" class="muted">No document loaded.</div>
-  </div>
-
-  <div class="preview-panel panel">
-    <div id="previewWrapper" class="doc-preview doc-preview-responsive">
-      <div id="noPreview" class="muted">No document loaded. Preview appears here.</div>
-      <!-- Mammoth HTML will be injected here for preview -->
+    <div class="preview-panel panel">
+      <div id="previewWrapper" class="doc-preview doc-preview-responsive">
+        <div id="noPreview" class="muted">No document loaded. Preview appears here.</div>
+        <!-- Mammoth HTML will be injected here for preview -->
+      </div>
     </div>
-  </div>
 
-</div> <!-- end .convert-container -->
+  </div>
+</div>
 
 <!-- Offscreen containers used during pagination -->
 <div id="paginatorOffscreen" class="offscreen" aria-hidden="true"></div>
 <div id="pdfPagesContainer" class="offscreen" aria-hidden="true"></div>
-
-<!-- FOOTER -->
-  <footer class="vertical-footer">
-  <ul>
-    <li><a href="about.html">About Us</a></li>
-    <li><a href="privacy.html">Privacy Policy</a></li>
-    <li><a href="terms.html">Terms of Service</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="faq.html">FAQ</a></li>
-  </ul>
-  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
-</footer>
-  
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
 
 <script>
 /* ---------- Utilities ---------- */
