@@ -94,7 +94,8 @@
 </style>
 </head>
 <body>
-  <!-- NAVBAR -->
+
+<!-- NAVBAR -->
 <div id="navbar"></div>
 <script>
 fetch("components/navbar.html")
@@ -106,9 +107,11 @@ fetch("components/navbar.html")
     if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
   });
 </script>
-<div class="wrap">
-  <h1>Word → PDF Converter (Auto A4 Pagination)</h1>
 
+<header class="head" style="max-width:1150px;margin:18px auto 0;padding:0 15px;">
+  <h1>Word → PDF Converter</h1>
+  <p class="tagline">Fast & stable DOCX → PDF conversion — fully client-side.</p>
+</header>
   <div class="convert-container">
 
     <div class="panel">
@@ -145,6 +148,19 @@ fetch("components/navbar.html")
 <!-- Offscreen containers used during pagination -->
 <div id="paginatorOffscreen" class="offscreen" aria-hidden="true"></div>
 <div id="pdfPagesContainer" class="offscreen" aria-hidden="true"></div>
+
+  <!-- FOOTER -->
+<footer class="vertical-footer">
+  <ul>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="privacy.html">Privacy Policy</a></li>
+    <li><a href="terms.html">Terms of Service</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+  </ul>
+  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
+</footer>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 
 <script>
 /* ---------- Utilities ---------- */
