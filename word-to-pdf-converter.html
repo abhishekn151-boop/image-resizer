@@ -94,6 +94,18 @@
 </style>
 </head>
 <body>
+  <!-- NAVBAR -->
+<div id="navbar"></div>
+<script>
+fetch("components/navbar.html")
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById("navbar").innerHTML = html;
+    const ham = document.getElementById("hamburger");
+    const menu = document.getElementById("mobileMenu");
+    if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
+  });
+</script>
 <div class="wrap">
   <h1>Word → PDF Converter (Auto A4 Pagination)</h1>
 
