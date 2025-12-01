@@ -52,6 +52,16 @@
     top: auto !important;
     transform: none !important;
   }
+  /* Force BLACK text inside paged PDF output */
+#pdfPagesContainer, 
+#pdfPagesContainer *, 
+#renderArea, 
+#renderArea * {
+  color: #000 !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  opacity: 1 !important;
+}
 </style>
 </head>
 <body>
@@ -277,13 +287,18 @@ async function buildPagedDocument(html, scale = 1) {
 
     const clone = render.cloneNode(true);
 
-    // absolutely position clone inside page and shift it to show the slice
-    clone.style.position = 'absolute';
-    clone.style.left = '0';
-    clone.style.top = '0';
-    clone.style.width = pageCssWidthPx + 'px';
-    clone.style.boxSizing = 'border-box';
-    clone.style.transform = `translateY(-${i * pageHeight}px)`;
+clone.style.position = 'absolute';
+clone.style.left = '0';
+clone.style.top = '0';
+clone.style.width = pageCssWidthPx + 'px';
+clone.style.boxSizing = 'border-box';
+clone.style.transform = `translateY(-${i * pageHeight}px)`;
+
+// FIX: FORCE BLACK TEXT
+clone.querySelectorAll('*').forEach(el => {
+  el.style.color = '#000';
+  el.style.opacity = '1';
+});
     clone.style.webkitTransform = clone.style.transform;
 
     pageWrap.appendChild(clone);
