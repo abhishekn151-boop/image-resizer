@@ -315,18 +315,18 @@ convertBtn.addEventListener('click', async () => {
     // Create a visible-but-invisible wrapper and append the container into it.
     // Important: wrapper must be in the viewport and not display:none — html2canvas needs layout.
     const wrapper = document.createElement('div');
-    wrapper.style.position = 'fixed';
-    wrapper.style.left = '0';
-    wrapper.style.top = '0';
-    wrapper.style.width = pageCssWidthPx + 'px';
-    // set height to contain all pages (helps html2canvas compute)
-    wrapper.style.height = (pageCssHeightPx * pages) + 'px';
-    wrapper.style.overflow = 'hidden';
-    // Must remain visible to html2canvas
-wrapper.style.opacity = '1';          
-wrapper.style.visibility = 'hidden';  // hides from user but still renderable
-wrapper.style.pointerEvents = 'none';
+    // Wrapper MUST be visible (not opacity:0 or visibility:hidden)
+wrapper.style.position = 'absolute';
+wrapper.style.left = '0';
+wrapper.style.top = '0';
+wrapper.style.width = pageCssWidthPx + 'px';
+wrapper.style.height = (pageCssHeightPx * pages) + 'px';
 wrapper.style.zIndex = '999999';
+wrapper.style.background = 'white';
+wrapper.style.overflow = 'hidden';
+
+// Important: DO NOT use opacity 0 or visibility hidden here
+
     wrapper.appendChild(container);
 
     document.body.appendChild(wrapper);
@@ -349,7 +349,7 @@ wrapper.style.zIndex = '999999';
   console.log("HTML PREVIEW:", container.innerHTML.slice(0,200));
 
     // Trigger html2pdf
-    await html2pdf().set(opt).from(container).save();
+    await html2pdf().set(opt).from(wrapper).save();
 
     // cleanup
     document.body.removeChild(wrapper);
