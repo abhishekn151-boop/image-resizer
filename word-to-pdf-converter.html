@@ -305,6 +305,23 @@ clone.querySelectorAll('[style]').forEach(el => {
         el.style.opacity = "1";
     }
 });
+    // FIX 3: strip problematic Word inline attributes  
+clone.querySelectorAll('[style]').forEach(el => {
+  const style = el.getAttribute('style').toLowerCase();
+
+  // Remove color, opacity, mix-blend-mode, and text-shadow
+  if (
+    style.includes('color') ||
+    style.includes('opacity') ||
+    style.includes('mix-blend') ||
+    style.includes('shadow')
+  ) {
+    el.style.color = "#000";
+    el.style.opacity = "1";
+    el.style.mixBlendMode = "normal";
+    el.style.textShadow = "none";
+  }
+});
 
 clone.style.position = 'absolute';
 clone.style.left = '0';
