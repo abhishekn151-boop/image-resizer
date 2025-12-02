@@ -287,6 +287,25 @@ async function buildPagedDocument(html, scale = 1) {
 
     const clone = render.cloneNode(true);
 
+// FIX 1: remove absolute positioning
+clone.querySelectorAll('*[style*="position:absolute"]').forEach(el => {
+    el.style.position = "static";
+    el.style.left = "auto";
+    el.style.top = "auto";
+    el.style.transform = "none";
+});
+
+// FIX 2: remove white / transparent text
+clone.querySelectorAll('[style]').forEach(el => {
+    const style = el.getAttribute('style').toLowerCase();
+    if (style.includes('color:#fff') || style.includes('color: rgb(255')) {
+        el.style.color = "#000";
+    }
+    if (style.includes('opacity')) {
+        el.style.opacity = "1";
+    }
+});
+
 clone.style.position = 'absolute';
 clone.style.left = '0';
 clone.style.top = '0';
