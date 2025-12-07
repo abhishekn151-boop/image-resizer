@@ -68,9 +68,9 @@
     }
 
     .tool-card .desc {
-  text-align: justify;
-  line-height: 1.6;
-}
+      text-align: justify;
+      line-height: 1.6;
+    }
   </style>
 
 </head>
@@ -90,6 +90,7 @@
       if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
     });
 </script>
+
 <header class="head" style="text-align:center; margin-top:25px;">
   <h1>Free Tools Hub</h1>
   <p class="tagline">Fast, private, browser-based tools. No upload required.</p>
@@ -99,7 +100,16 @@
 
   <h2 style="color:#7fc6ff; margin-bottom:15px;">Our Tools</h2>
 
+  <!-- ADDED SECTION: SHORT DESCRIPTION -->
+  <p style="margin-top:10px; color:#c4d4e8; font-size:15px; text-align:justify;">
+    Free Tools Hub provides fast, private, and browser-based image tools that work fully offline.
+    Resize, compress, convert, or merge images instantly — all without uploading your files anywhere.
+    Safe, simple, and perfect for students, professionals, and everyday users.
+  </p>
+
   <div class="tools-grid">
+
+    <!-- (Your tool cards stay the same) -->
 
     <!-- TOOL 1 -->
     <div class="tool-card">
@@ -162,7 +172,48 @@ transparent areas with a clean white background for perfect results.
     </div>
 
   </div>
+
+
+
+
+  <!-- ADDED SECTION: WHY CHOOSE US -->
+  <h2 style="color:#7fc6ff; margin-top:50px;">Why Choose Free Tools Hub?</h2>
+  <p style="text-align:justify; color:#c4d4e8; margin-top:10px; font-size:15px;">
+    Our tools are built for speed, privacy, and simplicity. Everything runs 
+    directly inside your browser — no servers, no uploads, no waiting.  
+    Whether you need fast image conversions, clean PDF creation, or powerful compression,
+    Free Tools Hub provides reliable results without sacrificing privacy.
+  </p>
+
+
+  <!-- ADDED SECTION: FEATURES -->
+  <h2 style="color:#7fc6ff; margin-top:40px;">Key Features</h2>
+  <ul style="color:#cbd6e8; line-height:1.8; font-size:15px; padding-left:18px; text-align:justify;">
+    <li>✔ 100% offline — images never leave your device</li>
+    <li>✔ Fast performance with advanced browser APIs</li>
+    <li>✔ Clean user-friendly interface</li>
+    <li>✔ Safe, private, and secure image processing</li>
+    <li>✔ High-quality output for all conversion types</li>
+    <li>✔ Compatible with all modern devices and browsers</li>
+  </ul>
+
+
+  <!-- ADDED SECTION: SHORT FAQ -->
+  <h2 style="color:#7fc6ff; margin-top:40px;">Frequently Asked Questions</h2>
+
+  <h4 style="color:#9fcaff; margin-top:15px;">Do you store or upload images?</h4>
+  <p style="text-align:justify; color:#c4d4e8;">No. All tools are 100% browser-based. Your images never leave your device.</p>
+
+  <h4 style="color:#9fcaff; margin-top:15px;">Are these tools free to use?</h4>
+  <p style="text-align:justify; color:#c4d4e8;">Yes — all tools are completely free and require no sign-up.</p>
+
+  <h4 style="color:#9fcaff; margin-top:15px;">Do they work offline?</h4>
+  <p style="text-align:justify; color:#c4d4e8;">Yes, after the page loads, all processing works fully offline.</p>
+
 </div>
+
+
+
 <!-- FOOTER -->
 <footer class="vertical-footer" style="margin-top:40px;">
   <ul>
