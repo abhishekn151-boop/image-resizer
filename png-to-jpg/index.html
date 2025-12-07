@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>PNG to JPG Converter — Free Tools Hub</title>
+
+  <!-- FIXED: absolute path -->
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+
+  <!-- Updated SEO -->
+  <meta name="description" content="Convert PNG images to JPG instantly — fast, secure, and free." />
+
+  <!-- FIXED: absolute CSS path -->
+  <link rel="stylesheet" href="/style.css" />
+
+  <style>
+    .convert-container {
+      max-width: 950px;
+      margin: 30px auto;
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 25px;
+      align-items: stretch;
+    }
+    @media (max-width:900px){
+      .convert-container { grid-template-columns: 1fr; }
+    }
+
+    .convert-left {
+      background:#131d32;
+      padding:20px;
+      border-radius:10px;
+      border:1px solid #1d2944;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .drop-area {
+      background:#0f1829;
+      border:1px dashed #1e2c47;
+      padding:25px;
+      border-radius:10px;
+      color:#cfe9ff;
+      text-align:center;
+      cursor:pointer;
+    }
+    .drop-area.active {
+      border-color:#4aa8ff;
+      box-shadow:0 0 10px rgba(31,155,255,0.2);
+    }
+
+    .generate-btn {
+      width:100%;
+      padding:12px;
+      background:#1f9bff;
+      color:white;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      margin-top:15px;
+      font-size:16px;
+    }
+
+    .preview-box {
+      background:#0f1829;
+      border:1px solid #1d2944;
+      padding:20px;
+      border-radius:10px;
+      min-height:260px;
+      color:#dceeff;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .preview-img {
+      max-width:100%;
+      border-radius:8px;
+      object-fit:contain;
+      margin-bottom:15px;
+      border:1px solid #26354f;
+    }
+
+    .meta-box {
+      background:#0b1422;
+      padding:12px;
+      border-radius:8px;
+      border:1px solid #162636;
+      font-size:14px;
+      color:#cfe9ff;
+    }
+
+    .muted { color:#9fb1d6; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div id="navbar"></div>
+<script>
+  fetch("/components/navbar.html")  <!-- FIXED: absolute path -->
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("navbar").innerHTML = html;
+
+      const ham = document.getElementById("hamburger");
+      const menu = document.getElementById("mobileMenu");
+      if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
+    });
+</script>
+
+<header class="head" style="max-width:950px;margin:20px auto 0;padding:0 15px;">
+  <h1>PNG to JPG Converter</h1>
+  <p class="tagline">Upload a PNG image and download a JPG version instantly.</p>
+</header>
+
+<!-- MAIN TOOL -->
+<div class="convert-container">
+
+  <!-- LEFT PANEL -->
+  <div class="convert-left">
+
+    <h3 style="color:#7fc6ff;">Upload PNG Image</h3>
+
+    <div id="drop-area" class="drop-area">
+      <h3>Drop PNG here</h3>
+      <p class="muted">or click to browse</p>
+
+      <!-- unchanged -->
+      <input id="fileInput" type="file" accept="image/png" hidden>
+    </div>
+
+    <button id="convertBtn" class="generate-btn" disabled>Convert to JPG</button>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="preview-box">
+
+    <div id="noPreview" class="muted" style="text-align:center;">
+      No image selected. Upload a PNG to preview it here.
+    </div>
+
+    <img id="previewImg" class="preview-img hidden">
+
+    <div id="metaBox" class="meta-box hidden">
+      <strong id="fileName">—</strong>
+      <div style="margin-top:8px;">
+        <div>Dimensions: <span id="fileDim">—</span></div>
+        <div>Size: <span id="fileSize">—</span></div>
+        <div>Type: <span id="fileType">PNG (image/png)</span></div>
+      </div>
+    </div>
+  </div> <!-- END of .preview-box -->
+
+</div> <!-- END of .convert-container -->
+
+
+<!-- FOOTER -->
+<footer class="vertical-footer">
+  <ul>
+    <li><a href="/about.html">About Us</a></li>
+    <li><a href="/privacy.html">Privacy Policy</a></li>
+    <li><a href="/terms.html">Terms of Service</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="/faq.html">FAQ</a></li>
+  </ul>
+
+  <p>© <span id="year"></span> Free Tools Hub — All Rights Reserved.</p>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+<script>
+/* ELEMENTS */
+const dropArea = document.getElementById("drop-area");
+const fileInput = document.getElementById("fileInput");
+const previewImg = document.getElementById("previewImg");
+const metaBox = document.getElementById("metaBox");
+const noPreview = document.getElementById("noPreview");
+const convertBtn = document.getElementById("convertBtn");
+const fileNameEl = document.getElementById("fileName");
+const fileDimEl = document.getElementById("fileDim");
+const fileSizeEl = document.getElementById("fileSize");
+
+let currentFile = null;
+let currentURL = null;
+
+/* --- Click to upload --- */
+dropArea.addEventListener("click", () => fileInput.click());
+
+/* --- Drag & Drop --- */
+dropArea.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropArea.classList.add("active");
+});
+
+dropArea.addEventListener("dragleave", () => dropArea.classList.remove("active"));
+
+dropArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropArea.classList.remove("active");
+  handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener("change", () => {
+  handleFile(fileInput.files[0]);
+  fileInput.value = "";
+});
+
+/* --- Handle PNG File --- */
+function handleFile(file) {
+  if (!file) return;
+
+  if (file.type !== "image/png") {
+    alert("Only PNG images are supported.");
+    return;
+  }
+
+  currentFile = file;
+
+  if (currentURL) URL.revokeObjectURL(currentURL);
+  currentURL = URL.createObjectURL(file);
+
+  const img = new Image();
+  img.onload = () => {
+    previewImg.src = currentURL;
+    previewImg.classList.remove("hidden");
+
+    noPreview.classList.add("hidden");
+    metaBox.classList.remove("hidden");
+
+    fileNameEl.textContent = file.name;
+    fileDimEl.textContent = img.naturalWidth + " × " + img.naturalHeight + " px";
+    fileSizeEl.textContent = readable(file.size);
+
+    convertBtn.disabled = false;
+  };
+
+  img.src = currentURL;
+}
+
+/* --- Convert PNG → JPG --- */
+convertBtn.addEventListener("click", async () => {
+  if (!currentFile) return;
+
+  convertBtn.disabled = true;
+  convertBtn.textContent = "Converting...";
+
+  try {
+    const img = new Image();
+    img.src = currentURL;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+
+      const ctx = canvas.getContext("2d");
+
+      // FIX: white background for transparent PNG → JPG
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(img, 0, 0);
+
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        download(url, currentFile.name.replace(/\.png$/i, "") + ".jpg");
+        URL.revokeObjectURL(url);
+      }, "image/jpeg", 0.95);
+    };
+  } catch (err) {
+    alert("Conversion failed.");
+  }
+
+  convertBtn.disabled = false;
+  convertBtn.textContent = "Convert to JPG";
+});
+
+/* --- Download helper --- */
+function download(url, name) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/* --- Human-readable file size --- */
+function readable(bytes) {
+  if (bytes < 1024) return bytes + " B";
+
+  const units = ["KB", "MB", "GB"];
+  let i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+  return (bytes / Math.pow(1024, i)).toFixed(1) + " " + units[i - 1];
+}
+</script>
+
+</body>
+</html>
