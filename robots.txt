@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Optional but recommended:
+Disallow: /admin/
+Disallow: /private/
+Disallow: /backend/
+
+Crawl-delay: 1
+
+Sitemap: https://freetoolshub.net/sitemap.xml
