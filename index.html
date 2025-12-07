@@ -1,11 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url=/image-resizer/">
-  <link rel="canonical" href="/image-resizer/">
-  <title>Redirecting...</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Free Tools Hub — Free Online Image Tools</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+
+  <!-- SEO -->
+  <meta name="description" content="Free Tools Hub offers fast, private, browser-based tools for resizing images, compressing images, converting JPG/PNG, and creating PDF files." />
+  <meta name="keywords" content="image resizer, image compressor, jpg to png, png to jpg, image to pdf, free tools hub" />
+  <link rel="canonical" href="https://freetoolshub.net/" />
+
+  <!-- Global Style -->
+  <link rel="stylesheet" href="/style.css" />
+
+  <style>
+    /* PAGE STYLES */
+    .home-container {
+      max-width: 1150px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .tool-card {
+      background: #111a2e;
+      border: 1px solid #1d2944;
+      border-radius: 12px;
+      padding: 25px;
+      color: #dceeff;
+      transition: 0.25s;
+    }
+
+    .tool-card:hover {
+      border-color: #3ca9ff;
+      transform: translateY(-4px);
+    }
+
+    .tool-card h3 {
+      margin: 10px 0;
+      font-size: 20px;
+      color: #7fc6ff;
+    }
+
+    .tool-card p {
+      font-size: 14px;
+      color: #a9c4e8;
+      margin-bottom: 15px;
+    }
+
+    .tool-btn {
+      display: inline-block;
+      padding: 10px 16px;
+      background: #1f9bff;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+  </style>
+
 </head>
+
 <body>
-  <p>Redirecting to Free Image Resizer…</p>
+
+<!-- NAVBAR -->
+<div id="navbar"></div>
+<script>
+  fetch("/components/navbar.html")
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("navbar").innerHTML = html;
+
+      const ham = document.getElementById("hamburger");
+      const menu = document.getElementById("mobileMenu");
+      if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
+    });
+</script>
+<header class="head" style="text-align:center; margin-top:25px;">
+  <h1>Free Tools Hub</h1>
+  <p class="tagline">Fast, private, browser-based tools. No upload required.</p>
+</header>
+
+<div class="home-container">
+
+  <h2 style="color:#7fc6ff; margin-bottom:15px;">Our Tools</h2>
+
+  <div class="tools-grid">
+
+    <!-- TOOL 1 -->
+    <div class="tool-card">
+      <h3>Image Resizer</h3>
+      <p>Resize, compress, and convert images instantly inside your browser. 100% private.</p>
+      <a class="tool-btn" href="/image-resizer/">Open Tool</a>
+    </div>
+
+    <!-- TOOL 2 -->
+    <div class="tool-card">
+      <h3>Image Compressor</h3>
+      <p>Compress images to an exact file size (KB) without losing quality.</p>
+      <a class="tool-btn" href="/image-compressor/">Open Tool</a>
+    </div>
+
+    <!-- TOOL 3 -->
+    <div class="tool-card">
+      <h3>Image to PDF</h3>
+      <p>Convert one or multiple images into a single PDF file with high quality.</p>
+      <a class="tool-btn" href="/image-to-pdf/">Open Tool</a>
+    </div>
+
+    <!-- TOOL 4 -->
+    <div class="tool-card">
+      <h3>JPG to PNG</h3>
+      <p>Convert JPG images to PNG instantly with high-quality output.</p>
+      <a class="tool-btn" href="/jpg-to-png/">Open Tool</a>
+    </div>
+
+    <!-- TOOL 5 -->
+    <div class="tool-card">
+      <h3>PNG to JPG</h3>
+      <p>Convert PNG images to JPG instantly. Transparent PNG is filled with a white background.</p>
+      <a class="tool-btn" href="/png-to-jpg/">Open Tool</a>
+    </div>
+
+  </div>
+</div>
+<!-- FOOTER -->
+<footer class="vertical-footer" style="margin-top:40px;">
+  <ul>
+    <li><a href="/about.html">About Us</a></li>
+    <li><a href="/privacy.html">Privacy Policy</a></li>
+    <li><a href="/terms.html">Terms of Service</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="/faq.html">FAQ</a></li>
+  </ul>
+  <p>© <span id="year"></span> Free Tools Hub — All Rights Reserved.</p>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
 </body>
 </html>
