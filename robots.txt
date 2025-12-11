@@ -1,11 +1,11 @@
 User-agent: *
 Allow: /
 
-# Optional but recommended:
-Disallow: /admin/
-Disallow: /private/
-Disallow: /backend/
+# Block common useless paths (you can keep these for safety)
+Disallow: /cgi-bin/
+Disallow: /*?*utm_*
+Disallow: /*?*ref=*
 
-Crawl-delay: 1
+# No crawl delay (Google ignores it)
 
 Sitemap: https://freetoolshub.net/sitemap.xml
