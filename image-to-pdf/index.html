@@ -44,8 +44,7 @@
   <!-- Global CSS -->
   <link rel="stylesheet" href="/style.css" />
 
-  <!-- Preload -->
-  
+  <!-- Preconnect -->
   <link rel="preconnect" href="https://www.googletagmanager.com" />
 
   <!-- JSON-LD: SoftwareApplication -->
@@ -100,7 +99,7 @@
   }
   </script>
 
-  <!-- Styles specific to this tool (your original layout preserved) -->
+  <!-- TOOL-SPECIFIC CSS -->
   <style>
     .pdf-container {
       max-width: 1150px;
@@ -171,6 +170,7 @@
   </style>
 </head>
 <body>
+
 <!-- TOP NAVIGATION BAR -->
 <div id="navbar"></div>
 <script>
@@ -202,7 +202,7 @@
     <div id="drop-area" class="drop-area" style="padding:20px; text-align:center;">
       <h3>Drop images here</h3>
       <p class="note-small">or click to browse</p>
-      <input id="fileInput" type="file" accept="image/*" multiple hidden />
+      <input id="fileInput" type="file" accept="image/*" multiple hidden>
     </div>
 
     <h3 style="margin-top:25px; color:#7fc6ff;">Page Size</h3>
@@ -215,8 +215,8 @@
     </select>
 
     <div id="customSizeRow" style="display:none; margin-top:10px;">
-      <input id="customWidth" class="small-input" type="number" placeholder="Width" />
-      <input id="customHeight" class="small-input" type="number" placeholder="Height" style="margin-top:8px;" />
+      <input id="customWidth" class="small-input" type="number" placeholder="Width">
+      <input id="customHeight" class="small-input" type="number" placeholder="Height" style="margin-top:8px;">
       <select id="customUnit" class="small-input" style="margin-top:8px;">
         <option value="mm">mm</option>
         <option value="cm">cm</option>
@@ -381,7 +381,7 @@
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
-<!-- MAIN SCRIPT (Processing Logic — UNCHANGED) -->
+<!-- MAIN SCRIPT (Processing Logic — EXACT WORKING VERSION) -->
 <script>
 /* -----------------------------------------
    BASIC ELEMENTS
@@ -700,12 +700,5 @@ generateBtn.addEventListener("click", async () => {
   generateBtn.textContent = "Generate PDF";
 });
 </script>
-<!-- Lazy Loading Enhancement -->
-<script>
-  document.querySelectorAll("img").forEach(img => {
-    img.loading = "lazy";
-  });
-</script>
-
 </body>
 </html>
