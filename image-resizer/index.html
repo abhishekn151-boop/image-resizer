@@ -130,14 +130,6 @@
 <header class="head">
   <h1>Free Image Resizer</h1>
   <p class="tagline">Resize, compress, and convert images instantly — 100% offline and private.</p>
-
-  <!-- Added: contextual internal links for SEO -->
-  <div style="margin-top:10px; font-size:14px;">
-    <a href="/image-compressor/" style="color:#7fc6ff;">Compress Images</a> ·
-    <a href="/image-to-pdf/" style="color:#7fc6ff;">Convert to PDF</a> ·
-    <a href="/jpg-to-png/" style="color:#7fc6ff;">JPG to PNG</a> ·
-    <a href="/png-to-jpg/" style="color:#7fc6ff;">PNG to JPG</a>
-  </div>
 </header>
 
 <!-- TOOL -->
@@ -234,33 +226,77 @@
   </ol>
 
   <!-- Added Related Tools for SEO internal linking -->
-  <h3>Related Tools</h3>
-  <ul>
-    <li><a href="/image-compressor/">Image Compressor</a> – Reduce file size even further</li>
-    <li><a href="/image-to-pdf/">Image to PDF Converter</a></li>
-    <li><a href="/jpg-to-png/">JPG to PNG Converter</a></li>
-    <li><a href="/png-to-jpg/">PNG to JPG Converter</a></li>
-  </ul>
+<h3>Related Tools</h3>
+<div class="related-tools-btns">
+  <a class="tool-btn" href="/image-compressor/">Image Compressor</a>
+  <a class="tool-btn" href="/image-to-pdf/">Image to PDF</a>
+  <a class="tool-btn" href="/jpg-to-png/">JPG to PNG</a>
+  <a class="tool-btn" href="/png-to-jpg/">PNG to JPG</a>
+</div>
 
 </section>
 <!-- FOOTER -->
 <footer class="vertical-footer">
-  <ul>
-    <li><a href="/about.html">About Us</a></li>
-    <li><a href="/privacy.html">Privacy Policy</a></li>
-    <li><a href="/terms.html">Terms of Service</a></li>
-    <li><a href="/contact.html">Contact</a></li>
-    <li><a href="/faq.html">FAQ</a></li>
+  <div class="footer-columns">
 
-    <!-- Added: SEO internal links for structure -->
-    <li><a href="/image-compressor/">Image Compressor</a></li>
-    <li><a href="/image-to-pdf/">Image to PDF</a></li>
-    <li><a href="/jpg-to-png/">JPG to PNG</a></li>
-    <li><a href="/png-to-jpg/">PNG to JPG</a></li>
-  </ul>
+    <!-- Column 1: Site Pages -->
+    <ul>
+      <li><strong>Site</strong></li>
+      <li><a href="/about.html">About Us</a></li>
+      <li><a href="/privacy.html">Privacy Policy</a></li>
+      <li><a href="/terms.html">Terms of Service</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+      <li><a href="/faq.html">FAQ</a></li>
+    </ul>
+
+    <!-- Column 2: Tools -->
+    <ul>
+      <li><strong>Tools</strong></li>
+      <li><a href="/image-compressor/">Image Compressor</a></li>
+      <li><a href="/image-to-pdf/">Image to PDF</a></li>
+      <li><a href="/jpg-to-png/">JPG to PNG</a></li>
+      <li><a href="/png-to-jpg/">PNG to JPG</a></li>
+    </ul>
+
+  </div>
 
   <p>© <span id="year"></span> Free Tools Hub — All Rights Reserved.</p>
 </footer>
+
+<style>
+.footer-columns {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.footer-columns ul li:first-child {
+  color: #7fc6ff;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.related-tools-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.tool-btn {
+  background: #1f9bff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.tool-btn:hover {
+  background: #0d7ed6;
+}
+</style>
 
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
