@@ -3,97 +3,150 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Free Image Resizer — Resize & Compress Images Online</title>
 
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QZBLMM34MW"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <title>Free Image Resizer — Resize, Compress & Convert Images Online</title>
 
-  gtag('config', 'G-QZBLMM34MW');
-</script>
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <!-- Robots -->
+  <meta name="robots" content="index, follow" />
 
-  <!-- OpenGraph -->
-  <meta property="og:image" content="/assets/logo.png" />
-
-  <!-- SEO -->
-  <meta name="description" content="Free Image Resizer — resize, compress, crop and convert images in your browser. Fast, private and free." />
-  <meta name="keywords" content="free image resizer, resize image online, compress image, crop image, convert to webp" />
+  <!-- Primary SEO -->
+  <meta name="description" content="Resize, compress and convert images instantly in your browser. 100% private, no upload needed. Supports JPG, PNG, WebP and custom dimensions." />
+  <meta name="keywords" content="image resizer, resize image online, compress image, reduce image size, jpg to webp, online image tool" />
 
   <!-- Canonical -->
   <link rel="canonical" href="https://freetoolshub.net/image-resizer/" />
 
-  <!-- JSON-LD (App) -->
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Free Image Resizer — Resize & Compress Images Online" />
+  <meta property="og:description" content="Fast, private and offline image resizing. Reduce image size, compress photos and convert formats instantly." />
+  <meta property="og:image" content="https://freetoolshub.net/assets/logo.png" />
+  <meta property="og:url" content="https://freetoolshub.net/image-resizer/" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Free Image Resizer — Fast Online Image Tool" />
+  <meta name="twitter:description" content="Resize and compress images instantly with no upload required." />
+  <meta name="twitter:image" content="https://freetoolshub.net/assets/logo.png" />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZBLMM34MW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QZBLMM34MW');
+  </script>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- JSON-LD: Software Application -->
   <script type="application/ld+json">
   {
-    "@context":"https://schema.org/",
-    "@type":"SoftwareApplication",
-    "name":"Free Image Resizer",
-    "description":"Resize, compress, crop and convert images offline in your browser.",
-    "applicationCategory":"ImageEditing",
-    "operatingSystem":"All",
-    "url":"https://freetoolshub.net/image-resizer/",
-    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Free Image Resizer",
+    "operatingSystem": "Web",
+    "applicationCategory": "ImageEditing",
+    "description": "Resize, compress, crop and convert images offline in your browser.",
+    "url": "https://freetoolshub.net/image-resizer/",
+    "image": "https://freetoolshub.net/assets/logo.png",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
   }
   </script>
 
-  <!-- JSON-LD (FAQ) -->
+  <!-- JSON-LD: Breadcrumbs -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://freetoolshub.net/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Image Resizer",
+        "item": "https://freetoolshub.net/image-resizer/"
+      }
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD: FAQ -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
     "@type":"FAQPage",
     "mainEntity":[
-      {"@type":"Question","name":"Is this tool free?","acceptedAnswer":{"@type":"Answer","text":"Yes, fully 100% free."}},
-      {"@type":"Question","name":"Do images get uploaded?","acceptedAnswer":{"@type":"Answer","text":"No, everything happens inside your browser."}}
+      {
+        "@type":"Question",
+        "name":"Is this tool free?",
+        "acceptedAnswer":{"@type":"Answer","text":"Yes, it is fully free with no limits."}
+      },
+      {
+        "@type":"Question",
+        "name":"Do images get uploaded to a server?",
+        "acceptedAnswer":{"@type":"Answer","text":"No. Everything happens offline in your browser."}
+      },
+      {
+        "@type":"Question",
+        "name":"Can I reduce image size to a specific KB?",
+        "acceptedAnswer":{"@type":"Answer","text":"Yes, enter your target size in KB and the tool will match it automatically."}
+      }
     ]
   }
   </script>
-
-  <!-- FIXED: CSS path -->
-  <link rel="stylesheet" href="/style.css" />
 
 </head>
 <body>
 
 <!-- TOP NAVIGATION BAR -->
-  <div id="navbar"></div>
+<div id="navbar"></div>
 <script>
-  fetch("/components/navbar.html")     <!-- FIXED PATH -->
+  fetch("/components/navbar.html")
     .then(r => r.text())
     .then(html => {
       document.getElementById("navbar").innerHTML = html;
-
-      // Attach hamburger listener AFTER navbar loads
       const ham = document.getElementById("hamburger");
       const menu = document.getElementById("mobileMenu");
-
-      if (ham && menu) {
-        ham.onclick = () => {
-          menu.classList.toggle("active");
-        };
-      }
+      if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
     });
 </script>
 
 <!-- HEADER -->
 <header class="head">
   <h1>Free Image Resizer</h1>
-  <p class="tagline">Fast Private Browser-based No upload required.</p>
+  <p class="tagline">Resize, compress, and convert images instantly — 100% offline and private.</p>
+
+  <!-- Added: contextual internal links for SEO -->
+  <div style="margin-top:10px; font-size:14px;">
+    <a href="/image-compressor/" style="color:#7fc6ff;">Compress Images</a> ·
+    <a href="/image-to-pdf/" style="color:#7fc6ff;">Convert to PDF</a> ·
+    <a href="/jpg-to-png/" style="color:#7fc6ff;">JPG to PNG</a> ·
+    <a href="/png-to-jpg/" style="color:#7fc6ff;">PNG to JPG</a>
+  </div>
 </header>
 
 <!-- TOOL -->
 <div class="tool-container">
 
   <!-- UPLOAD -->
-  <div id="drop-area" class="drop-area" role="button">
+  <div id="drop-area" class="drop-area" role="button" aria-label="Upload or drop images for resizing">
     <h2>Drop Images Here</h2>
     <p>or click to upload</p>
-
     <input type="file" id="fileInput" accept="image/*" hidden />
   </div>
 
@@ -101,7 +154,7 @@
   <div class="settings">
     <h3>Resize & Compression</h3>
 
-    <label>Resize Type</label>
+    <label for="resizeType">Resize Type</label>
     <select id="resizeType">
       <option value="px">By Pixels</option>
       <option value="percent">By Percent</option>
@@ -109,20 +162,20 @@
     </select>
 
     <p class="note-small" style="margin-top:10px; margin-bottom:10px; text-align: justify;">
-      Note: If you do not want to change width & height, leave these fields blank.
+      Leave the width and height blank if you want the tool to automatically maintain aspect ratio.
     </p>
 
-    <label>Width</label>
+    <label for="widthInput">Width</label>
     <input type="number" id="widthInput" placeholder="Auto" />
 
-    <label>Height</label>
+    <label for="heightInput">Height</label>
     <input type="number" id="heightInput" placeholder="Auto" />
 
     <h3 style="margin-top:5px; margin-bottom:10px;">Target File Size (KB)</h3>
     <input id="targetSizeKB" type="number" min="1" placeholder="e.g. 150" />
 
     <p class="note-small" style="margin-top:10px; margin-bottom:10px; text-align: justify;">
-      We match your target using smart compression & scaling.
+      Our smart compression algorithm adjusts quality and scaling to match your target file size.
     </p>
 
     <h3 style="margin-top:5px; margin-bottom:10px;">Format</h3>
@@ -135,7 +188,7 @@
   <!-- PREVIEW -->
   <div class="preview-section">
     <h3>Preview</h3>
-    <img id="previewImg" class="preview-img" alt="Preview will appear here" />
+    <img id="previewImg" class="preview-img" alt="Preview of resized image will appear here" />
     <p id="previewInfo"></p>
   </div>
 
@@ -148,7 +201,7 @@
 </div>
 
 <!-- LOADER -->
-<div id="loadingOverlay" class="loading-overlay hidden">
+<div id="loadingOverlay" class="loading-overlay hidden" aria-hidden="true">
   <div class="spinner"></div>
   <p>Processing image...</p>
 </div>
@@ -157,31 +210,39 @@
 <section class="seo-section">
   <h2>Resize and Compress Images Online — Fast, Free & Secure</h2>
   <p>
-    Our online image resizer allows you to quickly reduce image size,
-    adjust dimensions, crop photos, and convert formats — all directly in your browser.
-    No uploads, no servers, no data collection. Everything stays on your device.
+    Free Tools Hub provides a fast and efficient online image resizer.
+    Resize images by pixel, percentage, or physical dimensions without losing quality.
+    All processing is done <strong>offline inside your browser</strong>, ensuring complete privacy.
   </p>
 
-  <h3>Key Features</h3>
+  <h3>Why Use Our Image Resizer?</h3>
   <ul>
-    <li>Resize by pixels, percentage, or longest side</li>
-    <li>Compress images with adjustable quality or target size</li>
-    <li>Crop with draggable precision</li>
-    <li>Rotate images</li>
-    <li>Convert between JPG, PNG, and WebP</li>
-    <li>100% offline and private</li>
+    <li>Instant processing — no server upload</li>
+    <li>Reduce file size without visible quality loss</li>
+    <li>Convert between JPG, PNG, and WebP formats</li>
+    <li>Perfect for documents, websites, forms, and social media</li>
+    <li>Works on mobile, tablet, and desktop browsers</li>
   </ul>
 
-  <h3>How to Use</h3>
+  <h3>How to Use the Image Resizer</h3>
   <ol>
-    <li>Click the upload area or drag your image into the tool.</li>
-    <li>Select resize type: pixels, percent, or longest side.</li>
-    <li>Enter the <strong>Target File Size (KB)</strong> and choose output format.</li>
-    <li>Click "Process Image" to resize or compress.</li>
-    <li>Preview and download the optimized image.</li>
+    <li>Upload your image or drag it into the drop area.</li>
+    <li>Choose resize mode: pixels, percentage, or centimeters.</li>
+    <li>Optionally enter your desired target file size in KB.</li>
+    <li>Select output format (JPG or WebP).</li>
+    <li>Click <strong>Process Image</strong> and download your optimized file.</li>
   </ol>
-</section>
 
+  <!-- Added Related Tools for SEO internal linking -->
+  <h3>Related Tools</h3>
+  <ul>
+    <li><a href="/image-compressor/">Image Compressor</a> – Reduce file size even further</li>
+    <li><a href="/image-to-pdf/">Image to PDF Converter</a></li>
+    <li><a href="/jpg-to-png/">JPG to PNG Converter</a></li>
+    <li><a href="/png-to-jpg/">PNG to JPG Converter</a></li>
+  </ul>
+
+</section>
 <!-- FOOTER -->
 <footer class="vertical-footer">
   <ul>
@@ -190,16 +251,36 @@
     <li><a href="/terms.html">Terms of Service</a></li>
     <li><a href="/contact.html">Contact</a></li>
     <li><a href="/faq.html">FAQ</a></li>
+
+    <!-- Added: SEO internal links for structure -->
+    <li><a href="/image-compressor/">Image Compressor</a></li>
+    <li><a href="/image-to-pdf/">Image to PDF</a></li>
+    <li><a href="/jpg-to-png/">JPG to PNG</a></li>
+    <li><a href="/png-to-jpg/">PNG to JPG</a></li>
   </ul>
-  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
+
+  <p>© <span id="year"></span> Free Tools Hub — All Rights Reserved.</p>
 </footer>
 
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
-<!-- FIXED: JS PATH -->
+<!-- Added: Preload instructions for performance -->
+<link rel="preload" href="/app.js" as="script">
+
+<!-- Added: Preconnect for CDN used by GTM -->
+<link rel="preconnect" href="https://www.googletagmanager.com">
+
+<!-- Main JS -->
 <script type="module" src="/app.js"></script>
+
+<!-- Added: Lazy loading support for images -->
+<script>
+  document.querySelectorAll("img").forEach(img => {
+    img.loading = "lazy";
+  });
+</script>
 
 </body>
 </html>
