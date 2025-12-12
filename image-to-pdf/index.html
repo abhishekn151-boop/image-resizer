@@ -4,103 +4,32 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-  <title>Image to PDF Converter — Convert Images into PDF Online | Free Tools Hub</title>
+  <title>Image → PDF Converter — Free Tools Hub</title>
 
-  <!-- Robots -->
-  <meta name="robots" content="index, follow" />
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QZBLMM34MW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  <!-- Primary SEO -->
-  <meta name="description" content="Convert one or multiple images into a single high-quality PDF file online. 100% free, fast, and private — works fully in your browser." />
-  <meta name="keywords" content="image to pdf, convert image to pdf, jpg to pdf, png to pdf, merge images into pdf" />
+  gtag('config', 'G-QZBLMM34MW');
+</script>
 
-  <!-- Canonical -->
-  <link rel="canonical" href="https://freetoolshub.net/image-to-pdf/" />
-
-  <!-- Favicon -->
+  <!-- FIXED: favicon absolute path -->
   <link rel="icon" type="image/png" href="/assets/favicon.png" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Image to PDF Converter — Free Online Tool" />
-  <meta property="og:description" content="Convert images (JPG, PNG, WebP) to a single PDF instantly. No upload required." />
-  <meta property="og:image" content="https://freetoolshub.net/assets/logo.png" />
-  <meta property="og:url" content="https://freetoolshub.net/image-to-pdf/" />
-  <meta property="og:type" content="website" />
+  <!-- FIXED: SEO description -->
+  <meta name="description" content="Convert one or multiple images into a single high-quality PDF online, instantly and free." />
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Image to PDF Converter — Free Tools Hub" />
-  <meta name="twitter:description" content="Convert multiple images into a single high-quality PDF file instantly." />
-  <meta name="twitter:image" content="https://freetoolshub.net/assets/logo.png" />
-
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZBLMM34MW"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-QZBLMM34MW');
-  </script>
-
-  <!-- Global CSS -->
+  <!-- FIXED: Global CSS absolute path -->
   <link rel="stylesheet" href="/style.css" />
 
-  <!-- Preconnect -->
-  <link rel="preconnect" href="https://www.googletagmanager.com" />
+  <!-- jsPDF (unchanged) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- JSON-LD: SoftwareApplication -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Image to PDF Converter",
-    "operatingSystem": "Web",
-    "applicationCategory": "ImageEditing",
-    "description": "Convert one or multiple images into a single PDF file securely offline.",
-    "url": "https://freetoolshub.net/image-to-pdf/",
-    "image": "https://freetoolshub.net/assets/logo.png",
-    "offers": { "@type":"Offer", "price":"0", "priceCurrency":"USD" }
-  }
-  </script>
-
-  <!-- JSON-LD: Breadcrumbs -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://freetoolshub.net/" },
-      { "@type": "ListItem", "position": 2, "name": "Image to PDF", "item": "https://freetoolshub.net/image-to-pdf/" }
-    ]
-  }
-  </script>
-
-  <!-- JSON-LD: FAQ -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"FAQPage",
-    "mainEntity":[
-      {
-        "@type":"Question",
-        "name":"Is the image to PDF converter free?",
-        "acceptedAnswer":{"@type":"Answer","text":"Yes, it is 100% free with no limits or watermarks."}
-      },
-      {
-        "@type":"Question",
-        "name":"Are my images uploaded to any server?",
-        "acceptedAnswer":{"@type":"Answer","text":"No. All processing happens offline in your browser."}
-      },
-      {
-        "@type":"Question",
-        "name":"Can I combine multiple images into one PDF?",
-        "acceptedAnswer":{"@type":"Answer","text":"Yes. Upload multiple images and export a single PDF instantly."}
-      }
-    ]
-  }
-  </script>
-
-  <!-- TOOL-SPECIFIC CSS -->
   <style>
+    /* LAYOUT LIKE IMAGE RESIZER */
     .pdf-container {
       max-width: 1150px;
       margin: 30px auto;
@@ -110,8 +39,11 @@
       gap: 25px;
     }
     @media (max-width:900px){
-      .pdf-container { grid-template-columns: 1fr; }
+      .pdf-container {
+        grid-template-columns: 1fr;
+      }
     }
+
     .pdf-settings {
       background:#131d32;
       padding:20px;
@@ -119,6 +51,7 @@
       border-radius:10px;
       height: fit-content;
     }
+
     .thumbs-box {
       background:#0f1829;
       border:1px solid #1d2944;
@@ -126,12 +59,14 @@
       border-radius:10px;
       min-height:190px;
     }
+
     .thumb-list {
       display:flex;
       flex-wrap:wrap;
       gap:10px;
       min-height:160px;
     }
+
     .thumb {
       width:110px;
       padding:8px;
@@ -141,6 +76,7 @@
       cursor:grab;
       text-align:center;
     }
+
     .thumb img {
       width:100%;
       height:70px;
@@ -148,6 +84,12 @@
       border-radius:6px;
       margin-bottom:6px;
     }
+
+    .thumb.dragging {
+      opacity:.4;
+      transform:scale(.97);
+    }
+
     .small-input {
       width:100%;
       padding:10px;
@@ -156,6 +98,7 @@
       background:#0f1829;
       color:#e8ecf4;
     }
+
     .generate-btn {
       width:100%;
       padding:12px;
@@ -174,27 +117,29 @@
 <!-- TOP NAVIGATION BAR -->
 <div id="navbar"></div>
 <script>
-  fetch("/components/navbar.html")
+  fetch("/components/navbar.html")   // FIXED: absolute path
     .then(r => r.text())
     .then(html => {
       document.getElementById("navbar").innerHTML = html;
 
       const ham = document.getElementById("hamburger");
       const menu = document.getElementById("mobileMenu");
-      if (ham && menu) ham.onclick = () => menu.classList.toggle("active");
+
+      if (ham && menu) {
+        ham.onclick = () => menu.classList.toggle("active");
+      }
     });
 </script>
 
-<!-- HEADER -->
 <header class="head">
   <h1>Image to PDF Converter</h1>
-  <p class="tagline">Convert multiple images into a single high-quality PDF — fast, free & private.</p>
+  <p class="tagline">Upload multiple images and convert them into a single PDF in original quality.</p>
 </header>
 
 <!-- MAIN TOOL -->
 <div class="pdf-container">
 
-  <!-- SETTINGS COLUMN -->
+  <!-- SETTINGS -->
   <div class="pdf-settings">
 
     <h3 style="color:#7fc6ff;">Upload Images</h3>
@@ -202,6 +147,8 @@
     <div id="drop-area" class="drop-area" style="padding:20px; text-align:center;">
       <h3>Drop images here</h3>
       <p class="note-small">or click to browse</p>
+
+      <!-- no change -->
       <input id="fileInput" type="file" accept="image/*" multiple hidden>
     </div>
 
@@ -235,157 +182,39 @@
     <button id="generateBtn" class="generate-btn">Generate PDF</button>
 
   </div>
-
-  <!-- PREVIEW / THUMBNAILS COLUMN -->
+  <!-- PREVIEW / THUMBNAILS -->
   <div class="thumbs-box">
-
     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
       <strong>Selected Images</strong>
       <span id="count" class="note-small">0 files</span>
     </div>
 
     <div id="thumbList" class="thumb-list"></div>
-
   </div>
 
 </div> <!-- END .pdf-container -->
-<!-- SEO CONTENT -->
-<section class="seo-section">
-  <h2>Convert Images to PDF — Fast, Secure & High Quality</h2>
-  <p>
-    Free Tools Hub provides a simple but powerful online image-to-PDF converter. 
-    Upload multiple photos and combine them into one high-quality PDF file. 
-    All processing happens <strong>inside your browser</strong> — nothing is uploaded to any server.
-  </p>
 
-  <h3>Why Use Our Image to PDF Converter?</h3>
-  <ul>
-    <li>Combine multiple images into a single PDF</li>
-    <li>Supports JPG, PNG, WEBP, and more</li>
-    <li>Offline processing ensures 100% privacy</li>
-    <li>Custom page size (A4, Letter, Legal, Custom)</li>
-    <li>Easy drag-and-drop rearranging of pages</li>
-    <li>Works on mobile, tablet, and desktop</li>
-  </ul>
-
-  <h3>How to Convert Images to PDF</h3>
-  <ol>
-    <li>Upload your images using drag-and-drop or file picker.</li>
-    <li>Choose a page size or use original image size.</li>
-    <li>Select portrait or landscape orientation.</li>
-    <li>Reorder images by dragging thumbnails.</li>
-    <li>Click <strong>Generate PDF</strong> to download the merged file.</li>
-  </ol>
-
-  <h3>Related Tools</h3>
-  <div class="related-tools-btns">
-    <a class="tool-btn" href="/image-resizer/">Image Resizer</a>
-    <a class="tool-btn" href="/image-compressor/">Image Compressor</a>
-    <a class="tool-btn" href="/jpg-to-png/">JPG to PNG</a>
-    <a class="tool-btn" href="/png-to-jpg/">PNG to JPG</a>
-  </div>
-</section>
 
 <!-- FOOTER -->
 <footer class="vertical-footer">
-  <div class="footer-container">
+  <ul>
+    <li><a href="/about.html">About Us</a></li>
+    <li><a href="/privacy.html">Privacy Policy</a></li>
+    <li><a href="/terms.html">Terms of Service</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+    <li><a href="/faq.html">FAQ</a></li>
+  </ul>
 
-    <!-- Column 1 -->
-    <div class="footer-col">
-      <h4>Site</h4>
-      <a href="/about.html">About Us</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/terms.html">Terms of Service</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/faq.html">FAQ</a>
-    </div>
-
-    <!-- Column 2 -->
-    <div class="footer-col">
-      <h4>Tools</h4>
-      <a href="/image-compressor/">Image Compressor</a>
-      <a href="/image-resizer/">Image Resizer</a>
-      <a href="/image-to-pdf/">Image to PDF</a>
-      <a href="/jpg-to-png/">JPG to PNG</a>
-      <a href="/png-to-jpg/">PNG to JPG</a>
-    </div>
-
-  </div>
-
-  <p class="footer-copy">© <span id="year"></span> Free Tools Hub — All Rights Reserved.</p>
+  <p>© <span id="year"></span> Free Tools Hub — All Rights Reserved.</p>
 </footer>
-
-<style>
-.footer-container {
-  display: flex;
-  justify-content: center;
-  gap: 80px;
-  padding: 30px 0;
-  flex-wrap: wrap;
-}
-
-.footer-col {
-  display: flex;
-  flex-direction: column;
-  min-width: 150px;
-}
-
-.footer-col h4 {
-  color: #7fc6ff;
-  font-weight: bold;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.footer-col a {
-  color: #c9d6e2;
-  text-decoration: none;
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-.footer-col a:hover {
-  color: #ffffff;
-}
-
-.footer-copy {
-  text-align: center;
-  margin-top: 10px;
-  padding-bottom: 20px;
-  font-size: 14px;
-  color: #b0c4d4;
-}
-
-.related-tools-btns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.tool-btn {
-  background: #1f9bff;
-  padding: 10px 14px;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.tool-btn:hover {
-  background: #0d7ed6;
-}
-</style>
 
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
-<!-- MAIN SCRIPT (Processing Logic — EXACT WORKING VERSION) -->
 <script>
-/* -----------------------------------------
+/* ----------------------------
    BASIC ELEMENTS
------------------------------------------- */
+----------------------------- */
 const { jsPDF } = window.jspdf;
 
 const dropArea = document.getElementById("drop-area");
@@ -394,19 +223,17 @@ const thumbList = document.getElementById("thumbList");
 const countEl = document.getElementById("count");
 const pageSizeEl = document.getElementById("pageSize");
 const orientationEl = document.getElementById("orientation");
-
 const customSizeRow = document.getElementById("customSizeRow");
 const customWidth = document.getElementById("customWidth");
 const customHeight = document.getElementById("customHeight");
 const customUnit = document.getElementById("customUnit");
-
 const generateBtn = document.getElementById("generateBtn");
 
-let files = [];  // { file, url, id, img }
+let files = []; // { file, url, id, img }
 
-/* -----------------------------------------
+/* ----------------------------
    FILE HANDLING
------------------------------------------- */
+----------------------------- */
 function handleFilesList(list) {
   const arr = Array.from(list);
 
@@ -416,7 +243,8 @@ function handleFilesList(list) {
     const id = Math.random().toString(36).slice(2, 9);
     const url = URL.createObjectURL(file);
 
-    const item = { file, url, id, img: null };
+    let item = { file, url, id, img: null };
+
     files.push(item);
 
     const img = new Image();
@@ -451,9 +279,9 @@ function updateCount() {
   countEl.textContent = files.length + " file" + (files.length === 1 ? "" : "s");
 }
 
-/* -----------------------------------------
+/* ----------------------------
    RENDER THUMBNAILS
------------------------------------------- */
+----------------------------- */
 function createThumb(item, index) {
   const div = document.createElement("div");
   div.className = "thumb";
@@ -502,7 +330,7 @@ function createThumb(item, index) {
   removeBtn.style.cursor = "pointer";
 
   removeBtn.onclick = () => {
-    files = files.filter(f => f.id !== item.id);
+    files = files.filter((f) => f.id !== item.id);
     renderThumbs();
   };
 
@@ -519,15 +347,15 @@ function createThumb(item, index) {
 
 function renderThumbs() {
   thumbList.innerHTML = "";
-  files.forEach((item, index) => {
-    thumbList.appendChild(createThumb(item, index));
+  files.forEach((item, i) => {
+    thumbList.appendChild(createThumb(item, i));
   });
   updateCount();
 }
 
-/* -----------------------------------------
+/* ----------------------------
    DRAG TO REORDER
------------------------------------------- */
+----------------------------- */
 thumbList.addEventListener("dragover", (e) => {
   e.preventDefault();
 
@@ -535,6 +363,7 @@ thumbList.addEventListener("dragover", (e) => {
   if (!dragging) return;
 
   const afterElement = getDragAfterElement(thumbList, e.clientX, e.clientY);
+
   if (afterElement == null) {
     thumbList.appendChild(dragging);
   } else {
@@ -568,11 +397,12 @@ function getDragAfterElement(container, mouseX, mouseY) {
   ).element;
 }
 
-/* -----------------------------------------
+/* ----------------------------
    DELETE SELECTED
------------------------------------------- */
+----------------------------- */
 document.getElementById("deleteSelectedBtn").addEventListener("click", () => {
-  const selected = [...document.querySelectorAll(".select-checkbox:checked")].map(cb => cb.dataset.id);
+  const selected = [...document.querySelectorAll(".select-checkbox:checked")]
+    .map(cb => cb.dataset.id);
 
   if (!selected.length) return alert("No images selected.");
 
@@ -580,27 +410,27 @@ document.getElementById("deleteSelectedBtn").addEventListener("click", () => {
   renderThumbs();
 });
 
-/* -----------------------------------------
+/* ----------------------------
    DELETE ALL
------------------------------------------- */
+----------------------------- */
 document.getElementById("deleteAllBtn").addEventListener("click", () => {
   if (!files.length) return;
   if (!confirm("Delete ALL images?")) return;
-
   files = [];
   renderThumbs();
 });
 
-/* -----------------------------------------
+/* ----------------------------
    PAGE SIZE UI
------------------------------------------- */
+----------------------------- */
 pageSizeEl.addEventListener("change", () => {
-  customSizeRow.style.display = pageSizeEl.value === "custom" ? "block" : "none";
+  customSizeRow.style.display =
+    pageSizeEl.value === "custom" ? "block" : "none";
 });
 
-/* -----------------------------------------
+/* ----------------------------
    GENERATE PDF
------------------------------------------- */
+----------------------------- */
 generateBtn.addEventListener("click", async () => {
   if (!files.length) return alert("Please upload at least one image.");
 
@@ -610,60 +440,62 @@ generateBtn.addEventListener("click", async () => {
   try {
     const docPages = [];
 
-    for (const item of files) {
+    for (let item of files) {
       const img = item.img;
-      if (!img) continue;
-
       const orientation = orientationEl.value;
-      let pageW, pageH;
+
+      if (!img) continue;
 
       if (pageSizeEl.value === "original") {
         docPages.push({
           width: img.naturalWidth,
           height: img.naturalHeight,
           image: img,
-          orientation
+          orientation,
         });
-        continue;
-      }
+      } else {
+        let pageW, pageH;
 
-      if (pageSizeEl.value === "a4") pageW = 210, pageH = 297;
-      else if (pageSizeEl.value === "letter") pageW = 216, pageH = 279;
-      else if (pageSizeEl.value === "legal") pageW = 216, pageH = 356;
-      else {
-        let W = Number(customWidth.value);
-        let H = Number(customHeight.value);
+        if (pageSizeEl.value === "a4") pageW = 210, pageH = 297;
+        else if (pageSizeEl.value === "letter") pageW = 216, pageH = 279;
+        else if (pageSizeEl.value === "legal") pageW = 216, pageH = 356;
+        else {
+          let W = Number(customWidth.value);
+          let H = Number(customHeight.value);
+          const unit = customUnit.value;
 
-        const unit = customUnit.value;
-        if (unit === "cm") W *= 10, H *= 10;
-        if (unit === "px") {
-          const DPI = 96;
-          W = (W / DPI) * 25.4;
-          H = (H / DPI) * 25.4;
+          if (unit === "cm") {
+            W = W * 10;
+            H = H * 10;
+          }
+          if (unit === "px") {
+            const DPI = 96;
+            W = (W / DPI) * 25.4;
+            H = (H / DPI) * 25.4;
+          }
+
+          pageW = W;
+          pageH = H;
         }
 
-        pageW = W;
-        pageH = H;
+        const DPI = 96;
+        const mmToPx = (mm) => Math.round((mm / 25.4) * DPI);
+
+        let pxW = mmToPx(pageW), pxH = mmToPx(pageH);
+
+        if (orientation === "landscape") [pxW, pxH] = [pxH, pxW];
+
+        const scale = Math.min(pxW / img.naturalWidth, pxH / img.naturalHeight, 1);
+
+        docPages.push({
+          width: pxW,
+          height: pxH,
+          image: img,
+          drawW: img.naturalWidth * scale,
+          drawH: img.naturalHeight * scale,
+          orientation,
+        });
       }
-
-      const DPI = 96;
-      const mmToPx = mm => Math.round((mm / 25.4) * DPI);
-
-      let pxW = mmToPx(pageW);
-      let pxH = mmToPx(pageH);
-
-      if (orientation === "landscape") [pxW, pxH] = [pxH, pxW];
-
-      const scale = Math.min(pxW / img.naturalWidth, pxH / img.naturalHeight, 1);
-
-      docPages.push({
-        width: pxW,
-        height: pxH,
-        image: img,
-        drawW: img.naturalWidth * scale,
-        drawH: img.naturalHeight * scale,
-        orientation
-      });
     }
 
     const first = docPages[0];
@@ -671,7 +503,6 @@ generateBtn.addEventListener("click", async () => {
 
     for (let i = 0; i < docPages.length; i++) {
       const p = docPages[i];
-
       if (i > 0) doc.addPage([p.width, p.height], p.orientation);
 
       const c = document.createElement("canvas");
@@ -682,7 +513,6 @@ generateBtn.addEventListener("click", async () => {
       ctx.drawImage(p.image, 0, 0);
 
       const dataURL = c.toDataURL("image/jpeg", 1.0);
-
       const x = (p.width - (p.drawW || p.width)) / 2;
       const y = (p.height - (p.drawH || p.height)) / 2;
 
@@ -700,5 +530,6 @@ generateBtn.addEventListener("click", async () => {
   generateBtn.textContent = "Generate PDF";
 });
 </script>
+
 </body>
 </html>
