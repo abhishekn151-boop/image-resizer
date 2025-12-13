@@ -3,35 +3,64 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>About Us — Free Image Resizer</title>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <title>About Us — Free Tools Hub</title>
+
+  <!-- Robots -->
+  <meta name="robots" content="index, follow" />
 
   <!-- SEO Meta -->
-  <meta name="description" content="About Free Image Resizer — a privacy-first, browser-based image resizing and compression tool." />
-  <meta name="keywords" content="about image resizer, who we are, image compression tool, privacy image editor" />
-  <link rel="canonical" href="https://your-domain.com/about.html" />
+  <meta name="description" content="About Free Tools Hub — a privacy-first platform offering free online tools for images, documents, and productivity." />
+  <meta name="keywords" content="about free tools hub, image resizer, privacy image editor, online tools" />
 
-  <!-- Social Preview -->
-  <meta property="og:title" content="About Free Image Resizer" />
-  <meta property="og:description" content="Learn more about Free Image Resizer — fast, free, and privacy-focused image editing." />
-  <meta property="og:image" content="assets/logo.png" />
+  <!-- Canonical -->
+  <link rel="canonical" href="https://freetoolshub.net/about.html" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="About Free Tools Hub" />
+  <meta property="og:description" content="Learn more about Free Tools Hub — fast, free, and privacy-focused online tools." />
+  <meta property="og:image" content="https://freetoolshub.net/assets/logo.png" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://freetoolshub.net/about.html" />
 
-  <link rel="stylesheet" href="style.css" />
+  <!-- CSS -->
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- Breadcrumb JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      {
+        "@type":"ListItem",
+        "position":1,
+        "name":"Home",
+        "item":"https://freetoolshub.net/"
+      },
+      {
+        "@type":"ListItem",
+        "position":2,
+        "name":"About Us",
+        "item":"https://freetoolshub.net/about.html"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
-<!-- TOP NAVIGATION BAR -->
-  <div id="navbar"></div>
+<!-- NAVBAR -->
+<div id="navbar"></div>
 <script>
-  fetch("components/navbar.html")
+  fetch("/components/navbar.html")
     .then(r => r.text())
     .then(html => {
       document.getElementById("navbar").innerHTML = html;
 
-      // Attach hamburger listener AFTER navbar loads
       const ham = document.getElementById("hamburger");
       const menu = document.getElementById("mobileMenu");
 
@@ -52,7 +81,7 @@
 <section class="seo-section" style="text-align: justify;">
   <h2>Who We Are</h2>
   <p>
-    Free Image Resizer started with a simple idea — image editing should be fast, private, and available to everyone.
+    Free Tools Hub started with a simple idea — online tools should be fast, private, and available to everyone..
     We noticed that most online tools upload your pictures to unknown servers, add watermarks, force sign-ups, or hide
     basic features behind subscriptions. We wanted to build something better.
   </p>
@@ -71,7 +100,7 @@
 
   <h3>Why We Built This Tool</h3>
   <p>
-    We built Free Image Resizer because we believe in:
+    We built Free Tools Hub because we believe in:
   </p>
 
   <ul>
@@ -99,7 +128,7 @@
 
   <h3>Behind the Tool</h3>
   <p>
-    Free Image Resizer is developed by a small team of passionate engineers and designers who believe that
+    Free Tools Hub is developed by a small team of passionate engineers and designers who believe that
     privacy-friendly tools are the future of the web. We focus heavily on performance, clean UI, and seamless user
     experience.
   </p>
@@ -111,6 +140,15 @@
     <li>No watermark on images</li>
     <li>No ads interrupting your workflow</li>
   </ul>
+
+  <p>
+  Free Tools Hub offers a growing collection of browser-based utilities, including tools like
+  <a href="/image-resizer/">Image Resizer</a>,
+  <a href="/png-to-jpg/">PNG to JPG</a>,
+  <a href="/jpg-to-png/">JPG to PNG</a>, and
+  <a href="/image-to-pdf/">Image to PDF</a>.
+  All tools are designed to work instantly without uploads, accounts, or data storage.
+</p>
 
   <h3>Our Commitment to Privacy</h3>
   <p>
@@ -130,25 +168,84 @@
     and offering tools that genuinely help people.
   </p>
 </section>
-
-
-<!-- FOOTER -->
-  <footer class="vertical-footer">
-  <ul>
-    <li><a href="about.html">About Us</a></li>
-    <li><a href="privacy.html">Privacy Policy</a></li>
-    <li><a href="terms.html">Terms of Service</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="faq.html">FAQ</a></li>
-  </ul>
-  <p>© <span id="year"></span> Free Image Resizer — All Rights Reserved.</p>
-</footer>
   
-<!-- JAVASCRIPT -->
-<script>
-  // Insert year
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+<!-- FOOTER -->
+<footer class="vertical-footer">
 
+  <div class="footer-container">
+
+    <!-- SITE LINKS -->
+    <div class="footer-col">
+      <h4>Site</h4>
+      <a href="/about.html">About Us</a>
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/faq.html">FAQ</a>
+    </div>
+
+    <!-- TOOLS LINKS -->
+    <div class="footer-col">
+      <h4>Tools</h4>
+      <a href="/image-compressor/">Image Compressor</a>
+      <a href="/image-resizer/">Image Resizer</a>
+      <a href="/jpg-to-png/">JPG to PNG</a>
+      <a href="/png-to-jpg/">PNG to JPG</a>
+      <a href="/image-to-pdf/">Image to PDF</a>
+    </div>
+
+  </div>
+
+  <p class="footer-copy">
+    © <span id="year"></span> Free Tools Hub — All Rights Reserved.
+  </p>
+
+</footer>
+
+  <style>
+.vertical-footer {
+  background: #0b1422;
+  border-top: 1px solid #162636;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  padding: 30px 15px;
+  flex-wrap: wrap;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.footer-col h4 {
+  color: #7fc6ff;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.footer-col a {
+  color: #c9d6e2;
+  text-decoration: none;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.footer-col a:hover {
+  color: #ffffff;
+}
+
+.footer-copy {
+  text-align: center;
+  padding: 15px 0 20px;
+  font-size: 14px;
+  color: #b0c4d4;
+}
+</style>
 </body>
 </html>
